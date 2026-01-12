@@ -1,0 +1,61 @@
+<div class="items-container">
+
+  <div class="header">
+    <input type="text" placeholder="Search by name or category" [formControl]="searchControl" />  <!--[(ngModel)]="searchControl" (input)="onSearch()"-->
+    <button routerLink="/create" class="add-button">Add Item</button>
+  </div>
+
+  <table class="items-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Quantity</th>
+        <th>Price</th>
+        <th>Category</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of items">
+        <td>{{ item.name }}</td>
+        <td>{{ item.quantity }}</td>
+        <td>{{ item.price }}</td>
+        <td>{{ item.category }}</td>
+        <td>
+        <tr *ngIf="itemToDelete && itemToDelete._id === item._id" class="confirm-row">
+      <td colspan="5">
+      <div class="confirm-box">
+      <p>Are you sure you want to delete <strong>{{itemToDelete.name}}</strong>?</p>
+      <button class="btn-yes" (click)="deleteItem(itemToDelete._id)">Yes, Delete</button>
+      <button class="btn-no" (click)="cancelDelete()">No, Cancel</button>
+    </div>
+  </td>
+</tr>
+          <button [routerLink]="['/edit', item._id]" class="edit-button">Edit</button>
+          <button (click)="confirmDelete(item)" class="delete-button">Delete</button>
+        </td>
+      </tr>
+
+    </tbody>
+  </table>
+
+  <div *ngIf="items.length === 0 " class="no-items">
+    No items found.
+  </div>
+<div class="pagination-container" *ngIf="items.length>0">
+
+    <button class="page-btn"
+            (click)="prevPage()"
+            [disabled]="currentpage === 1">
+      ← Previous
+    </button>
+
+   <span > page{{currentpage}}</span>
+
+    <button class="page-btn"
+            (click)="nextPage()"
+            [disabled]="currentpage * limit >= totalitems">
+      Next →
+    </button>
+  </div>
+  </div>

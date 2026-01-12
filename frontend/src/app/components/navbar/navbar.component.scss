@@ -1,0 +1,435 @@
+// .navbar {
+//   width: 100%;
+//   background-color: teal;
+//   padding: 20px;
+//   margin-bottom: 50px;
+//   display: flex;
+//   justify-content: space-between;
+//   align-items: center;
+// }
+
+// .nav-title {
+//   color: white;
+//   font-size: 24px;
+//   font-weight: 600;
+//   letter-spacing: 1px;
+//   margin: 0;
+// }
+
+// /* Navigation Buttons Container */
+// .nav-buttons {
+//   display: flex;
+//   align-items: center;
+//   gap: 15px;
+// }
+
+// .Logout {
+//   padding: 10px 20px;
+//   background-color: rgb(89, 222, 240);
+//   border: none;
+//   border-radius: 40px;
+//   color: black;
+//   font-size: 15px;
+//   cursor: pointer;
+//   transition: background-color 0.2s ease;
+//   white-space: nowrap;
+// }
+
+// .Logout:hover {
+//   background-color: rgb(70, 200, 220);
+//   transform: translateY(-1px);
+// }
+
+// @media (max-width: 768px) {
+//   .navbar {
+//     padding: 15px 20px;
+//     flex-wrap: wrap;
+//     gap: 10px;
+//   }
+
+//   .nav-title {
+//     font-size: 20px;
+//   }
+
+//   .Logout {
+//     padding: 8px 16px;
+//     font-size: 14px;
+//   }
+// }
+
+// @media (max-width: 480px) {
+//   .navbar {
+//     padding: 10px 15px;
+//   }
+
+//   .nav-title {
+//     font-size: 18px;
+//   }
+
+//   .Logout {
+//     padding: 6px 12px;
+//     font-size: 13px;
+//   }
+// }
+
+// /* Router Link Styles */
+// a {
+//   text-decoration: none;
+//   color: white;
+//   font-size: 16px;
+//   font-weight: 500;
+//   padding: 8px 16px;
+//   border-radius: 20px;
+//   transition: all 0.2s ease;
+//   margin: 0 10px;
+// }
+
+// a:hover {
+//   background-color: rgba(255, 255, 255, 0.1);
+//   transform: translateY(-1px);
+// }
+
+// a.active {
+//   background-color: rgb(89, 222, 240);
+//   color: black;
+// }
+
+// /* User Button Class */
+// .userbutton {
+//   padding: 10px 20px;
+//   background-color: rgb(89, 222, 240);
+//   border: none;
+//   border-radius: 40px;
+//   color: black;
+//   font-size: 15px;
+//   cursor: pointer;
+//   transition: all 0.2s ease;
+//   white-space: nowrap;
+//   text-decoration: none;
+//   display: inline-block;
+//   margin-right: 40px;
+// }
+
+// .userbutton:hover {
+//   background-color: rgb(70, 200, 220);
+//   transform: translateY(-1px);
+//   color: black;
+// }
+
+// .logout-btn {
+//   background-color: #e74c3c;
+//   color: white;
+// }
+
+// .logout-btn:hover {
+//   background-color: #c0392b;
+//   color: white;
+// }
+
+
+
+// Modern Navbar Variables
+:root {
+  --primary: #6366f1;
+  --primary-dark: #4f46e5;
+  --primary-light: #a5b4fc;
+  --secondary: #f59e0b;
+  --accent: #06b6d4;
+  --success: #10b981;
+  --danger: #ef4444;
+  --white: #ffffff;
+  --gray-900: #111827;
+  --gray-800: #1f2937;
+  --gray-700: #374151;
+  --gray-600: #4b5563;
+  --gray-100: #f3f4f6;
+  --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #06b6d4 100%);
+  --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  --gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  --gradient-danger: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+  --shadow-colored: 0 10px 25px -5px rgb(99 102 241 / 0.3);
+  --border-radius: 12px;
+  --border-radius-lg: 16px;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.navbar {
+  position: relative;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: var(--gradient-primary);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  box-shadow: var(--shadow-lg);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+  .nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    .brand-icon {
+      font-size: 32px;
+      filter: drop-shadow(0 2px 4px rgba(255, 255, 255, 0.3));
+      animation: pulse 2s infinite;
+    }
+
+    .nav-title {
+      color: var(--white);
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color:var(--transition);
+      background-clip: text;
+    }
+  }
+
+  .nav-buttons {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    color: white;
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+  }
+
+  .nav-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border: none;
+    //border-radius: var(--border-radius);
+    border-radius: 20px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+    color: white;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.6s;
+    }
+
+    &:hover::before {
+      left: 100%;
+    }
+
+    .btn-icon {
+      font-size: 18px;
+      filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+    }
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+
+    // Users button
+    &.nav-btn-users {
+     // background: var(--gradient-success);
+      background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+      color: var(teal);
+
+      &:hover {
+        box-shadow: 0 10px 25px -5px rgb(16 185 129 / 0.4);
+      }
+    }
+
+    // Inventory button
+    &.nav-btn-inventory {
+      background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+      color: var(--white);
+
+      &:hover {
+        box-shadow: 0 10px 25px -5px rgb(6 182 212 / 0.4);
+      }
+    }
+
+    // Logout button
+    &.nav-btn-logout {
+    //  background: var(--gradient-danger);
+     background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+      color: var(--white);
+
+      &:hover {
+        box-shadow: 0 10px 25px -5px rgb(239 68 68 / 0.4);
+      }
+    }
+  }
+}
+
+// Add padding to body to account for fixed navbar
+body {
+  padding-top: 80px;
+}
+
+// Pulse animation for brand icon
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+// Responsive Design
+@media (max-width: 1024px) {
+  .navbar {
+    .nav-container {
+      padding: 14px 20px;
+    }
+
+    .nav-brand .nav-title {
+      font-size: 24px;
+    }
+
+    .nav-buttons {
+      gap: 16px;
+
+      .nav-links {
+        gap: 12px;
+      }
+    }
+
+    .nav-btn {
+      padding: 10px 16px;
+      font-size: 14px;
+
+      .btn-icon {
+        font-size: 16px;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  body {
+    padding-top: 70px;
+  }
+
+  .navbar {
+    .nav-container {
+      padding: 12px 16px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .nav-brand {
+      .brand-icon {
+        font-size: 28px;
+      }
+
+      .nav-title {
+        font-size: 20px;
+      }
+    }
+
+    .nav-buttons {
+      width: 100%;
+      justify-content: space-between;
+      gap: 12px;
+
+      .nav-links {
+        gap: 8px;
+      }
+    }
+
+    .nav-btn {
+      padding: 8px 12px;
+      font-size: 13px;
+
+      span:not(.btn-icon) {
+        display: none;
+      }
+
+      .btn-icon {
+        font-size: 18px;
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar {
+    .nav-container {
+      padding: 10px 12px;
+    }
+
+    .nav-brand {
+      .brand-icon {
+        font-size: 24px;
+      }
+
+      .nav-title {
+        font-size: 18px;
+      }
+    }
+
+    .nav-btn {
+      padding: 6px 10px;
+
+      .btn-icon {
+        font-size: 16px;
+      }
+    }
+  }
+}
+
+// Hover effects for better interactivity
+.nav-btn {
+  &:hover {
+    .btn-icon {
+      animation: bounce 0.6s ease-in-out;
+    }
+  }
+}
+
+@keyframes bounce {
+  0%, 20%, 60%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-4px);
+  }
+  80% {
+    transform: translateY(-2px);
+  }
+}

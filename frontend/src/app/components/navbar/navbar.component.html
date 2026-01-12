@@ -1,0 +1,61 @@
+<!--
+<header class="navbar">
+  <span class="nav-title">{{ title() }}</span>
+
+  <div class="nav-buttons" *ngIf="isAuthenticated()">
+    <div class="left-buttons">
+
+      <button *ngIf="isadmin()"  routerLink='/users/all' class="userbutton">Users</button>
+      <button routerLink="/inventory/all" class="userbutton">Inventory</button>
+    </div>
+    <button (click)="onLogout()" class="userbutton logout-btn">Logout</button>
+  </div>
+</header>
+
+<header class="navbar">
+  <nav class="nav-container">
+    <span class="nav-title">{{ title() }}</span>
+  </nav>
+  <nav *ngIf="isAuthenticated()">
+  <a  (click)="onLogout()" class="Logout">Logout</a>
+  <nav>
+   <button routerLink='/users/all' class="userbutton">Users</button>
+   <button routerLink="/inventory/all" class="inventorybutton">Inventory</button>
+  </nav>
+</nav>
+
+</header>-->
+
+
+
+<header class="navbar">
+  <div class="nav-container">
+    <div class="nav-brand">
+      <div class="brand-icon">📦</div>
+      <span class="nav-title">{{ title() }}</span>
+    </div>
+
+    <div class="nav-buttons" *ngIf="isAuthenticated()">
+      <div class="nav-links">
+
+         <button  routerLink='/homepage' class="nav-btn nav-btn-users">
+          <span class="btn-icon">👥</span>
+          <span>Home</span>
+        </button>
+        <!-- <button class="nav-btn nav-btn-users" routerLink="/homepage">Home</button> -->
+        <button *ngIf="isadmin()" routerLink='/users/all' class="nav-btn nav-btn-users">
+          <span class="btn-icon">👥</span>
+          <span>Users</span>
+        </button>
+        <button routerLink="/inventory/all" class="nav-btn nav-btn-inventory">
+          <span class="btn-icon">📦</span>
+          <span>Inventory</span>
+        </button>
+      </div>
+      <button (click)="onLogout()" class="nav-btn nav-btn-logout">
+        <span class="btn-icon">🚪</span>
+        <span>Logout</span>
+      </button>
+    </div>
+  </div>
+</header>

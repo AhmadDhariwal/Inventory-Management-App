@@ -1,0 +1,112 @@
+
+<div class="form">
+  <form [formGroup]="userForm" class="form-item" >
+
+
+    <label for="name" >Name</label>
+    <input type="text" placeholder="Name of the User" id="name" formControlName="name">
+
+    @if ( submitted || userForm.get('name')?.invalid && userForm.get('name')?.dirty || userForm.get('name')?.touched) {
+
+    <div >
+        @if (userForm.get('name')?.hasError('required')) {
+          <div  class="error-box">Name is required.</div>
+        }
+       @if (userForm.get('name')?.hasError('minlength')){
+        <div  class="error-box">Length Should be greater than 7</div>
+       }
+       @if (userForm.get('name')?.hasError('maxlength')){
+        <div  class="error-box">Length Should be less than 50</div>
+       }
+       @if (userForm.get('name')?.hasError('pattern')){
+        <div  class="error-box">Name should has not special chracter or space</div>
+       }
+      </div>
+    }
+    <br>
+
+    <label for="email">Email</label>
+    <input type="text" placeholder="Write the email" id="email" formControlName="email" ><br>
+
+    @if ( submitted || userForm.get('email')?.invalid && userForm.get('email')?.dirty || userForm.get('email')?.touched) {
+
+    <div >
+        @if (userForm.get('email')?.hasError('required')) {
+          <div  class="error-box">Email is required.</div>
+        }
+       @if (userForm.get('email')?.hasError('email')){
+        <div  class="error-box">Email should be valid</div>
+       }
+       </div>
+      }
+
+     <label for="username">username</label>
+    <input type="text" placeholder="Write the username" id="username" formControlName="username"><br>
+
+    @if ( submitted || userForm.get('username')?.invalid && userForm.get('username')?.dirty || userForm.get('username')?.touched) {
+
+    <div >
+        @if (userForm.get('username')?.hasError('required')) {
+          <div  class="error-box">username is required.</div>
+        }
+       @if (userForm.get('username')?.hasError('min')){
+        <div  class="error-box">Length Should be greater than 8</div>
+       }
+       @if (userForm.get('username')?.hasError('max')){
+        <div  class="error-box">Length Should be less than 100</div>
+       }
+      </div>
+    }
+
+     <label for="password">Password</label>
+  <!---  <input type="text" placeholder="Write the Password" id="password" formControlName="password" required><br>  -->
+
+   <input [type]="show ?  'text' : 'password'" placeholder="Write the Password"  class="password" id="password" formControlName = "password">
+    <button (click)="toggleShow()">{{ show ? 'Hide' : 'Show' }}</button>
+
+    @if ( submitted || userForm.get('password')?.invalid && userForm.get('password')?.dirty || userForm.get('password')?.touched) {
+
+    <div>
+        @if (userForm.get('password')?.hasError('required')) {
+          <div  class="error-box">Password is required.</div>
+        }
+       @if (userForm.get('password')?.hasError('max')){
+        <div  class="error-box">Length Should be less than 250</div>
+       }
+       @if (userForm.get('password')?.hasError('pattern')){
+        <div  class="error-box">Password should has atleast 8 chracters , One uppercase , One lowercase , One number and One special chracters </div>
+       }
+      </div>
+    }
+
+
+   <label for="role">Role</label>
+<select id="role" class="role" formControlName="role">
+  <option value="" >Select Role</option>   <!--disabled selected-->
+  <option class="optionn" value="admin">admin</option>
+  <option class="optionn" value="user">user</option>
+</select>
+
+@if (submitted || (userForm.get('role')?.invalid && (userForm.get('role')?.dirty || userForm.get('role')?.touched))) {
+  <div >
+    @if (userForm.get('role')?.hasError('required')) {
+      <div class="error-box">Role is required.</div>
+    }
+  </div>
+}
+
+
+    <input (click)="onsubmit()" type="submit" value="Sign Up"  >
+     <button [routerLink]="['login']" type="submit"> Login here </button>
+  </form>
+</div>
+
+   <!-- <input (click)="onCreate()" type="submit" value="submit"  >-->
+      <!-- <button (click)="onSubmit()" type="submit" value="submit"> {{ userid ? 'Save Changes' : 'Add Item' }}   </button> -->
+
+
+  <!-- <p *ngIf="message" style="text-align:center; margin-top:10px;">
+  {{ message }}
+</p>-->
+
+

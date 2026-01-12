@@ -1,0 +1,31 @@
+<div class="users-container">
+
+  <!--<div class="header">
+    <input type="text" placeholder="Search by name or category" [formControl]="searchControl" />  [(ngModel)]="searchControl" (input)="onSearch()"
+  </div>-->
+
+  <table class="users-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Username</th>
+        <th>Password</th>
+        <th>Role</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let user of users">
+        <td>{{ user.name }}</td>
+        <td>{{ user.email }}</td>
+        <td>{{ user.username }}</td>
+        <td>{{ user.password }}</td>
+        <td>{{user.role}}</td>
+        <td>
+
+</tr>
+ <div *ngIf="users.length === 0 " class="no-items">
+    No items found.
+  </div>
+    </tbody>
+  </table>

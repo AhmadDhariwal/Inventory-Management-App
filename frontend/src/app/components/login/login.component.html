@@ -1,0 +1,66 @@
+
+<div class="form">
+  <form [formGroup]="userForm" class="form-item" >
+
+     <label for="username">username</label>
+    <input type="text" placeholder="Write the username" id="username" formControlName="username"><br>
+
+    @if ( userForm.get('username')?.invalid && userForm.get('username')?.dirty || userForm.get('username')?.touched) {
+
+    <div >
+        @if (userForm.get('username')?.hasError('required')) {
+          <div  class="error-box">username is required.</div>
+        }
+       @if (userForm.get('username')?.hasError('min')){
+        <div  class="error-box">Length Should be greater than 8</div>
+       }
+       @if (userForm.get('username')?.hasError('max')){
+        <div  class="error-box">Length Should be less than 100</div>
+       }
+      </div>
+    }
+
+     <label for="password">Password</label>
+<!--    <input type="text" placeholder="Write the Password" id="password" formControlName="password" required  #passwordfield> -->
+     <input [type]="show ?  'text' : 'password'" placeholder="Write the Password"  class="password" id="password" formControlName = "password">
+    <button (click)="toggleShow()">{{ show ? 'Hide' : 'Show' }}</button>
+
+
+    @if (  userForm.get('password')?.invalid && userForm.get('password')?.dirty || userForm.get('password')?.touched) {
+
+    <div>
+        @if (userForm.get('password')?.hasError('required')) {
+          <div  class="error-box">Password is required.</div>
+        }
+       @if (userForm.get('password')?.hasError('max')){
+        <div  class="error-box">Length Should be less than 250</div>
+       }
+       @if (userForm.get('password')?.hasError('pattern')){
+        <div  class="error-box">Password should has atleast 8 chracters , One uppercase , One lowercase , One number and One special chracters </div>
+       }
+
+
+      </div>
+    }
+    <input (click)="onsubmit()" type="submit" value="Login"  >
+
+<!--<div>
+    @if ( submitted ||userForm.get('submit')?.invalid && userForm.get('submit')?.dirty || userForm.get('submit')?.touched) {
+     <div class="error-box">
+       {{message}}
+     </div>
+    }
+     </div>-->
+
+   <div>
+  @if (message) {
+    <div class="error-box">
+      {{message}}
+    </div>
+  }
+</div>
+
+
+     <button [routerLink]="['/']" type="submit"> Not Register? Sign Up here </button>
+  </form>
+</div>
