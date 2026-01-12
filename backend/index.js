@@ -5,6 +5,7 @@ const inventoryschema = require("./src/models/model");
 const { connecttomongodb} = require('./connect');
 const route = require("./src/routes/route");
 const inventoryroute = require("./src/routes/inventory.routes")
+const supplierroute = require("./src/routes/supplier.routes");
 const cors = require('cors');
 const userroute = require('./src/routes/user');
 const { verifytoken,restrictto } = require('./src/middleware/auth.middleware');
@@ -37,6 +38,7 @@ app.use(cookieParser());
 app.use('/items',verifytoken,restrictto(["admin","user"]), route);
 app.use('/user',userroute);
 app.use('/api/inventory',verifytoken ,inventoryroute);
+app.use("/api/suppliers", supplierroute);
 
 // app.get('/', (req, res) => {
 //   res.send('Hello World'); 
