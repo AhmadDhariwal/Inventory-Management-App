@@ -1,9 +1,9 @@
-const Purchase = require("../models/purchaseorder");
+const Purchaseorder = require("../models/purchaseorder");
 const Product = require("../models/product");
 const Supplier = require("../models/supplier");
 const StockMovement = require("../models/stockmovement");
 
-const createpurchase = async (data, userId) => {
+const createpurchaseorder = async (data, userId) => {
   const { supplier, items } = data;
 
   
@@ -11,7 +11,7 @@ const createpurchase = async (data, userId) => {
   if (!supplierexists || supplierexists.status === "inactive") {
     throw new Error("Supplier not found or inactive");
   }
-
+  let totalquantity = 0;
   let totalAmount = 0;
 
   for (let item of items) {
@@ -20,29 +20,33 @@ const createpurchase = async (data, userId) => {
       throw new Error("Product not found");
     }
 
+    
     product.stockQuantity += item.quantity;
     await product.save();
 
     await StockMovement.create({
       product: item.product,
+      warehouse: item.warehouse || null, // optional, you can add warehouse if needed
       type: "IN",
       quantity: item.quantity,
       reason: "PURCHASE",
       user: userId,
     });
 
-    totalAmount += item.quantity * item.costPrice;
+    item.total= item.quantity * item.costprice;
+    totalquantity += item.quantity; 
+    totalAmount += item.total;
   }
 
-  // 3. Save purchase
-  const purchase = await purchaseorder.create({
+
+  const purchaseorder = await Purchaseorder.create({
     supplier,
     items,
     totalAmount,
     createdBy: userId,
   });
 
-  return purchase;
+  return purchaseorder;
 };
 
-module.exports = { createpurchase };
+module.exports = { createpurchaseorder };

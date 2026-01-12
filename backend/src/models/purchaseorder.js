@@ -7,7 +7,6 @@ const purchaseorderschema = new mongoose.Schema(
       ref: "Supplier",
       required: true,
     },
-
     items: [
       {
         product: {
@@ -20,18 +19,16 @@ const purchaseorderschema = new mongoose.Schema(
           required: true,
           min: 1,
         },
-        costPrice: {
+        costprice: {
           type: Number,
           required: true,
         },
       },
     ],
-
     totalAmount: {
       type: Number,
       required: true,
     },
-
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -41,5 +38,5 @@ const purchaseorderschema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const purchaseorder = mongoose.model("Purchase", purchaseorderschema);
-module.exports = purchaseorder;
+const purchaseorder = mongoose.model("PurchaseOrder", purchaseorderschema);
+module.exports= purchaseorder;
