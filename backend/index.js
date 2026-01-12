@@ -7,6 +7,7 @@ const route = require("./src/routes/route");
 const inventoryroute = require("./src/routes/inventory.routes")
 const purchaseorderroutes = require("./src/routes/purchaseorder.routes");
 const supplierroute = require("./src/routes/supplier.routes");
+const salesorderroutes = require("./src/routes/salesorder.routes");
 const cors = require('cors');
 const userroute = require('./src/routes/user');
 const { verifytoken,restrictto } = require('./src/middleware/auth.middleware');
@@ -41,6 +42,7 @@ app.use('/user',userroute);
 app.use('/api/inventory',verifytoken ,inventoryroute);
 app.use("/api/suppliers", supplierroute);
 app.use("/api/purchaseorders", purchaseorderroutes);
+app.use("/api/salesorders", salesorderroutes);
 
 
 // app.get('/', (req, res) => {
