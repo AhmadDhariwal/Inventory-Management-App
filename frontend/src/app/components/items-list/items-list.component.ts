@@ -104,7 +104,7 @@ showDeleteConfirmation: boolean = false;
 confirmDelete(item:any){
 
   this.itemToDelete = item;
-  this.loadItems();
+  //this.loadItems();
 }
 cancelDelete(){
   this.itemToDelete = null;
@@ -115,12 +115,12 @@ deleteItem(id: string) {
     next: () => {
       this.showDeleteConfirmation = false;
       this.itemToDelete = null;
-
+      this.items=this.items.filter((item:any) => item._id !== id)
       if (this.items.length === 1 && this.currentpage > 1) {
        this.currentpage--;
       }
 
-      this.loadItems();
+      //this.loadItems();
     },
     error: (err) => {
       console.error('Error deleting item', err);
