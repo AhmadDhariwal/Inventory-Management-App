@@ -1,0 +1,26 @@
+.sidebar {
+  width: 260px;
+  background: var(--primary);
+  color: #fff;
+  padding: 20px;
+
+  &__logo {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 30px;
+  }
+
+  &__nav a {
+    display: block;
+    padding: 12px;
+    color: #d1d5db;
+    text-decoration: none;
+    border-radius: 6px;
+
+    &.active,
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+  }
+}

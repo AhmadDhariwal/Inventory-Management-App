@@ -1,0 +1,13 @@
+.footer {
+  height: 48px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 0 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  font-size: 13px;
+  color: var(--muted);
+}

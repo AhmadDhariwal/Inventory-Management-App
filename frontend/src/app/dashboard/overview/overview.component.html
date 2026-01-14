@@ -1,1 +1,84 @@
-<p>overview works!</p>
+<section class="dashboard">
+
+  <!-- Header -->
+  <div class="dashboard__header">
+    <h1 class="dashboard__title">Inventory Overview</h1>
+    <p class="dashboard__subtitle">
+      Real-time snapshot of global inventory performance
+    </p>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="dashboard__loading">
+    Loading dashboard data...
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error" class="dashboard__error">
+    {{ error }}
+  </div>
+
+  <!-- Content -->
+  <ng-container *ngIf="!loading && !error">
+
+    <!-- KPI CARDS -->
+    <div class="dashboard__kpis">
+
+      <div class="kpi-card">
+        <span class="kpi-card__label">Total Products</span>
+        <strong class="kpi-card__value">
+          {{ stats.totalproducts }}
+        </strong>
+      </div>
+
+      <div class="kpi-card">
+        <span class="kpi-card__label">Total Suppliers</span>
+        <strong class="kpi-card__value">
+          {{ stats.totalsuppliers }}
+        </strong>
+      </div>
+
+      <div class="kpi-card">
+        <span class="kpi-card__label">Total Stock</span>
+        <strong class="kpi-card__value">
+          {{ stats.totalstock }}
+        </strong>
+      </div>
+
+      <div class="kpi-card">
+        <span class="kpi-card__label">Total Purchases</span>
+        <strong class="kpi-card__value">
+          {{ stats.totalpurchases }}
+        </strong>
+      </div>
+
+    </div>
+
+    <!-- LOW STOCK SECTION -->
+    <div class="dashboard__section">
+      <h2 class="dashboard__section-title">Low Stock Alerts</h2>
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>SKU</th>
+            <th>Stock</th>
+            <th>Min Level</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let item of stats.lowstockproducts">
+            <td>{{ item.name }}</td>
+            <td>{{ item.sku }}</td>
+            <td>{{ item.stockQuantity }}</td>
+            <td>{{ item.minStockLevel }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </ng-container>
+
+</section>

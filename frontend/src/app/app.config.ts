@@ -12,6 +12,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(),
     importProvidersFrom(ReactiveFormsModule),
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(routes), provideAnimationsAsync('noop')
+    provideRouter(routes), provideAnimationsAsync('noop'),
+       provideRouter(routes),
   ]
 };

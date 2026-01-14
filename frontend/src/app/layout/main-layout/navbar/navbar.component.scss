@@ -1,0 +1,18 @@
+.navbar {
+  height: 64px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  &__title {
+    font-weight: 600;
+    font-size: 18px;
+  }
+
+  &__user {
+    color: var(--muted);
+  }
+}

@@ -1,0 +1,95 @@
+.dashboard {
+  padding: 24px;
+
+  /* Header */
+  &__header {
+    margin-bottom: 24px;
+  }
+
+  &__title {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+
+  &__subtitle {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+    margin-top: 4px;
+  }
+
+  /* KPI Grid */
+  &__kpis {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  /* Section Container */
+  &__section {
+    background: var(--color-surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+  }
+
+  &__section-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+
+  /* States */
+  &__loading,
+  &__error {
+    padding: 20px;
+    background: var(--color-surface);
+    border-radius: 8px;
+    color: var(--color-text-secondary);
+  }
+}
+
+/* KPI Card */
+.kpi-card {
+  height: 110px;
+  background: var(--color-surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  &__label {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    margin-bottom: 6px;
+  }
+
+  &__value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--color-text-primary);
+  }
+}
+
+/* Table */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th,
+  td {
+    padding: 12px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+  }
+
+  th {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    font-weight: 500;
+  }
+}
