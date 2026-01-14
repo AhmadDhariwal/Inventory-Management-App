@@ -25,7 +25,7 @@ const purchaseorderschema = new mongoose.Schema(
         },
       },
     ],
-    totalAmount: {
+    totalamount: {
       type: Number,
       required: true,
     },
