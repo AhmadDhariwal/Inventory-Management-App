@@ -1,0 +1,15 @@
+<div class="widget-card" [ngStyle]="{'border-left-color': color || '#4caf50'}">
+  <div class="widget-card__icon" *ngIf="icon">
+    <i [class]="icon"></i>
+  </div>
+
+  <div class="widget-card__content">
+    <span class="widget-card__title">{{ title }}</span>
+    <strong class="widget-card__value">{{ value }}</strong>
+  </div>
+
+  <div class="widget-card__trend" *ngIf="trend">
+    <i *ngIf="trend === 'up'" class="fa fa-arrow-up trend-up"></i>
+    <i *ngIf="trend === 'down'" class="fa fa-arrow-down trend-down"></i>
+  </div>
+</div>

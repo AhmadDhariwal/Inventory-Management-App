@@ -2,11 +2,12 @@
   <div class="sidebar__logo">Inventory ERP</div>
 
   <nav class="sidebar__nav">
-    <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
-    <a routerLink="/products">Products</a>
-    <a routerLink="/purchases">Purchases</a>
-    <a routerLink="/stock">Stock</a>
-    <a routerLink="/reports">Reports</a>
-    <a routerLink="/settings">Settings</a>
+    <a routerLink="/dashboard" routerLinkActive="active" (click)="close.emit()">Dashboard</a>
+    <a routerLink="/products" (click)="close.emit()">Products</a>
+    <a routerLink="/purchases" (click)="close.emit()">Purchases</a>
+    <a routerLink="/stock" (click)="close.emit()">Stock</a>
+    <a routerLink="/reports" (click)="close.emit()">Reports</a>
+    <a routerLink="/settings" (click)="close.emit()">Settings</a>
   </nav>
 </aside>
+<div class="sidebar__overlay" (click)="close.emit()"></div>

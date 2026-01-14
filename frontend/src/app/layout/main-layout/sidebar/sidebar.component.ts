@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 @Component({
@@ -9,10 +9,5 @@ import { RouterLink } from '@angular/router';
   styleUrl: './sidebar.component.scss'
 })
 export class SidebarComponent {
- // @Input() open: boolean = true;
-    sidebarOpen = true;
-
-  toggleSidebar() {
-    this.sidebarOpen = !this.sidebarOpen;
-  }
+  @Output() close = new EventEmitter<void>();
 }

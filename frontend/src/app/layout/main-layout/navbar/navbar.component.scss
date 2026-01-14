@@ -7,6 +7,29 @@
   align-items: center;
   justify-content: space-between;
 
+  &__menu-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-right: 16px;
+
+    span {
+      width: 24px;
+      height: 2px;
+      background: #000;
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+
+    &:hover span {
+      background: var(--primary);
+    }
+  }
+
   &__title {
     font-weight: 600;
     font-size: 18px;

@@ -1,5 +1,11 @@
 <header class="navbar">
-  <div class="navbar__title">Dashboard</div>
+  <button type="button" class="navbar__menu-btn" (click)="toggleSidebar.emit()" aria-label="Toggle menu">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+  
+  <div class="navbar__title">{{ pageTitle }}</div>
 
   <div class="navbar__actions">
     <span class="navbar__user">Admin</span>

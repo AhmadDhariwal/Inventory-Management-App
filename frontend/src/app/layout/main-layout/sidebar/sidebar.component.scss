@@ -1,8 +1,14 @@
 .sidebar {
+  position: fixed;
+  top: 0;
+  left: -260px;
   width: 260px;
+  height: 100vh;
   background: var(--primary);
   color: #fff;
   padding: 20px;
+  transition: left 0.3s ease;
+  z-index: 1000;
 
   &__logo {
     font-size: 20px;
@@ -23,4 +29,23 @@
       color: #fff;
     }
   }
+
+  &__overlay {
+    display: none;
+  }
+}
+
+:host-context(.sidebar-open) .sidebar {
+  left: 0;
+}
+
+:host-context(.sidebar-open) .sidebar__overlay {
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
 }

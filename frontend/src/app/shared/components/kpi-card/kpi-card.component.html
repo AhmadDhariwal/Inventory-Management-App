@@ -1,0 +1,15 @@
+<div class="kpi-card">
+  <div class="kpi-card__content">
+    <span class="kpi-card__label">{{ label }}</span>
+    <strong class="kpi-card__value">{{ value }}</strong>
+  </div>
+
+  <div
+    *ngIf="trend !== undefined"
+    class="kpi-card__trend"
+    [class.kpi-card__trend--up]="trend! > 0"
+    [class.kpi-card__trend--down]="trend! < 0"
+  >
+    {{ trend! > 0 ? '+' : '' }}{{ trend }}%
+  </div>
+</div>
