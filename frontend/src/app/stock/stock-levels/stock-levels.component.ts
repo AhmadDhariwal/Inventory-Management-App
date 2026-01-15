@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component,OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { StockDetailDrawerComponent } from '../stock-detail-drawer/stock-detail-drawer.component';
 
 interface StockLevel {
   sku: string;
@@ -17,7 +18,7 @@ interface StockLevel {
 @Component({
   selector: 'app-stock-levels',
   standalone: true,
-  imports: [RouterLink, CommonModule, FormsModule],
+  imports: [RouterLink, CommonModule, FormsModule, StockDetailDrawerComponent],
   templateUrl: './stock-levels.component.html',
   styleUrl: './stock-levels.component.scss'
 })
@@ -77,4 +78,14 @@ export class StockLevelsComponent implements OnInit {
        item.sku.toLowerCase().includes(this.searchText.toLowerCase()))
     );
   }
+  selectedStock: any = null;
+
+openDrawer(stock: any) {
+  this.selectedStock = stock;
+}
+
+closeDrawer() {
+  this.selectedStock = null;
+}
+
 }

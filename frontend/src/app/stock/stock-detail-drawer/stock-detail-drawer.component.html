@@ -1,0 +1,253 @@
+<div class="drawer-overlay" (click)="close.emit()"></div>
+
+<aside class="stock-drawer">
+
+  <div class="drawer-header">
+    <div>
+      <h2>{{ stock.productName }}</h2>
+      <span class="sku">{{ stock.sku }}</span>
+    </div>
+
+    <button class="close-btn" (click)="close.emit()">×</button>
+  </div>
+
+  <div class="drawer-content">
+
+    <section class="drawer-section">
+      <h3>Stock Information</h3>
+
+      <div class="info-grid">
+        <div>
+          <label>Category</label>
+          <span>{{ stock.category }}</span>
+        </div>
+
+        <div>
+          <label>Warehouse</label>
+          <span>{{ stock.warehouse }}</span>
+        </div>
+
+        <div>
+          <label>Available Quantity</label>
+          <span>{{ stock.availableQty }}</span>
+        </div>
+
+        <div>
+          <label>Reserved Quantity</label>
+          <span>{{ stock.reservedQty }}</span>
+        </div>
+
+        <div>
+          <label>Reorder Level</label>
+          <span>{{ stock.reorderLevel }}</span>
+        </div>
+
+        <div>
+          <label>Status</label>
+          <span class="status" [ngClass]="stock.status.toLowerCase()">
+            {{ stock.status }}
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <section class="drawer-section">
+      <h3>Recent Movements</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Quantity</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td>2026-01-10</td>
+            <td>Inbound</td>
+            <td>+50</td>
+          </tr>
+          <tr>
+            <td>2026-01-08</td>
+            <td>Outbound</td>
+            <td>-20</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+  </div>
+
+</aside>
+
+<!-- <div class="drawer-overlay" (click)="close.emit()"></div>
+
+<aside class="stock-drawer">
+
+  <div class="drawer-header">
+    <div class="header-content">
+      <h2>{{ stock.productName }}</h2>
+      <span class="sku">SKU: {{ stock.sku }}</span>
+    </div>
+
+    <button class="close-btn" (click)="close.emit()" aria-label="Close drawer">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+  </div>
+
+  <div class="drawer-content">
+
+    <section class="drawer-section">
+      <div class="section-header">
+        <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+        </svg>
+        <h3>Stock Overview</h3>
+      </div>
+
+      <div class="info-grid two-column">
+        <div class="info-item">
+          <label>Available Quantity</label>
+          <span class="value large">{{ stock.availableQty }}</span>
+        </div>
+
+        <div class="info-item">
+          <label>Status</label>
+          <span class="status-badge" [ngClass]="'status-' + stock.status.toLowerCase()">
+            <span class="status-dot"></span>
+            {{ stock.status }}
+          </span>
+        </div>
+
+        <div class="info-item">
+          <label>Reserved Quantity</label>
+          <span class="value">{{ stock.reservedQty }}</span>
+        </div>
+
+        <div class="info-item">
+          <label>Reorder Level</label>
+          <span class="value">{{ stock.reorderLevel }}</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="drawer-section">
+      <div class="section-header">
+        <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"/>
+        </svg>
+        <h3>Product Details</h3>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-item">
+          <label>Category</label>
+          <span class="value">{{ stock.category }}</span>
+        </div>
+
+        <div class="info-item">
+          <label>Warehouse Location</label>
+          <span class="value">{{ stock.warehouse }}</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="drawer-section">
+      <div class="section-header">
+        <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="20" x2="18" y2="10"/>
+          <line x1="12" y1="20" x2="12" y2="4"/>
+          <line x1="6" y1="20" x2="6" y2="14"/>
+        </svg>
+        <h3>Key Metrics</h3>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-header">
+          <span class="metric-label">Total Stock Value</span>
+          <svg class="metric-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="1" x2="12" y2="23"/>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+        </div>
+        <div class="metric-value">${{ (stock.availableQty * 25) | number:'1.0-0' }}</div>
+        <div class="metric-change positive">↗ 12% from last month</div>
+      </div>
+    </section>
+
+    <section class="drawer-section">
+      <div class="section-header">
+        <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="23,6 13.5,15.5 8.5,10.5 1,18"/>
+          <polyline points="17,6 23,6 23,12"/>
+        </svg>
+        <h3>Recent Movements</h3>
+      </div>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Quantity</th>
+            <th>Reference</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td>Jan 10, 2026</td>
+            <td>
+              <span class="status-badge status-ok">
+                <span class="status-dot"></span>
+                Inbound
+              </span>
+            </td>
+            <td>+50</td>
+            <td>PO-2026-001</td>
+          </tr>
+          <tr>
+            <td>Jan 08, 2026</td>
+            <td>
+              <span class="status-badge status-low">
+                <span class="status-dot"></span>
+                Outbound
+              </span>
+            </td>
+            <td>-20</td>
+            <td>SO-2026-045</td>
+          </tr>
+          <tr>
+            <td>Jan 05, 2026</td>
+            <td>
+              <span class="status-badge status-ok">
+                <span class="status-dot"></span>
+                Inbound
+              </span>
+            </td>
+            <td>+100</td>
+            <td>PO-2026-002</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+  </div>
+
+  <div class="action-buttons">
+    <button class="btn btn-secondary" (click)="close.emit()">
+      View Full History
+    </button>
+    <button class="btn btn-primary">
+      Update Stock
+    </button>
+  </div>
+
+</aside>
+ -->

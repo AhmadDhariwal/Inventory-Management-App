@@ -38,7 +38,7 @@
       </thead>
 
       <tbody>
-        <tr *ngFor="let item of filteredStock()">
+        <tr *ngFor="let item of filteredStock()" >
           <td>{{ item.sku }}</td>
           <td>{{ item.productName }}</td>
           <td>{{ item.category }}</td>
@@ -55,5 +55,26 @@
       </tbody>
     </table>
   </div>
+<section class="stock-levels">
+
+  <table class="data-table">
+    <tr
+      *ngFor="let stock of stockLevels"
+      (click)="openDrawer(stock)"
+      class="data-table__row"
+    >
+      <td>{{ stock.productName }}</td>
+      <td>{{ stock.warehouse }}</td>
+      <td>{{ stock.availableQty }}</td>
+    </tr>
+  </table>
+
+</section>
+<div class="drawer-overlay" *ngIf="selectedStock">
+
+  <app-stock-detail-drawer
+    [stock]="selectedStock"
+    (close)="closeDrawer()">
+  </app-stock-detail-drawer>
 
 </div>
