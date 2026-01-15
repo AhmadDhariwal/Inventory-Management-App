@@ -1,0 +1,95 @@
+<section class="inventory-overview">
+
+  <!-- PAGE HEADER -->
+  <header class="inventory-overview__header">
+    <div class="inventory-overview__title-group">
+      <h1 class="inventory-overview__title">Inventory Overview</h1>
+      <p class="inventory-overview__subtitle">
+        Global inventory status across warehouses and locations
+      </p>
+    </div>
+
+    <div class="inventory-overview__actions">
+      <button class="btn btn--secondary">
+        Export Summary
+      </button>
+    </div>
+  </header>
+
+  <!-- KPI SECTION -->
+  <div class="inventory-overview__kpis">
+
+    <div class="kpi-card kpi-card--primary">
+      <span class="kpi-card__label">Total Products</span>
+      <strong class="kpi-card__value">1,248</strong>
+      <span class="kpi-card__meta">Active SKUs confirming stock</span>
+    </div>
+
+    <div class="kpi-card">
+      <span class="kpi-card__label">Total Stock Units</span>
+      <strong class="kpi-card__value">84,392</strong>
+      <span class="kpi-card__meta">Units available globally</span>
+    </div>
+
+    <div class="kpi-card">
+      <span class="kpi-card__label">Stock Value</span>
+      <strong class="kpi-card__value">$12.6M</strong>
+      <span class="kpi-card__meta">Based on latest cost</span>
+    </div>
+
+    <div class="kpi-card kpi-card--warning">
+      <span class="kpi-card__label">Low Stock Items</span>
+      <strong class="kpi-card__value">37</strong>
+      <span class="kpi-card__meta">Require immediate review</span>
+    </div>
+
+  </div>
+
+  <!-- LOW STOCK PREVIEW -->
+  <section class="inventory-overview__panel">
+    <header class="panel-header">
+      <h2 class="panel-header__title">Critical Stock Alerts</h2>
+      <a routerLink="/stock/movements" class="panel-header__link">
+        View All Movements
+      </a>
+    </header>
+
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>SKU</th>
+          <th>Warehouse</th>
+          <th class="align-right">Available</th>
+          <th class="align-right">Reorder Level</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr>
+          <td>Wireless Scanner</td>
+          <td>WS-2041</td>
+          <td>Berlin Hub</td>
+          <td class="align-right">18</td>
+          <td class="align-right">50</td>
+          <td>
+            <span class="status-badge status-badge--critical">Critical</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td>Thermal Printer</td>
+          <td>TP-8892</td>
+          <td>Dubai DC</td>
+          <td class="align-right">42</td>
+          <td class="align-right">60</td>
+          <td>
+            <span class="status-badge status-badge--low">Low</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+</section>

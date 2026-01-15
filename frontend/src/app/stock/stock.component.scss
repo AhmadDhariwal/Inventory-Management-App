@@ -1,0 +1,163 @@
+.stock-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #f8f9fa;
+}
+
+.stock-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2rem 2.5rem;
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+
+  &__content {
+    flex: 1;
+  }
+
+  &__title {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 0.5rem 0;
+    letter-spacing: -0.025em;
+  }
+
+  &__subtitle {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin: 0;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 0.75rem;
+  }
+}
+
+.stock-tabs {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0 2.5rem;
+  background: white;
+  border-bottom: 2px solid #e5e7eb;
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #6b7280;
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    position: relative;
+
+    svg {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+    }
+
+    &:hover {
+      color: #111827;
+      background: #f9fafb;
+    }
+
+    &--active {
+      color: #2563eb;
+      border-bottom-color: #2563eb;
+      background: transparent;
+
+      &:hover {
+        background: transparent;
+      }
+    }
+  }
+}
+
+.stock-content {
+  flex: 1;
+  overflow: auto;
+  padding: 0;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  &--primary {
+    background: #2563eb;
+    color: white;
+
+    &:hover {
+      background: #1d4ed8;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+
+  &--secondary {
+    background: white;
+    color: #374151;
+    border: 1px solid #d1d5db;
+
+    &:hover {
+      background: #f9fafb;
+      border-color: #9ca3af;
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .stock-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.5rem;
+
+    &__actions {
+      width: 100%;
+
+      .btn {
+        flex: 1;
+        justify-content: center;
+      }
+    }
+  }
+
+  .stock-tabs {
+    padding: 0 1rem;
+    overflow-x: auto;
+
+    &__item {
+      white-space: nowrap;
+      padding: 0.875rem 1rem;
+    }
+  }
+}

@@ -1,0 +1,80 @@
+.stock-levels-page {
+  padding: 24px;
+  background-color: #f8f9fb;
+}
+
+.page-header {
+  margin-bottom: 20px;
+
+  h1 {
+    font-size: 24px;
+    font-weight: 600;
+  }
+
+  p {
+    color: #6c757d;
+    font-size: 14px;
+  }
+}
+
+.filter-bar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+
+  input, select {
+    padding: 10px 12px;
+    border-radius: 6px;
+    border: 1px solid #dcdcdc;
+    font-size: 14px;
+    min-width: 220px;
+  }
+}
+
+.table-wrapper {
+  background: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  th {
+    text-align: left;
+    padding: 12px;
+    background-color: #f1f3f5;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  td {
+    padding: 12px;
+    border-top: 1px solid #eee;
+    font-size: 14px;
+  }
+}
+
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+
+  &.ok {
+    background: #e6f4ea;
+    color: #1e7e34;
+  }
+
+  &.low {
+    background: #fff4e5;
+    color: #d9480f;
+  }
+
+  &.critical {
+    background: #fdecea;
+    color: #c92a2a;
+  }
+}

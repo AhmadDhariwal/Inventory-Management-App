@@ -1,0 +1,53 @@
+<div class="stock-container">
+  <header class="stock-header">
+    <div class="stock-header__content">
+      <h1 class="stock-header__title">Stock Management</h1>
+      <p class="stock-header__subtitle">Manage inventory, track movements, and monitor stock levels</p>
+    </div>
+    <div class="stock-header__actions">
+      <button class="btn btn--primary" routerLink="/stock/movements/new">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M8 3.33334V12.6667M3.33334 8H12.6667" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        New Movement
+      </button>
+    </div>
+  </header>
+
+  <nav class="stock-tabs">
+    <a 
+      routerLink="/stock/overview" 
+      routerLinkActive="stock-tabs__item--active"
+      class="stock-tabs__item">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <rect x="3" y="3" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/>
+        <rect x="11" y="3" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/>
+        <rect x="3" y="11" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/>
+        <rect x="11" y="11" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/>
+      </svg>
+      <span>Overview</span>
+    </a>
+    <a 
+      routerLink="/stock/levels" 
+      routerLinkActive="stock-tabs__item--active"
+      class="stock-tabs__item">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path d="M3 17V7M10 17V3M17 17V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <span>Levels</span>
+    </a>
+    <a 
+      routerLink="/stock/movements" 
+      routerLinkActive="stock-tabs__item--active"
+      class="stock-tabs__item">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path d="M3 10H17M17 10L13 6M17 10L13 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>Movements</span>
+    </a>
+  </nav>
+
+  <div class="stock-content">
+    <router-outlet></router-outlet>
+  </div>
+</div>
