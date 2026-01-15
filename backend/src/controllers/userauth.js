@@ -55,11 +55,11 @@ async function handleuserlogin(req,res){
         })
        // const passwordMatch = await bcrypt.compare(password, logineduser.password);
         if(!logineduser){
-            return res.status(400).json({ error: "Invalid username or password" });
+            return res.status(401).json({ error: "Invalid username or password" });
         }
-        const token = jwt.sign({ userid : logineduser._id , role : logineduser.role }, "Hello", {expiresIn : '1h'});
+        const token = jwt.sign({ userid : logineduser._id , role : logineduser.role }, "Hello", {expiresIn : '24h'});
       
-        res.status(201).json({
+        res.status(200).json({
              message: "User found successfully",
              token: token,
              role : logineduser.role,

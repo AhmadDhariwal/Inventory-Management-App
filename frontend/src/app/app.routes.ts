@@ -4,13 +4,17 @@ import { AuthGuard } from './guards/auth.guard';
 import { ItemsListComponent } from './components/items-list/items-list.component';
 import { ItemcreateComponent } from './components/itemcreate/itemcreate.component';
 import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
-export const routes: Routes = [
+import { LoginComponent } from './auth/login/login.component';
+import { RegisterComponent } from './auth/register/register.component';
 
+export const routes: Routes = [
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  { path: 'login', component: LoginComponent },
+  { path: 'register', component: RegisterComponent },
   {
     path: '',
     component: MainLayoutComponent,
     children: [
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       {
         path: 'dashboard',
         loadChildren : () =>
@@ -18,15 +22,14 @@ export const routes: Routes = [
           (m) => m.DashboardModule,
           )
       },
-
-      // {
-      //   path: 'suppliers',
-      //   loadChildren: () =>
-      //     import('./suppliers/suppliers.module').then(m => m.SuppliersModule)
-      // }
+      {
+        path: 'stock',
+        loadChildren: () =>
+          import('./stock/stock.module').then(m => m.StockModule)
+      }
     ]
   },
-  { path: '**', redirectTo: 'dashboard' }
+  { path: '**', redirectTo: 'login' }
 ]
 
 

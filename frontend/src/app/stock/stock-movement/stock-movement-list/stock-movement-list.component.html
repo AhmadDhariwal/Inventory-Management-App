@@ -1,0 +1,138 @@
+<section class="stock-movements">
+
+  <header class="stock-movements__header">
+    <div class="stock-movements__header-content">
+      <h1 class="stock-movements__title">Stock Movements</h1>
+      <p class="stock-movements__subtitle">Track and manage inventory transactions</p>
+    </div>
+    <div class="stock-movements__actions">
+      <button class="btn btn--secondary">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M14 14L10 10M11.3333 6.66667C11.3333 9.244 9.244 11.3333 6.66667 11.3333C4.08934 11.3333 2 9.244 2 6.66667C2 4.08934 4.08934 2 6.66667 2C9.244 2 11.3333 4.08934 11.3333 6.66667Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        Filter
+      </button>
+      <button class="btn btn--secondary">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M14 11.3333V14M14 14H11.3333M14 14L10.6667 10.6667M2 4.66667V2M2 2H4.66667M2 2L5.33333 5.33333" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        Export
+      </button>
+      <button routerLink="/stock/movements/new" class="btn btn--primary">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M8 3.33334V12.6667M3.33334 8H12.6667" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        New Movement
+      </button>
+    </div>
+  </header>
+
+  <div class="stock-movements__filters">
+    <div class="filter-group">
+      <label class="filter-group__label">Movement Type</label>
+      <div class="filter-group__options">
+        <button class="filter-chip filter-chip--active">All</button>
+        <button class="filter-chip">Inbound</button>
+        <button class="filter-chip">Outbound</button>
+        <button class="filter-chip">Adjustment</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="stock-movements__table-container">
+    <table class="data-table">
+      <thead class="data-table__head">
+        <tr>
+          <th class="data-table__th data-table__th--sortable">
+            <div class="data-table__th-content">
+              <span>Product</span>
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M6 3V9M6 3L4 5M6 3L8 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </th>
+          <th class="data-table__th data-table__th--sortable">
+            <div class="data-table__th-content">
+              <span>Warehouse</span>
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M6 3V9M6 3L4 5M6 3L8 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </th>
+          <th class="data-table__th">Type</th>
+          <th class="data-table__th data-table__th--align-right">Quantity</th>
+          <th class="data-table__th">Reason</th>
+          <th class="data-table__th">Created By</th>
+          <th class="data-table__th data-table__th--sortable">
+            <div class="data-table__th-content">
+              <span>Date</span>
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M6 3V9M6 3L4 5M6 3L8 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </th>
+          <th class="data-table__th data-table__th--actions"></th>
+        </tr>
+      </thead>
+      <tbody class="data-table__body">
+        <tr class="data-table__row" *ngFor="let movement of movements">
+          <td class="data-table__td data-table__td--primary">
+            <div class="product-cell">
+              <div class="product-cell__icon">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                </svg>
+              </div>
+              <span class="product-cell__name">{{ movement.product?.name }}</span>
+            </div>
+          </td>
+          <td class="data-table__td">{{ movement.warehouse?.name }}</td>
+          <td class="data-table__td">
+            <span class="status-badge status-badge--{{ movement.type.toLowerCase() }}">
+              {{ movement.type }}
+            </span>
+          </td>
+          <td class="data-table__td data-table__td--align-right data-table__td--numeric">
+            {{ movement.quantity }}
+          </td>
+          <td class="data-table__td data-table__td--secondary">{{ movement.reason }}</td>
+          <td class="data-table__td">{{ movement.user?.name || 'N/A' }}</td>
+          <td class="data-table__td data-table__td--secondary">{{ movement.createdAt | date:'MMM d, y, h:mm a' }}</td>
+          <td class="data-table__td data-table__td--actions">
+            <button class="action-btn" title="More actions">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <circle cx="8" cy="3" r="1" fill="currentColor"/>
+                <circle cx="8" cy="8" r="1" fill="currentColor"/>
+                <circle cx="8" cy="13" r="1" fill="currentColor"/>
+              </svg>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <footer class="stock-movements__footer">
+    <div class="pagination">
+      <span class="pagination__info">Showing 1-10 of 245 movements</span>
+      <div class="pagination__controls">
+        <button class="pagination__btn" disabled title="Previous page">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M10 12L6 8L10 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <button class="pagination__btn pagination__btn--active">1</button>
+        <button class="pagination__btn">2</button>
+        <button class="pagination__btn">3</button>
+        <span class="pagination__ellipsis">...</span>
+        <button class="pagination__btn">25</button>
+        <button class="pagination__btn" title="Next page">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M6 4L10 8L6 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </footer>
+
+</section>

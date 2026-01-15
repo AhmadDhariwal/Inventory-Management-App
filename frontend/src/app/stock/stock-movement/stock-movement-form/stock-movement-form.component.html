@@ -1,0 +1,144 @@
+<section class="stock-form">
+  
+  <header class="stock-form__header">
+    <div class="stock-form__breadcrumb">
+      <a routerLink="/stock/movements" class="stock-form__breadcrumb-link">Stock Movements</a>
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M6 4L10 8L6 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="stock-form__breadcrumb-current">New Movement</span>
+    </div>
+    <h1 class="stock-form__title">Create Stock Movement</h1>
+  </header>
+
+  <div class="stock-form__container">
+    <form class="form" (ngSubmit)="onSubmit()">
+      
+      <div class="form__section">
+        <h2 class="form__section-title">Movement Details</h2>
+        
+        <div class="form__row">
+          <div class="form__group form__group--required">
+            <label class="form__label" for="product">Product</label>
+            <select class="form__select" id="product" title="Product" [(ngModel)]="movement.product" name="product" required>
+              <option value="">Select product</option>
+              <option *ngFor="let product of products" [value]="product._id">{{ product.name }}</option>
+            </select>
+            <span class="form__hint">Select the product for this movement</span>
+          </div>
+          
+          <div class="form__group form__group--required">
+            <label class="form__label" for="warehouse">Warehouse</label>
+            <select class="form__select" id="warehouse" title="Warehouse" [(ngModel)]="movement.warehouse" name="warehouse" required>
+              <option value="">Select warehouse</option>
+              <option *ngFor="let warehouse of warehouses" [value]="warehouse._id">{{ warehouse.name }}</option>
+            </select>
+            <span class="form__hint">Warehouse location for this movement</span>
+          </div>
+        </div>
+        
+        <div class="form__row">
+          <div class="form__group form__group--required">
+            <label class="form__label" for="movement-type">Movement Type</label>
+            <select class="form__select" id="movement-type" title="Movement Type" [(ngModel)]="movement.type" name="type" required>
+              <option value="">Select type</option>
+              <option value="IN">Inbound (IN)</option>
+              <option value="OUT">Outbound (OUT)</option>
+              <option value="ADJUSTMENT">Adjustment</option>
+            </select>
+            <span class="form__hint">Type of stock movement</span>
+          </div>
+          
+          <div class="form__group form__group--required">
+            <label class="form__label" for="quantity">Quantity</label>
+            <input 
+              class="form__input" 
+              type="number" 
+              id="quantity" 
+              title="Quantity" 
+              placeholder="0" 
+              min="1"
+              [(ngModel)]="movement.quantity"
+              name="quantity"
+              required
+            />
+            <span class="form__hint">Number of units</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="form__section">
+        <h2 class="form__section-title">Additional Information</h2>
+        
+        <div class="form__group">
+          <label class="form__label" for="reason">Reason</label>
+          <textarea 
+            class="form__textarea" 
+            id="reason" 
+            title="Reason" 
+            rows="4"
+            placeholder="Enter reason for this stock movement..."
+            [(ngModel)]="movement.reason"
+            name="reason"
+          ></textarea>
+          <span class="form__hint">Optional: Provide context for this movement</span>
+        </div>
+        
+        <div class="form__group">
+          <label class="form__label" for="reference">Reference Number</label>
+          <input 
+            class="form__input" 
+            type="text" 
+            id="reference" 
+            title="Reference Number" 
+            placeholder="e.g., PO-2024-001"
+            [(ngModel)]="movement.reference"
+            name="reference"
+          />
+          <span class="form__hint">Optional: Purchase order or reference ID</span>
+        </div>
+      </div>
+      
+      <div class="form__actions">
+        <button type="button" class="btn btn--secondary" routerLink="/stock/movements">
+          Cancel
+        </button>
+        <button type="submit" class="btn btn--primary" [disabled]="loading">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M13.3333 4L6 11.3333L2.66667 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          {{ loading ? 'Creating...' : 'Create Movement' }}
+        </button>
+      </div>
+      
+    </form>
+    
+    <aside class="stock-form__sidebar">
+      <div class="info-card">
+        <div class="info-card__header">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M10 10V14M10 6V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <h3 class="info-card__title">Movement Guidelines</h3>
+        </div>
+        <ul class="info-card__list">
+          <li><strong>Inbound:</strong> Stock received from suppliers or transfers</li>
+          <li><strong>Outbound:</strong> Stock shipped to customers or locations</li>
+          <li><strong>Adjustment:</strong> Corrections for inventory discrepancies</li>
+        </ul>
+      </div>
+      
+      <div class="info-card info-card--warning">
+        <div class="info-card__header">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M10 6V10M10 14H10.01M18 10C18 14.4183 14.4183 18 10 18C5.58172 18 2 14.4183 2 10C2 5.58172 5.58172 2 10 2C14.4183 2 18 5.58172 18 10Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <h3 class="info-card__title">Important</h3>
+        </div>
+        <p class="info-card__text">All stock movements are tracked and audited. Ensure accuracy before submission.</p>
+      </div>
+    </aside>
+  </div>
+
+</section>
