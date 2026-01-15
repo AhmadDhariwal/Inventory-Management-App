@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { StockService } from '../../../shared/services/stock.service';
 
 
+
 @Component({
   selector: 'app-stock-movement-list',
   standalone: true,

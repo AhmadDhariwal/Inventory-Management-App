@@ -1,0 +1,97 @@
+<section class="movement-detail">
+
+  <!-- Header -->
+  <header class="movement-detail__header">
+    <div class="movement-detail__breadcrumb">
+      <a routerLink="/stock/movements">Stock Movements</a>
+      <span>/</span>
+      <span>Movement Details</span>
+    </div>
+
+    <div class="movement-detail__header-main">
+      <h1 class="movement-detail__title">Stock Movement</h1>
+      <span class="movement-detail__badge movement-detail__badge--inbound">
+        INBOUND
+      </span>
+    </div>
+
+    <p class="movement-detail__subtitle">
+      Immutable record of inventory transaction
+    </p>
+  </header>
+
+  <!-- Summary -->
+  <section class="movement-detail__summary">
+    <div class="summary-item">
+      <span class="summary-item__label">Product</span>
+      <span class="summary-item__value">Laptop Dell XPS 15</span>
+    </div>
+
+    <div class="summary-item">
+      <span class="summary-item__label">Warehouse</span>
+      <span class="summary-item__value">Main Warehouse – New York</span>
+    </div>
+
+    <div class="summary-item">
+      <span class="summary-item__label">Quantity</span>
+      <span class="summary-item__value summary-item__value--numeric">+50</span>
+    </div>
+
+    <div class="summary-item">
+      <span class="summary-item__label">Created By</span>
+      <span class="summary-item__value">Ahmad Hassan</span>
+    </div>
+
+    <div class="summary-item">
+      <span class="summary-item__label">Created At</span>
+      <span class="summary-item__value">Mar 12, 2026 – 10:42 AM</span>
+    </div>
+  </section>
+
+  <!-- Details -->
+  <section class="movement-detail__info">
+    <div class="info-block">
+      <h3 class="info-block__title">Reason</h3>
+      <p class="info-block__text">
+        Stock received from supplier against purchase order PO-2026-014.
+      </p>
+    </div>
+
+    <div class="info-block">
+      <h3 class="info-block__title">Reference</h3>
+      <p class="info-block__text">PO-2026-014</p>
+    </div>
+  </section>
+
+  <!-- Audit Log -->
+  <section class="movement-detail__audit">
+    <h2 class="movement-detail__section-title">Audit Trail</h2>
+
+    <table class="audit-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>User</th>
+          <th>Action</th>
+          <th>Details</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Mar 12, 2026 – 10:42 AM</td>
+          <td>Ahmad Hassan</td>
+          <td>CREATED</td>
+          <td>Stock movement created</td>
+        </tr>
+
+        <tr>
+          <td>Mar 12, 2026 – 10:43 AM</td>
+          <td>System</td>
+          <td>POSTED</td>
+          <td>Inventory balance updated</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+</section>
