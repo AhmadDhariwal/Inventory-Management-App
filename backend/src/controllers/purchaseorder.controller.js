@@ -16,5 +16,16 @@ const createpurchaseorder = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+const getallpurchaseorders = async (req,res) => {
+try{
+   const purchaseorder = await purchaseorderservice.getallpurchaseorders();
+    res.status(200).json(purchaseorder);
+}
+catch(error){
+    res.status(400).json({error:error.message});
+}
+}
 
-module.exports = { createpurchaseorder };
+module.exports = { createpurchaseorder,
+  getallpurchaseorders
+ };

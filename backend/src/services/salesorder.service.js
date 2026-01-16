@@ -27,7 +27,7 @@ const createsalesorder = async (data, userId) => {
     // Stock movement (OUT)
     await StockMovement.create({
       product: item.product,
-      warehouse: item.warehouse || null,
+    //  warehouse: item.warehouse || null,
       type: "OUT",
       quantity: item.quantity,
       reason: "SALE",
@@ -47,5 +47,14 @@ const createsalesorder = async (data, userId) => {
 
   return salesorder;
 };
-
-module.exports = { createsalesorder };
+const getallsalesorders = async () => {
+  try{
+  return await SalesOrder.find().populate("items.product");
+}
+catch(error){
+  throw new Error("error fetching sales orders" + error.message);
+}
+};
+module.exports = { createsalesorder,
+  getallsalesorders
+ };

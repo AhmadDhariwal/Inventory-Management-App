@@ -16,4 +16,14 @@ const createsalesorder = async (req, res) => {
   }
 };
 
-module.exports = { createsalesorder };
+const getallsalesorders = async(req,res) => {
+try{
+   const salesorder = await salesorderservice.getallsalesorders();
+    res.status(200).json(salesorder);
+}
+catch(error){
+    res.status(400).json({error:error.message});
+}
+}
+
+module.exports = { createsalesorder,getallsalesorders };

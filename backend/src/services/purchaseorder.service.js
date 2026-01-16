@@ -49,4 +49,10 @@ const createpurchaseorder = async (data, userId) => {
   return purchaseorder;
 };
 
-module.exports = { createpurchaseorder };
+const getallpurchaseorders = async () => {
+    return await Purchaseorder.find();
+};
+module.exports = { 
+  createpurchaseorder,
+  getallpurchaseorders
+ };
