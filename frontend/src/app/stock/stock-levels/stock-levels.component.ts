@@ -1,83 +1,52 @@
 import { CommonModule } from '@angular/common';
-import { Component,OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { StockService } from '../../shared/services/stock.service';
 import { StockDetailDrawerComponent } from '../stock-detail-drawer/stock-detail-drawer.component';
-
-interface StockLevel {
-  sku: string;
-  productName: string;
-  category: string;
-  warehouse: string;
-  availableQty: number;
-  reservedQty: number;
-  reorderLevel: number;
-  status: 'OK' | 'LOW' | 'CRITICAL';
-}
 
 @Component({
   selector: 'app-stock-levels',
   standalone: true,
-  imports: [RouterLink, CommonModule, FormsModule, StockDetailDrawerComponent],
+  imports: [RouterLink, CommonModule, FormsModule,StockDetailDrawerComponent],
   templateUrl: './stock-levels.component.html',
   styleUrl: './stock-levels.component.scss'
 })
-
 export class StockLevelsComponent implements OnInit {
-
   searchText = '';
   selectedWarehouse = 'ALL';
+  warehouses: string[] = ['ALL'];
+  stockLevels: any[] = [];
 
-  warehouses = ['ALL', 'Karachi WH', 'Lahore WH'];
-
-  stockLevels: StockLevel[] = [];
+  constructor(private stockService: StockService) {}
 
   ngOnInit(): void {
-    this.loadSampleData();
+    this.loadStockLevels();
   }
 
-  loadSampleData() {
-    this.stockLevels = [
-      {
-        sku: 'SKU-001',
-        productName: 'Wireless Mouse',
-        category: 'Electronics',
-        warehouse: 'Karachi WH',
-        availableQty: 120,
-        reservedQty: 20,
-        reorderLevel: 50,
-        status: 'OK'
+  loadStockLevels(): void {
+    this.stockService.getStockLevels().subscribe({
+      next: (data) => {
+        this.stockLevels = data;
+        this.extractWarehouses(data);
       },
-      {
-        sku: 'SKU-002',
-        productName: 'Mechanical Keyboard',
-        category: 'Electronics',
-        warehouse: 'Lahore WH',
-        availableQty: 30,
-        reservedQty: 10,
-        reorderLevel: 40,
-        status: 'LOW'
-      },
-      {
-        sku: 'SKU-003',
-        productName: 'USB-C Cable',
-        category: 'Accessories',
-        warehouse: 'Karachi WH',
-        availableQty: 8,
-        reservedQty: 5,
-        reorderLevel: 20,
-        status: 'CRITICAL'
-      }
-    ];
+      error: (err) => console.error('Stock load failed', err)
+    });
+  }
+
+  extractWarehouses(data: any[]): void {
+    const uniqueWarehouses = [...new Set(data.map(item => item.warehouseName))];
+    this.warehouses = ['ALL', ...uniqueWarehouses];
   }
 
   filteredStock() {
     return this.stockLevels.filter(item =>
-      (this.selectedWarehouse === 'ALL' || item.warehouse === this.selectedWarehouse) &&
-      (item.productName.toLowerCase().includes(this.searchText.toLowerCase()) ||
-       item.sku.toLowerCase().includes(this.searchText.toLowerCase()))
+      (this.selectedWarehouse === 'ALL' || item.warehouseName === this.selectedWarehouse) &&
+      (item.productName?.toLowerCase().includes(this.searchText.toLowerCase()) ||
+       item.sku?.toLowerCase().includes(this.searchText.toLowerCase()))
     );
   }
+
   selectedStock: any = null;
 
 openDrawer(stock: any) {
@@ -89,3 +58,4 @@ closeDrawer() {
 }
 
 }
+

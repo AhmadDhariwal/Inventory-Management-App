@@ -5,6 +5,8 @@ const reportcontroller = require("../controllers/report.controller");
 router.get("/stock", reportcontroller.getstockreport);
 router.get("/stockmovements", reportcontroller.getstockmovementreport);
 router.get("/purchases", reportcontroller.getpurchasereport);
+router.get("/stocklevels", reportcontroller.getstocklevelsreport);
+router.get("/lowstock", reportcontroller.getlowstockreport);
 
 
 module.exports = router;
