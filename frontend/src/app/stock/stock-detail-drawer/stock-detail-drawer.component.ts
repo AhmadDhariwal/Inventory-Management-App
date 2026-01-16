@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output,HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 
@@ -20,5 +20,9 @@ export class StockDetailDrawerComponent {
   closeDrawer() {
     this.stock = null;
     this.close.emit(); // Emit the close event
+  }
+    @HostListener('document:keydown.escape')
+  onEsc(): void {
+    this.close.emit();
   }
 }
