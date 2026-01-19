@@ -17,6 +17,8 @@ export class StockLevelsComponent implements OnInit {
   selectedWarehouse = 'ALL';
   warehouses: string[] = ['ALL'];
   stockLevels: any[] = [];
+  loading = false;
+  errorMessage = '';
 
   constructor(private stockService: StockService) {}
 
@@ -25,12 +27,20 @@ export class StockLevelsComponent implements OnInit {
   }
 
   loadStockLevels(): void {
+    this.loading = true;
+    this.errorMessage = '';
     this.stockService.getStockLevels().subscribe({
       next: (data) => {
+        console.log('Stock levels data:', data);
         this.stockLevels = data;
         this.extractWarehouses(data);
+        this.loading = false;
       },
-      error: (err) => console.error('Stock load failed', err)
+      error: (err) => {
+        console.error('Stock load failed', err);
+        this.errorMessage = err.error?.error || err.message || 'Failed to load stock levels';
+        this.loading = false;
+      }
     });
   }
 

@@ -1,63 +1,75 @@
 <div class="stock-levels-page">
-
   <!-- PAGE HEADER -->
   <div class="page-header">
     <h1>Inventory Levels</h1>
     <p>Real-time overview of available stock across warehouses</p>
   </div>
 
-  <!-- FILTER BAR -->
-  <div class="filter-bar">
-    <input
-      type="text"
-      placeholder="Search by SKU or product name"
-      [(ngModel)]="searchText"
-    />
-
-    <select [(ngModel)]="selectedWarehouse" title="Filter by warehouse" aria-label="Filter by warehouse">
-      <option *ngFor="let wh of warehouses" [value]="wh">
-        {{ wh }}
-      </option>
-    </select>
+  <!-- ERROR MESSAGE -->
+  <div *ngIf="errorMessage" class="error-message">
+    <p>{{ errorMessage }}</p>
+    <button (click)="loadStockLevels()">Retry</button>
   </div>
 
-  <!-- STOCK TABLE -->
-  <div class="table-wrapper">
-    <table>
-      <thead>
-        <tr>
-          <th>SKU</th>
-          <th>Product</th>
-          <th>Category</th>
-          <th>Warehouse</th>
-          <th>Available</th>
-          <th>Reserved</th>
-          <th>Reorder Level</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        <tr *ngFor="let item of filteredStock()" >
-          <td>{{ item.sku }}</td>
-          <td>{{ item.productName }}</td>
-          <td>{{ item.category }}</td>
-          <td>{{ item.warehouse }}</td>
-          <td>{{ item.availableQty }}</td>
-          <td>{{ item.reservedQty }}</td>
-          <td>{{ item.reorderLevel }}</td>
-          <td>
-            <span class="status-badge" [ngClass]="item.status.toLowerCase()">
-              {{ item.status }}
-            </span>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  <!-- LOADING STATE -->
+  <div *ngIf="loading" class="loading">
+    <p>Loading stock levels...</p>
   </div>
-<section class="stock-levels">
 
-  <table class="data-table">
+  <!-- CONTENT -->
+  <div *ngIf="!loading && !errorMessage">
+    <!-- FILTER BAR -->
+    <div class="filter-bar">
+      <input
+        type="text"
+        placeholder="Search by SKU or product name"
+        [(ngModel)]="searchText"
+      />
+
+      <select [(ngModel)]="selectedWarehouse" title="Filter by warehouse" aria-label="Filter by warehouse">
+        <option *ngFor="let wh of warehouses" [value]="wh">
+          {{ wh }}
+        </option>
+      </select>
+    </div>
+
+    <!-- STOCK TABLE -->
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>SKU</th>
+            <th>Product</th>
+            <th>Category</th>
+            <th>Warehouse</th>
+            <th>Available</th>
+            <th>Reserved</th>
+            <th>Reorder Level</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let item of filteredStock()" (click)="openDrawer(item)" class="clickable-row">
+            <td>{{ item.sku }}</td>
+            <td>{{ item.productName }}</td>
+            <td>{{ item.category || 'N/A' }}</td>
+            <td>{{ item.warehouseName }}</td>
+            <td>{{ item.availableQty }}</td>
+            <td>{{ item.reservedQty || 0 }}</td>
+            <td>{{ item.reorderLevel || 'N/A' }}</td>
+            <td>
+              <span class="status-badge" [ngClass]="item.status?.toLowerCase()">
+                {{ item.status }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- <table class="data-table">
     <tr
       *ngFor="let stock of stockLevels"
       (click)="openDrawer(stock)"
@@ -69,12 +81,11 @@
     </tr>
   </table>
 
-</section>
-<div class="drawer-overlay" *ngIf="selectedStock">
+  <div class="drawer-overlay" *ngIf="selectedStock">
+    <app-stock-detail-drawer
+      [stock]="selectedStock"
+      (close)="closeDrawer()">
+    </app-stock-detail-drawer>
+  </div>
 
-  <app-stock-detail-drawer
-    [stock]="selectedStock"
-    (close)="closeDrawer()">
-  </app-stock-detail-drawer>
-
-</div>
+</div> -->

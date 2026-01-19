@@ -1,0 +1,28 @@
+<section class="stock-summary" *ngIf="!loading">
+
+  <app-kpi-card
+    label="Total Products"
+    [value]="summary.totalProducts">
+  </app-kpi-card>
+
+  <app-kpi-card
+    label="Total Stock"
+    [value]="summary.totalStock">
+  </app-kpi-card>
+
+  <app-kpi-card
+    label="Low Stock Items"
+    [value]="summary.lowStockItems">
+  </app-kpi-card>
+
+  <app-kpi-card
+    label="Warehouses"
+    [value]="summary.warehouses">
+  </app-kpi-card>
+
+  <app-kpi-card
+    label="Inventory Value"
+    [value]="summary.inventoryValue">
+  </app-kpi-card>
+
+</section>

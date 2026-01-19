@@ -35,6 +35,16 @@ const getstocklevelsreport = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+const getstocksummary = async (req, res) => {
+  try {
+    const summary = await reportservice.getstocksummary();
+    res.status(200).json(summary);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 const getlowstockreport = async (req, res) => {
   try {
     const report = await reportservice.getlowstockreport();
@@ -49,5 +59,6 @@ module.exports = {
   getstockmovementreport,
   getpurchasereport,
   getstocklevelsreport,
-  getlowstockreport
+  getlowstockreport,
+  getstocksummary
 };

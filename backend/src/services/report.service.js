@@ -29,7 +29,6 @@ const getpurchasereport = async () => {
     .sort({ createdAt: -1 })
     .lean();
 };
-
 const getstocklevelsreport = async () => {
   const levels = await StockMovement.aggregate([
     {
@@ -66,14 +65,44 @@ const getstocklevelsreport = async () => {
       }
     },
     {
+      $lookup: {
+        from: "categories",
+        localField: "productInfo.category",
+        foreignField: "_id",
+        as: "categoryInfo"
+      }
+    },
+    {
+      $lookup: {
+        from: "stockrules",
+        let: { product: "$_id.product", warehouse: "$_id.warehouse" },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ["$product", "$$product"] },
+                  { $eq: ["$warehouse", "$$warehouse"] }
+                ]
+              }
+            }
+          }
+        ],
+        as: "stockRule"
+      }
+    },
+    {
       $project: {
         productId: "$_id.product",
         warehouseId: "$_id.warehouse",
         productName: { $arrayElemAt: ["$productInfo.name", 0] },
         sku: { $arrayElemAt: ["$productInfo.sku", 0] },
         cost: { $arrayElemAt: ["$productInfo.cost", 0] },
+        category: { $arrayElemAt: ["$categoryInfo.name", 0] },
         warehouseName: { $arrayElemAt: ["$warehouseInfo.name", 0] },
         availableQty: 1,
+        reservedQty: { $literal: 0 },
+        reorderLevel: { $arrayElemAt: ["$stockRule.reorderLevel", 0] },
         totalValue: {
           $multiply: [
             "$availableQty",
@@ -172,11 +201,53 @@ const getlowstockreport = async () => {
   return lowStock;
 };
 
+const getstocksummary = async () => {
+  const totalProducts = await Product.countDocuments();
+  const warehouses = await Warehouse.countDocuments({ isActive: true });
+
+  const stockAggregation = await StockMovement.aggregate([
+    {
+      $group: {
+        _id: "$product",
+        availableQty: {
+          $sum: {
+            $cond: [
+              { $eq: ["$type", "IN"] },
+              "$quantity",
+              { $multiply: ["$quantity", -1] }
+            ]
+          }
+        }
+      }
+    }
+  ]);
+
+  const totalStock = stockAggregation.reduce(
+    (sum, item) => sum + item.availableQty,
+    0
+  );
+
+  const lowStockItems = stockAggregation.filter(
+    item => item.availableQty <= 10
+  ).length;
+
+  const inventoryValue = totalStock * 100; // approximate value
+
+  return {
+    totalProducts,
+    totalStock,
+    lowStockItems,
+    warehouses,
+    inventoryValue
+  };
+};
+
 
 module.exports = {
   getstockreport,
   getstockmovementreport,
   getpurchasereport,
   getstocklevelsreport,
-  getlowstockreport
+  getlowstockreport,
+  getstocksummary
 };
