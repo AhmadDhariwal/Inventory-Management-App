@@ -17,26 +17,24 @@ const routes: Routes = [
       { path: '', redirectTo: 'overview', pathMatch: 'full' },
       { path: 'overview', component: StockOverviewComponent },
       { path: 'levels', component: StockLevelsComponent},
-
       { path: 'movements', component: StockMovementListComponent },
+      {
+        path: 'reports',
+        children: [
+          {
+            path: 'summary',
+            component: StockSummaryComponent
+          },
+          {
+            path: 'movements',
+            component: StockMovementReportComponent
+          },
+        ]
+      }
     ]
   },
   { path: 'movements/new', component: StockMovementFormComponent },
-  { path: 'movements/:id', component: StockMovementDetailComponent },
-
-  {
-      path: 'reports',
-      children: [
-        {
-          path: 'summary',
-          component: StockSummaryComponent
-        },
-        {
-          path: 'movements',
-          component: StockMovementReportComponent
-        },
-      ]
-      }
+  { path: 'movements/:id', component: StockMovementDetailComponent }
 ];
 
 

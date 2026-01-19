@@ -57,6 +57,30 @@ export class StockLevelsComponent implements OnInit {
     );
   }
 
+  getTotalItems(): number {
+    return this.stockLevels.length;
+  }
+
+  getCriticalItems(): number {
+    return this.stockLevels.filter(item => item.status === 'CRITICAL').length;
+  }
+
+  getStockPercentage(item: any): number {
+    const maxStock = item.reorderLevel * 3;
+    return Math.min((item.availableQty / maxStock) * 100, 100);
+  }
+
+  getProgressClass(item: any): string {
+    if (item.availableQty <= item.reorderLevel * 0.5) {
+      return 'progress-critical';
+    } else if (item.availableQty <= item.reorderLevel) {
+      return 'progress-low';
+    }
+    return 'progress-ok';
+  }
+
+  viewMode: 'cards' | 'table' = 'cards';
+
   selectedStock: any = null;
 
 openDrawer(stock: any) {
