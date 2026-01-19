@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { InventorySummary } from '../models/inventory/inventory-summary.model';
 
 @Injectable({
   providedIn: 'root'
@@ -38,5 +39,8 @@ export class StockService {
 
   getWarehouses(): Observable<any[]> {
     return this.http.get<any[]>(`${this.baseUrl}/api/warehouses`);
+  }
+  getStockSummary(): Observable<InventorySummary> {
+    return this.http.get<InventorySummary>(`${this.baseUrl}/api/reports/summary`);
   }
 }

@@ -7,6 +7,7 @@ router.get("/stockmovements", reportcontroller.getstockmovementreport);
 router.get("/purchases", reportcontroller.getpurchasereport);
 router.get("/stocklevels", reportcontroller.getstocklevelsreport);
 router.get("/lowstock", reportcontroller.getlowstockreport);
+router.get("/summary",reportcontroller.getstocksummary);
 
 
 module.exports = router;
