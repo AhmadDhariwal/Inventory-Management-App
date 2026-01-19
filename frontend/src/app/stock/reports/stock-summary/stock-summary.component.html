@@ -1,1 +1,70 @@
-<p>stock-summary works!</p>
+<!-- <section class="stock-summary">
+
+  <header class="stock-summary__header">
+    <h1>Stock Summary Report</h1>
+    <p>Enterprise-wide inventory health overview</p>
+  </header>
+
+  <div class="stock-summary__grid">
+
+    <div class="kpi-card">
+      <span class="kpi-card__label">Total SKUs</span>
+      <strong class="kpi-card__value">{{ summary.totalSkus }}</strong>
+    </div>
+
+    <div class="kpi-card">
+      <span class="kpi-card__label">Total Quantity</span>
+      <strong class="kpi-card__value">{{ summary.totalQuantity }}</strong>
+    </div>
+
+    <div class="kpi-card">
+      <span class="kpi-card__label">Inventory Value</span>
+      <strong class="kpi-card__value">
+        {{ summary.totalValue | number }}
+      </strong>
+    </div>
+
+    <div class="kpi-card kpi-card--warning">
+      <span class="kpi-card__label">Low Stock</span>
+      <strong class="kpi-card__value">{{ summary.lowStockCount }}</strong>
+    </div>
+
+    <div class="kpi-card kpi-card--danger">
+      <span class="kpi-card__label">Critical Stock</span>
+      <strong class="kpi-card__value">{{ summary.criticalStockCount }}</strong>
+    </div>
+
+  </div>
+
+</section> -->
+
+<section class="stock-summary">
+
+  <header class="page-header">
+    <h1>Stock Summary</h1>
+    <p>Current available inventory by product and warehouse</p>
+  </header>
+
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>SKU</th>
+          <th>Product</th>
+          <th>Warehouse</th>
+          <th>Available Stock</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let item of summary">
+          <td>{{ item.sku }}</td>
+          <td>{{ item.productName }}</td>
+          <td>{{ item.warehouseName }}</td>
+          <td class="qty">{{ item.availableQuantity }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</section>

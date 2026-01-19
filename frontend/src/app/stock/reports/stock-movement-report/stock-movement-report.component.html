@@ -1,1 +1,52 @@
-<p>stock-movement-report works!</p>
+<section class="stock-movement-report">
+
+  <header class="page-header">
+    <h1>Stock Movement Report</h1>
+    <p>Complete audit trail of inventory transactions</p>
+  </header>
+
+  <div class="filter-bar">
+    <select [(ngModel)]="selectedType" (change)="applyFilters()" title="Filter by movement type" aria-label="Filter by movement type">
+      <option *ngFor="let t of types" [value]="t">{{ t }}</option>
+    </select>
+
+    <select [(ngModel)]="selectedWarehouse" (change)="applyFilters()" title="Filter by warehouse" aria-label="Filter by warehouse">
+      <option *ngFor="let w of warehouses" [value]="w">{{ w }}</option>
+    </select>
+  </div>
+
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>SKU</th>
+          <th>Product</th>
+          <th>Warehouse</th>
+          <th>Type</th>
+          <th>Qty</th>
+          <th>Reason</th>
+          <th>Performed By</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let m of filteredMovements">
+          <td>{{ m.createdAt | date:'MMM d, y' }}</td>
+          <td>{{ m.product.sku }}</td>
+          <td>{{ m.product.name }}</td>
+          <td>{{ m.warehouse.name }}</td>
+          <td>
+            <span class="movement-type" [ngClass]="m.type.toLowerCase()">
+              {{ m.type }}
+            </span>
+          </td>
+          <td>{{ m.quantity }}</td>
+          <td>{{ m.reason }}</td>
+          <td>{{ m.user.name }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</section>
