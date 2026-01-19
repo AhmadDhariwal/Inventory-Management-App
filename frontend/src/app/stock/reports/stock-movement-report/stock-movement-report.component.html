@@ -1,20 +1,23 @@
 <section class="stock-movement-report">
 
+  <!-- PAGE HEADER -->
   <header class="page-header">
     <h1>Stock Movement Report</h1>
     <p>Complete audit trail of inventory transactions</p>
   </header>
 
+  <!-- FILTER BAR -->
   <div class="filter-bar">
-    <select [(ngModel)]="selectedType" (change)="applyFilters()" title="Filter by movement type" aria-label="Filter by movement type">
+    <select [(ngModel)]="selectedType" (change)="applyFilters()" aria-label="Filter by type">
       <option *ngFor="let t of types" [value]="t">{{ t }}</option>
     </select>
 
-    <select [(ngModel)]="selectedWarehouse" (change)="applyFilters()" title="Filter by warehouse" aria-label="Filter by warehouse">
+    <select [(ngModel)]="selectedWarehouse" (change)="applyFilters()" aria-label="Filter by warehouse">
       <option *ngFor="let w of warehouses" [value]="w">{{ w }}</option>
     </select>
   </div>
 
+  <!-- MOVEMENT TABLE -->
   <div class="table-wrapper">
     <table>
       <thead>
@@ -37,9 +40,7 @@
           <td>{{ m.product.name }}</td>
           <td>{{ m.warehouse.name }}</td>
           <td>
-            <span class="movement-type" [ngClass]="m.type.toLowerCase()">
-              {{ m.type }}
-            </span>
+            <span class="movement-type" [ngClass]="m.type.toLowerCase()">{{ m.type }}</span>
           </td>
           <td>{{ m.quantity }}</td>
           <td>{{ m.reason }}</td>

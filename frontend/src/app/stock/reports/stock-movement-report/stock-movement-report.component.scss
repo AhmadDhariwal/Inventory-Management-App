@@ -1,74 +1,74 @@
 .stock-movement-report {
   padding: 24px;
   background: #f8f9fb;
-}
 
-.page-header {
-  margin-bottom: 20px;
+  .page-header {
+    margin-bottom: 20px;
 
-  h1 {
-    font-size: 22px;
+    h1 {
+      font-size: 22px;
+      font-weight: 600;
+    }
+
+    p {
+      font-size: 14px;
+      color: #6b7280;
+    }
+  }
+
+  .filter-bar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+
+    select {
+      padding: 8px 12px;
+      font-size: 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      background: #fff;
+    }
+  }
+
+  .table-wrapper {
+    background: #ffffff;
+    border-radius: 8px;
+    overflow-x: auto;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th {
+      background: #f3f4f6;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 12px;
+      text-align: left;
+    }
+
+    td {
+      padding: 12px;
+      font-size: 14px;
+      border-top: 1px solid #e5e7eb;
+    }
+  }
+
+  .movement-type {
     font-weight: 600;
-  }
 
-  p {
-    font-size: 14px;
-    color: #6b7280;
-  }
-}
+    &.in {
+      color: #15803d;
+    }
 
-.filter-bar {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 16px;
+    &.out {
+      color: #b91c1c;
+    }
 
-  select {
-    padding: 8px 12px;
-    font-size: 14px;
-    border: 1px solid #d1d5db;
-    border-radius: 6px;
-    background: #fff;
-  }
-}
-
-.table-wrapper {
-  background: #ffffff;
-  border-radius: 8px;
-  overflow-x: auto;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  th {
-    background: #f3f4f6;
-    font-size: 13px;
-    font-weight: 600;
-    padding: 12px;
-    text-align: left;
-  }
-
-  td {
-    padding: 12px;
-    font-size: 14px;
-    border-top: 1px solid #e5e7eb;
-  }
-}
-
-.movement-type {
-  font-weight: 600;
-
-  &.in {
-    color: #15803d;
-  }
-
-  &.out {
-    color: #b91c1c;
-  }
-
-  &.adjustment {
-    color: #92400e;
+    &.adjustment {
+      color: #92400e;
+    }
   }
 }

@@ -7,6 +7,7 @@ import { StockOverviewComponent } from './stock-overview/stock-overview.componen
 import { StockComponent } from './stock.component';
 import { StockLevelsComponent } from './stock-levels/stock-levels.component';
 import { StockSummaryComponent } from './reports/stock-summary/stock-summary.component';
+import { StockMovementReportComponent } from './reports/stock-movement-report/stock-movement-report.component';
 
 const routes: Routes = [
   {
@@ -32,7 +33,7 @@ const routes: Routes = [
         },
         {
           path: 'movements',
-          component: StockSummaryComponent
+          component: StockMovementReportComponent
         },
       ]
       }
