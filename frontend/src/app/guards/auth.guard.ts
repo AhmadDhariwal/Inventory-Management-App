@@ -1,24 +1,42 @@
 import { Injectable } from '@angular/core';
-import { ItemService } from './../services/item.service';
-import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router} from '@angular/router';
+import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router } from '@angular/router';
+import { AuthService } from '../shared/services/auth.service';
+import { Observable } from 'rxjs';
+import { map, take } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthGuard implements CanActivate {
-  constructor(private itemService : ItemService, private router: Router){};
+  constructor(private authService: AuthService, private router: Router) {}
+
   canActivate(
     route: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot): boolean {
-    if(this.itemService.isAuthenticated()) {
-
-      return true
-    }
-     else {
-      alert("Please login to access this page");
-      this.router.navigate(['/login']);
-      return false;
-    }
+    state: RouterStateSnapshot
+  ): Observable<boolean> | Promise<boolean> | boolean {
+    return this.authService.isAuthenticated$.pipe(
+      take(1),
+      map(isAuthenticated => {
+        if (isAuthenticated) {
+          // Check for role-based access if specified in route data
+          const requiredRoles = route.data?.['roles'] as string[];
+          if (requiredRoles && requiredRoles.length > 0) {
+            const hasRequiredRole = this.authService.hasAnyRole(requiredRoles);
+            if (!hasRequiredRole) {
+              this.router.navigate(['/auth/login'], {
+                queryParams: { returnUrl: state.url, error: 'insufficient_permissions' }
+              });
+              return false;
+            }
+          }
+          return true;
+        } else {
+          this.router.navigate(['/auth/login'], {
+            queryParams: { returnUrl: state.url }
+          });
+          return false;
+        }
+      })
+    );
   }
-
 }

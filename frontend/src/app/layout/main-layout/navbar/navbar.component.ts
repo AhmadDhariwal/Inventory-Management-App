@@ -2,6 +2,8 @@ import { Component, EventEmitter, Output, OnInit } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { filter, map } from 'rxjs/operators';
+import { AuthService, User } from '../../../shared/services/auth.service';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-navbar',
@@ -13,8 +15,16 @@ import { filter, map } from 'rxjs/operators';
 export class NavbarComponent implements OnInit {
   @Output() toggleSidebar = new EventEmitter<void>();
   pageTitle = 'Dashboard';
+  currentUser$: Observable<User | null>;
+  showUserMenu = false;
 
-  constructor(private router: Router) {}
+
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) {
+    this.currentUser$ = this.authService.currentUser$;
+  }
 
   ngOnInit() {
     this.router.events.pipe(
@@ -35,5 +45,26 @@ export class NavbarComponent implements OnInit {
     if (url.includes('/settings')) return 'Settings';
     if (url.includes('/suppliers')) return 'Suppliers';
     return 'Home';
+  }
+
+  toggleUserMenu(): void {
+    this.showUserMenu = !this.showUserMenu;
+  }
+
+  logout(): void {
+    console.log('Logout clicked');
+    this.showUserMenu = false;
+    this.authService.logout();
+    this.router.navigate(['/auth/login']);
+  }
+
+  navigateToProfile(): void {
+    this.showUserMenu = false;
+    this.router.navigate(['/settings/profile']);
+  }
+
+  navigateToSettings(): void {
+    this.showUserMenu = false;
+    this.router.navigate(['/settings']);
   }
 }

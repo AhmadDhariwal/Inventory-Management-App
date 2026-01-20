@@ -1,13 +1,89 @@
-<header class="navbar">
+<header class="navbar" >
   <button type="button" class="navbar__menu-btn" (click)="toggleSidebar.emit()" aria-label="Toggle menu">
     <span></span>
     <span></span>
     <span></span>
   </button>
-  
+
   <div class="navbar__title">{{ pageTitle }}</div>
 
   <div class="navbar__actions">
-    <span class="navbar__user">Admin</span>
+    <!-- User Menu -->
+    <div class="user-menu" *ngIf="currentUser$ | async as user; else logoutButton">
+      <button
+        type="button"
+        class="user-menu__trigger"
+        (click)="toggleUserMenu()"
+        [attr.aria-expanded]="showUserMenu"
+        aria-haspopup="true"
+      >
+        <div class="user-avatar">
+          <span>{{ user.name.charAt(0).toUpperCase() || 'U' }}</span>
+        </div>
+        <div class="user-info">
+          <span class="user-name">{{ user.name || 'User' }}</span>
+          <span class="user-role">{{ user.role || 'user' }}</span>
+        </div>
+        <svg class="chevron" [class.rotated]="showUserMenu" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+          <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+        </svg>
+      </button>
+
+      <!-- Dropdown Menu -->
+      <div class="user-menu__dropdown" [class.show]="showUserMenu">
+        <div class="dropdown-header">
+          <div class="user-avatar user-avatar--large">
+            <span>{{ user.name.charAt(0).toUpperCase() || 'U' }}</span>
+          </div>
+          <div class="user-details">
+            <div class="user-name">{{ user.name || 'User' }}</div>
+            <div class="user-email">{{ user.email || 'user@example.com' }}</div>
+          </div>
+        </div>
+
+        <div class="dropdown-divider"></div>
+
+        <nav class="dropdown-nav">
+          <button type="button" class="dropdown-item" (click)="navigateToProfile()">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM12.735 14c.618 0 1.093-.561.872-1.139a6.002 6.002 0 0 0-11.215 0c-.22.578.254 1.139.872 1.139h9.47z"/>
+            </svg>
+            <span>Profile</span>
+          </button>
+
+          <button type="button" class="dropdown-item" (click)="navigateToSettings()">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/>
+              <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319z"/>
+            </svg>
+            <span>Settings</span>
+          </button>
+
+          <div class="dropdown-divider"></div>
+
+          <button type="button" class="dropdown-item dropdown-item--danger" (click)="logout(); $event.stopPropagation()">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+              <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z"/>
+              <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"/>
+            </svg>
+            <span>Sign out</span>
+          </button>
+        </nav>
+      </div>
+    </div>
+
+    <!-- Simple logout button when no user -->
+    <ng-template #logoutButton>
+      <button type="button" class="btn btn--logout" (click)="logout(); $event.stopPropagation()">
+        <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+          <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z"/>
+          <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"/>
+        </svg>
+        Logout
+      </button>
+    </ng-template>
   </div>
 </header>
+
+<!-- Backdrop for mobile menu -->
+<div class="user-menu__backdrop" [class.show]="showUserMenu" (click)="showUserMenu = false"></div>

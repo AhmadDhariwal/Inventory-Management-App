@@ -14,38 +14,72 @@ export const routes: Routes = [
     children: [
       { path: 'login', component: LoginComponent },
       { path: 'register', component: RegisterComponent },
-      { path: '', redirectTo: 'login', pathMatch: 'full' }
+      { path: '', redirectTo: 'register', pathMatch: 'full' }
     ]
   },
-  
+
   // Legacy auth routes (redirect to new structure)
   { path: 'login', redirectTo: 'auth/login', pathMatch: 'full' },
   { path: 'register', redirectTo: 'auth/register', pathMatch: 'full' },
 
-  // Main application routes (with layout)
+  // Main application routes (with layout and auth guard)
   {
     path: '',
     component: MainLayoutComponent,
+    canActivate: [AuthGuard],
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       {
         path: 'dashboard',
-        loadChildren : () =>
-          import("./dashboard/dashboard.module").then(
-          (m) => m.DashboardModule,
-          )
+        loadChildren: () =>
+          import('./dashboard/dashboard.module').then(
+            (m) => m.DashboardModule
+          ),
+        canActivate: [AuthGuard]
       },
       {
         path: 'stock',
         loadChildren: () =>
-          import('./stock/stock.module').then(m => m.StockModule)
+          import('./stock/stock.module').then(m => m.StockModule),
+        canActivate: [AuthGuard]
+      },
+      {
+        path: 'products',
+        loadChildren: () =>
+          import('./products/products.module').then(m => m.ProductsModule),
+        canActivate: [AuthGuard]
+      },
+      {
+        path: 'purchases',
+        loadChildren: () =>
+          import('./purchases/purchases.module').then(m => m.PurchasesModule),
+        canActivate: [AuthGuard]
+      },
+      {
+        path: 'suppliers',
+        loadChildren: () =>
+          import('./suppliers/suppliers.module').then(m => m.SuppliersModule),
+        canActivate: [AuthGuard]
+      },
+      {
+        path: 'reports',
+        loadChildren: () =>
+          import('./reports/reports.module').then(m => m.ReportsModule),
+        canActivate: [AuthGuard]
+      },
+      {
+        path: 'settings',
+        loadChildren: () =>
+          import('./settings/settings.module').then(m => m.SettingsModule),
+        canActivate: [AuthGuard],
+        data: { roles: ['admin'] } // Only admin can access settings
       }
     ]
   },
-  
+
   // Fallback
   { path: '**', redirectTo: 'auth/login' }
-]
+];
 
 
 //   {

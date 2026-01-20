@@ -32,6 +32,7 @@ export class StockMovementReportComponent implements OnInit {
   loadStockMovements(): void {
     this.stockService.getStockMovements().subscribe({
       next: data => {
+        console.log('Raw movements data:', data);
         this.movements = data;
         this.extractWarehouses();
         this.applyFilters();
@@ -44,14 +45,27 @@ export class StockMovementReportComponent implements OnInit {
 
   extractWarehouses(): void {
     const whSet = new Set<string>();
-    this.movements.forEach(m => whSet.add(m.warehouse.name));
+    this.movements.forEach(m => {
+      if (m.warehouse && m.warehouse.name) {
+        whSet.add(m.warehouse.name);
+      }
+    });
     this.warehouses = ['ALL', ...Array.from(whSet)];
+    console.log('Extracted warehouses:', this.warehouses);
   }
 
   applyFilters(): void {
-    this.filteredMovements = this.movements.filter(m =>
-      (this.selectedType === 'ALL' || m.type === this.selectedType) &&
-      (this.selectedWarehouse === 'ALL' || m.warehouse.name === this.selectedWarehouse)
-    );
+    console.log('Applying filters - Type:', this.selectedType, 'Warehouse:', this.selectedWarehouse);
+    
+    this.filteredMovements = this.movements.filter(m => {
+      const typeMatch = this.selectedType === 'ALL' || m.type === this.selectedType;
+      const warehouseMatch = this.selectedWarehouse === 'ALL' || 
+        (m.warehouse && m.warehouse.name === this.selectedWarehouse);
+      
+      return typeMatch && warehouseMatch;
+    });
+    
+    console.log('Filtered movements count:', this.filteredMovements.length);
+    console.log('Total movements count:', this.movements.length);
   }
 }

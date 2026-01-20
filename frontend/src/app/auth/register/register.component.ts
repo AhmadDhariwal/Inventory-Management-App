@@ -1,44 +1,88 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { AuthService } from '../../shared/services/auth.service';
+import { AuthService, RegisterRequest } from '../../shared/services/auth.service';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss'
 })
-export class RegisterComponent {
-  formData = {
-    firstName: '',
-    lastName: '',
-    email: '',
-    username: '',
-    password: '',
-    confirmPassword: ''
-  };
-  
+export class RegisterComponent implements OnInit {
+  registerForm!: FormGroup;
   loading = false;
   error = '';
   showPassword = false;
   showConfirmPassword = false;
-  acceptTerms = false;
-  
-  // Individual field errors
-  firstNameError = '';
-  lastNameError = '';
-  emailError = '';
-  usernameError = '';
-  passwordError = '';
-  confirmPasswordError = '';
-  termsError = '';
-  
   passwordStrength = 0;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private router: Router
+  ) {}
+
+  ngOnInit(): void {
+    // Check if user is already authenticated
+    if (this.authService.isAuthenticated()) {
+      this.router.navigate(['/dashboard']);
+      return;
+    }
+
+    this.initializeForm();
+  }
+
+  private initializeForm(): void {
+    this.registerForm = this.fb.group({
+      firstName: ['', [Validators.required, Validators.minLength(2)]],
+      lastName: ['', [Validators.required, Validators.minLength(2)]],
+      email: ['', [Validators.required, Validators.email]],
+      username: ['', [Validators.required, Validators.minLength(3), Validators.pattern(/^[a-zA-Z0-9_]+$/)]],
+      password: ['', [Validators.required, Validators.minLength(8), this.passwordValidator]],
+      confirmPassword: ['', [Validators.required]],
+      acceptTerms: [false, [Validators.requiredTrue]]
+    }, { validators: this.passwordMatchValidator });
+
+    // Watch password changes for strength calculation
+    this.registerForm.get('password')?.valueChanges.subscribe(password => {
+      this.passwordStrength = this.calculatePasswordStrength(password || '');
+    });
+  }
+
+  // Custom validators
+  private passwordValidator(control: any) {
+    const password = control.value;
+    if (!password) return null;
+    
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumber = /\d/.test(password);
+    
+    if (hasUpperCase && hasLowerCase && hasNumber) {
+      return null;
+    }
+    
+    return { passwordStrength: true };
+  }
+
+  private passwordMatchValidator(form: FormGroup) {
+    const password = form.get('password');
+    const confirmPassword = form.get('confirmPassword');
+    
+    if (password && confirmPassword && password.value !== confirmPassword.value) {
+      confirmPassword.setErrors({ passwordMismatch: true });
+      return { passwordMismatch: true };
+    }
+    
+    return null;
+  }
+
+  get f() {
+    return this.registerForm.controls;
+  }
 
   togglePassword(): void {
     this.showPassword = !this.showPassword;
@@ -48,82 +92,10 @@ export class RegisterComponent {
     this.showConfirmPassword = !this.showConfirmPassword;
   }
 
-  // Validation methods
-  validateFirstName(): void {
-    if (!this.formData.firstName.trim()) {
-      this.firstNameError = 'First name is required';
-    } else if (this.formData.firstName.trim().length < 2) {
-      this.firstNameError = 'First name must be at least 2 characters';
-    } else {
-      this.firstNameError = '';
-    }
+  clearError(): void {
+    this.error = '';
   }
 
-  validateLastName(): void {
-    if (!this.formData.lastName.trim()) {
-      this.lastNameError = 'Last name is required';
-    } else if (this.formData.lastName.trim().length < 2) {
-      this.lastNameError = 'Last name must be at least 2 characters';
-    } else {
-      this.lastNameError = '';
-    }
-  }
-
-  validateEmail(): void {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!this.formData.email.trim()) {
-      this.emailError = 'Email address is required';
-    } else if (!emailRegex.test(this.formData.email)) {
-      this.emailError = 'Please enter a valid email address';
-    } else {
-      this.emailError = '';
-    }
-  }
-
-  validateUsername(): void {
-    if (!this.formData.username.trim()) {
-      this.usernameError = 'Username is required';
-    } else if (this.formData.username.length < 3) {
-      this.usernameError = 'Username must be at least 3 characters';
-    } else if (!/^[a-zA-Z0-9_]+$/.test(this.formData.username)) {
-      this.usernameError = 'Username can only contain letters, numbers, and underscores';
-    } else {
-      this.usernameError = '';
-    }
-  }
-
-  validatePassword(): void {
-    if (!this.formData.password) {
-      this.passwordError = 'Password is required';
-    } else if (this.formData.password.length < 8) {
-      this.passwordError = 'Password must be at least 8 characters';
-    } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(this.formData.password)) {
-      this.passwordError = 'Password must contain uppercase, lowercase, and number';
-    } else {
-      this.passwordError = '';
-    }
-  }
-
-  validateConfirmPassword(): void {
-    if (!this.formData.confirmPassword) {
-      this.confirmPasswordError = 'Please confirm your password';
-    } else if (this.formData.password !== this.formData.confirmPassword) {
-      this.confirmPasswordError = 'Passwords do not match';
-    } else {
-      this.confirmPasswordError = '';
-    }
-  }
-
-  // Clear error methods
-  clearFirstNameError(): void { this.firstNameError = ''; this.error = ''; }
-  clearLastNameError(): void { this.lastNameError = ''; this.error = ''; }
-  clearEmailError(): void { this.emailError = ''; this.error = ''; }
-  clearUsernameError(): void { this.usernameError = ''; this.error = ''; }
-  clearPasswordError(): void { this.passwordError = ''; this.error = ''; }
-  clearConfirmPasswordError(): void { this.confirmPasswordError = ''; this.error = ''; }
-  clearTermsError(): void { this.termsError = ''; this.error = ''; }
-
-  // Password strength calculation
   calculatePasswordStrength(password: string): number {
     let strength = 0;
     if (password.length >= 8) strength++;
@@ -132,14 +104,6 @@ export class RegisterComponent {
     if (/\d/.test(password)) strength++;
     if (/[^\w\s]/.test(password)) strength++;
     return strength;
-  }
-
-  onPasswordInput(): void {
-    this.clearPasswordError();
-    this.passwordStrength = this.calculatePasswordStrength(this.formData.password);
-    if (this.formData.confirmPassword) {
-      this.validateConfirmPassword();
-    }
   }
 
   getPasswordStrengthClass(): string {
@@ -154,59 +118,44 @@ export class RegisterComponent {
     return 'Strong password';
   }
 
-  isFormValid(): boolean {
-    return this.formData.firstName.trim().length >= 2 &&
-           this.formData.lastName.trim().length >= 2 &&
-           this.formData.email.trim().length > 0 &&
-           /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.formData.email) &&
-           this.formData.username.length >= 3 &&
-           this.formData.password.length >= 8 &&
-           this.formData.password === this.formData.confirmPassword &&
-           this.acceptTerms === true &&
-           !this.firstNameError &&
-           !this.lastNameError &&
-           !this.emailError &&
-           !this.usernameError &&
-           !this.passwordError &&
-           !this.confirmPasswordError;
-  }
-
-  signUpWithGoogle(): void {
-    console.log('Google signup clicked');
-  }
-
-  signUpWithGitHub(): void {
-    console.log('GitHub signup clicked');
-  }
-
   onSubmit(): void {
     this.error = '';
-    
-    // Validate all fields
-    this.validateFirstName();
-    this.validateLastName();
-    this.validateEmail();
-    this.validateUsername();
-    this.validatePassword();
-    this.validateConfirmPassword();
-    
-    if (!this.acceptTerms) {
-      this.termsError = 'Please accept the terms and conditions';
-    }
 
-    if (!this.isFormValid()) {
+    if (this.registerForm.invalid) {
+      this.registerForm.markAllAsTouched();
       return;
     }
 
     this.loading = true;
     
-    // Simulate API call - replace with actual registration service
-    setTimeout(() => {
-      this.loading = false;
-      // On success, redirect to login with success message
-      this.router.navigate(['/auth/login'], { 
-        queryParams: { message: 'Account created successfully! Please sign in to continue.' }
-      });
-    }, 2000);
+    const formValue = this.registerForm.value;
+    const userData: RegisterRequest = {
+      name: `${formValue.firstName} ${formValue.lastName}`,
+      email: formValue.email,
+      username: formValue.username,
+      password: formValue.password,
+      role: 'user' // Default role
+    };
+
+    this.authService.register(userData).subscribe({
+      next: (response) => {
+        this.loading = false;
+        // Redirect to dashboard after successful registration
+        this.router.navigate(['/dashboard']);
+      },
+      error: (err) => {
+        this.loading = false;
+        this.error = err?.error || 'Registration failed. Please try again.';
+      }
+    });
+  }
+
+  // Social registration methods (placeholder for future implementation)
+  signUpWithGoogle(): void {
+    console.log('Google signup - Feature coming soon');
+  }
+
+  signUpWithGitHub(): void {
+    console.log('GitHub signup - Feature coming soon');
   }
 }
