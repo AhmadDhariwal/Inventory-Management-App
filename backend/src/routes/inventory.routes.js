@@ -10,5 +10,6 @@ router.get(
   verifytoken,
   inventorycontroller.getstock
 );
+router.get("/summary", verifytoken, inventorycontroller.getstocksummary);
 
 module.exports = router;

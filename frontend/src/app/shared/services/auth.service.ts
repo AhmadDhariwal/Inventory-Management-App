@@ -40,25 +40,15 @@ export class AuthService {
   private tokenKey = 'auth_token';
   private userKey = 'user_data';
   private roleKey = 'user_role';
-
-  private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
-  private currentUserSubject = new BehaviorSubject<User | null>(null);
-
   
+  private isAuthenticatedSubject = new BehaviorSubject<boolean>(this.hasValidToken());
+  private currentUserSubject = new BehaviorSubject<User | null>(this.getCurrentUser());
 
   public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
   public currentUser$ = this.currentUserSubject.asObservable();
 
   constructor(private http: HttpClient, private router: Router) {
-    const token = this.getToken();
-    const user = this.getCurrentUser();
-
-    if (token && user && this.isTokenValid(token)) {
-      this.isAuthenticatedSubject.next(true);
-      this.currentUserSubject.next(user);
-    } else {
-      this.clearAuthData();
-    }
+    this.checkTokenValidity();
   }
 
   login(credentials: LoginRequest): Observable<AuthResponse> {
@@ -86,15 +76,20 @@ export class AuthService {
       localStorage.setItem(this.tokenKey, response.token);
       localStorage.setItem(this.roleKey, response.role);
       localStorage.setItem(this.userKey, JSON.stringify(response.item));
-
+      
       this.isAuthenticatedSubject.next(true);
       this.currentUserSubject.next(response.item);
     }
   }
 
   logout(): void {
-    console.log('Logout method called');
-    this.clearAuthData();
+    localStorage.removeItem(this.tokenKey);
+    localStorage.removeItem(this.roleKey);
+    localStorage.removeItem(this.userKey);
+    
+    this.isAuthenticatedSubject.next(false);
+    this.currentUserSubject.next(null);
+    
     this.router.navigate(['/auth/login']);
   }
 
@@ -114,36 +109,25 @@ export class AuthService {
   hasValidToken(): boolean {
     const token = this.getToken();
     if (!token) return false;
-
-    return this.isTokenValid(token);
-  }
-
-  private isTokenValid(token: string): boolean {
+    
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
       const currentTime = Math.floor(Date.now() / 1000);
-
+      
       if (payload.exp && payload.exp < currentTime) {
+        this.logout();
         return false;
       }
-
+      
       return true;
     } catch (error) {
+      this.logout();
       return false;
     }
   }
 
   isAuthenticated(): boolean {
     return this.hasValidToken();
-  }
-
-  private clearAuthData(): void {
-    localStorage.removeItem(this.tokenKey);
-    localStorage.removeItem(this.roleKey);
-    localStorage.removeItem(this.userKey);
-
-    this.isAuthenticatedSubject.next(false);
-    this.currentUserSubject.next(null);
   }
 
   hasRole(role: string): boolean {
@@ -156,15 +140,21 @@ export class AuthService {
     return userRole ? roles.includes(userRole) : false;
   }
 
+  private checkTokenValidity(): void {
+    if (!this.hasValidToken()) {
+      this.logout();
+    }
+  }
+
   private handleError = (error: HttpErrorResponse): Observable<never> => {
     let errorMessage = 'An unknown error occurred';
-
+    
     if (error.error instanceof ErrorEvent) {
       errorMessage = error.error.message;
     } else {
       errorMessage = error.error?.error || error.error?.message || error.message;
     }
-
+    
     return throwError(() => ({ error: errorMessage }));
   }
 }

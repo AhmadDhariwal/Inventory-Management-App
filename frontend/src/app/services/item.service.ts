@@ -36,59 +36,59 @@ isadmin(): boolean {
 }
 
 
-isAuthenticated() : boolean{
+// isAuthenticated() : boolean{
 
-  const  t = localStorage.getItem('token') !== null;
-  return t;
-  }
+//   const  t = localStorage.getItem('token') !== null;
+//   return t;
+//   }
 
-logout(): void {
-        localStorage.removeItem('token');
-         localStorage.removeItem('role');
-       this.router.navigate(['/login']);
+// logout(): void {
+//         localStorage.removeItem('token');
+//          localStorage.removeItem('role');
+//        this.router.navigate(['/login']);
 
-      }
+//       }
 
-usersignup(item: signup) {
-  return this.http.post<signup>(this.signupurl, item).pipe(
-    tap((res:any) => {
+// usersignup(item: signup) {
+//   return this.http.post<signup>(this.signupurl, item).pipe(
+//     tap((res:any) => {
 
-      localStorage.setItem('token', res.token);
-       localStorage.setItem('role', res.item.role);
-    }),
-    catchError(err => {
-      console.error('User Signup Error:', err);
-      return throwError(() => err);
-    })
-  );
-}
+//       localStorage.setItem('token', res.token);
+//        localStorage.setItem('role', res.item.role);
+//     }),
+//     catchError(err => {
+//       console.error('User Signup Error:', err);
+//       return throwError(() => err);
+//     })
+//   );
+// }
 
-  userlogin(item : login){
-    const url = `${this.signupurl}/login`;
-    return this.http.post<login>(url, item,{
-        headers: this.getAuthHeaders()
-    }).pipe(
-      tap((res: any) => {
-        localStorage.setItem('token', res.token);
-        localStorage.setItem('role', res.item.role);
-      }),
-     catchError(err => {
-        console.error('User Login error : ', err);
-        return throwError(()=> err);
-     })
-    );
- }
- getusers(){
-  const url = `${this.apiurl}/allusers`;
-    return this.http.get<Inventory>(url,{
-        headers: this.getAuthHeaders()
-    }).pipe(
-     catchError(err => {
-        console.error('Get users error : ', err);
-        return throwError(()=> err);
-     })
-    );
- }
+//   userlogin(item : login){
+//     const url = `${this.signupurl}/login`;
+//     return this.http.post<login>(url, item,{
+//         headers: this.getAuthHeaders()
+//     }).pipe(
+//       tap((res: any) => {
+//         localStorage.setItem('token', res.token);
+//         localStorage.setItem('role', res.item.role);
+//       }),
+//      catchError(err => {
+//         console.error('User Login error : ', err);
+//         return throwError(()=> err);
+//      })
+//     );
+//  }
+//  getusers(){
+//   const url = `${this.apiurl}/allusers`;
+//     return this.http.get<Inventory>(url,{
+//         headers: this.getAuthHeaders()
+//     }).pipe(
+//      catchError(err => {
+//         console.error('Get users error : ', err);
+//         return throwError(()=> err);
+//      })
+//     );
+//  }
 
 
  createitems(item : Inventory) {

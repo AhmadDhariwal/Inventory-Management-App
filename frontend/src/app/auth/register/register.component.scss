@@ -1,4 +1,4 @@
-/* Register component specific styles */
+/* Register Component Styles */
 .auth-layout {
   min-height: 100vh;
   display: flex;
@@ -10,7 +10,7 @@
 
 .auth-container {
   width: 100%;
-  max-width: 400px;
+  max-width: 450px;
 }
 
 .auth-card {
@@ -96,6 +96,13 @@
   margin-bottom: 1.5rem;
 }
 
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
 .form-label {
   display: block;
   font-size: 0.875rem;
@@ -162,6 +169,112 @@
   margin-top: 0.25rem;
   font-size: 0.75rem;
   color: #ef4444;
+}
+
+/* Password Strength Indicator */
+.password-strength {
+  margin-top: 0.5rem;
+}
+
+.strength-bar {
+  width: 100%;
+  height: 4px;
+  background-color: #e5e7eb;
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 0.25rem;
+}
+
+.strength-fill {
+  height: 100%;
+  transition: all 0.3s ease;
+  border-radius: 2px;
+}
+
+.strength-fill.strength--weak {
+  width: 25%;
+  background-color: #ef4444;
+}
+
+.strength-fill.strength--medium {
+  width: 75%;
+  background-color: #f59e0b;
+}
+
+.strength-fill.strength--strong {
+  width: 100%;
+  background-color: #10b981;
+}
+
+.strength-text {
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.strength-text.strength--weak {
+  color: #ef4444;
+}
+
+.strength-text.strength--medium {
+  color: #f59e0b;
+}
+
+.strength-text.strength--strong {
+  color: #10b981;
+}
+
+/* Checkbox Styles */
+.checkbox-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.checkbox-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.checkbox-custom {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #d1d5db;
+  border-radius: 4px;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.checkbox-input:checked + .checkbox-custom {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+}
+
+.checkbox-input:checked + .checkbox-custom::after {
+  content: '';
+  width: 10px;
+  height: 10px;
+  background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='m13.854 3.646-7.5 7.5a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6 10.293l7.146-7.147a.5.5 0 0 1 .708.708z'/%3e%3c/svg%3e");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.checkbox-input:focus + .checkbox-custom {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+.checkbox-text {
+  color: #374151;
 }
 
 /* Buttons */
@@ -281,152 +394,7 @@
   text-decoration: underline;
 }
 
-/* Additional styles for register component */
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-/* Password Strength Indicator */
-.password-strength {
-  margin-top: 0.5rem;
-}
-
-.strength-bar {
-  width: 100%;
-  height: 4px;
-  background-color: #e5e7eb;
-  border-radius: 2px;
-  overflow: hidden;
-  margin-bottom: 0.25rem;
-}
-
-.strength-fill {
-  height: 100%;
-  transition: all 0.3s ease;
-  border-radius: 2px;
-}
-
-.strength-fill.strength--weak {
-  width: 25%;
-  background-color: #ef4444;
-}
-
-.strength-fill.strength--medium {
-  width: 75%;
-  background-color: #f59e0b;
-}
-
-.strength-fill.strength--strong {
-  width: 100%;
-  background-color: #10b981;
-}
-
-.strength-text {
-  font-size: 0.75rem;
-  font-weight: 500;
-}
-
-.strength-text.strength--weak {
-  color: #ef4444;
-}
-
-.strength-text.strength--medium {
-  color: #f59e0b;
-}
-
-.strength-text.strength--strong {
-  color: #10b981;
-}
-
-/* Checkbox Styles */
-.checkbox-label {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
-  cursor: pointer;
-  font-size: 0.875rem;
-  line-height: 1.5;
-}
-
-.checkbox-input {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.checkbox-custom {
-  width: 18px;
-  height: 18px;
-  border: 2px solid #d1d5db;
-  border-radius: 4px;
-  background-color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-
-.checkbox-input:checked + .checkbox-custom {
-  background-color: #3b82f6;
-  border-color: #3b82f6;
-}
-
-.checkbox-input:checked + .checkbox-custom::after {
-  content: '';
-  width: 10px;
-  height: 10px;
-  background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='m13.854 3.646-7.5 7.5a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6 10.293l7.146-7.147a.5.5 0 0 1 .708.708z'/%3e%3c/svg%3e");
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-}
-
-.checkbox-input:focus + .checkbox-custom {
-  outline: 2px solid #3b82f6;
-  outline-offset: 2px;
-}
-
-.checkbox-text {
-  color: #374151;
-}
-
-/* Enhanced form validation styles */
-.form-input.error {
-  border-color: #ef4444;
-  background-color: #fef2f2;
-}
-
-.form-input.error:focus {
-  border-color: #ef4444;
-  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
-}
-
-.form-input.success {
-  border-color: #10b981;
-}
-
-.form-input.success:focus {
-  border-color: #10b981;
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
-}
-
-/* Loading state enhancements */
-.btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none !important;
-}
-
-.btn-spinner {
-  animation: spin 1s linear infinite;
-}
-
-/* Enhanced responsive design */
+/* Responsive */
 @media (max-width: 640px) {
   .form-row {
     grid-template-columns: 1fr;
@@ -456,22 +424,25 @@
   }
 }
 
-/* Enhanced accessibility */
-@media (prefers-reduced-motion: reduce) {
-  .strength-fill,
-  .checkbox-custom,
-  .btn,
-  .form-input {
-    transition: none !important;
-  }
-  
-  .btn-spinner {
-    animation: none !important;
-  }
+/* Focus styles for accessibility */
+.btn:focus-visible,
+.form-input:focus-visible,
+.password-toggle:focus-visible,
+.link:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
 }
 
-/* High contrast mode */
+/* High contrast mode support */
 @media (prefers-contrast: high) {
+  .auth-card {
+    border: 2px solid #000;
+  }
+  
+  .form-input {
+    border-width: 2px;
+  }
+  
   .checkbox-custom {
     border-width: 3px;
   }
@@ -481,47 +452,11 @@
   }
 }
 
-/* Focus management for better UX */
-.form-input:focus,
-.checkbox-input:focus + .checkbox-custom {
-  outline: 2px solid #3b82f6;
-  outline-offset: 2px;
-}
-
-/* Enhanced error states */
-.alert--error {
-  animation: shake 0.5s ease-in-out;
-}
-
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-5px); }
-  75% { transform: translateX(5px); }
-}
-
-/* Success states */
-.form-group.success .form-input {
-  border-color: #10b981;
-}
-
-.form-group.success .input-icon {
-  color: #10b981;
-}
-
-/* Loading overlay for form */
-.auth-form.loading {
-  position: relative;
-  pointer-events: none;
-}
-
-.auth-form.loading::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(255, 255, 255, 0.8);
-  border-radius: 8px;
-  z-index: 10;
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

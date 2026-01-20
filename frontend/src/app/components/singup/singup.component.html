@@ -1,4 +1,4 @@
-
+<!--
 <div class="form">
   <form [formGroup]="userForm" class="form-item" >
 
@@ -59,8 +59,8 @@
     }
 
      <label for="password">Password</label>
-  <!---  <input type="text" placeholder="Write the Password" id="password" formControlName="password" required><br>  -->
-
+   <input type="text" placeholder="Write the Password" id="password" formControlName="password" required><br>  -->
+<!--
    <input [type]="show ?  'text' : 'password'" placeholder="Write the Password"  class="password" id="password" formControlName = "password">
     <button (click)="toggleShow()">{{ show ? 'Hide' : 'Show' }}</button>
 
@@ -82,7 +82,7 @@
 
    <label for="role">Role</label>
 <select id="role" class="role" formControlName="role">
-  <option value="" >Select Role</option>   <!--disabled selected-->
+  <option value="" >Select Role</option>   disabled selected
   <option class="optionn" value="admin">admin</option>
   <option class="optionn" value="user">user</option>
 </select>
@@ -99,7 +99,7 @@
     <input (click)="onsubmit()" type="submit" value="Sign Up"  >
      <button [routerLink]="['login']" type="submit"> Login here </button>
   </form>
-</div>
+</div> -->
 
    <!-- <input (click)="onCreate()" type="submit" value="submit"  >-->
       <!-- <button (click)="onSubmit()" type="submit" value="submit"> {{ userid ? 'Save Changes' : 'Add Item' }}   </button> -->

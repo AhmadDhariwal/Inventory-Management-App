@@ -30,7 +30,12 @@ export class OverviewComponent implements OnInit{
  loading = true;
   error: string | null = null;
 
-  stats: any = null;
+  stats: any = {
+    totalproducts: 0,
+    totalsuppliers: 0,
+    totalStock: 0,
+    totalpurchases: 0
+  };
 
    constructor( private dashboardService: DashboardService) {}
 

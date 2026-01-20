@@ -18,6 +18,50 @@ const getstockmovementreport = async (req, res) => {
   }
 };
 
+const exportStockMovementsCSV = async (req, res) => {
+  try {
+    const csv = await reportservice.exportStockMovementsCSV(req.query);
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename=stock-movements.csv');
+    res.send(csv);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const exportStockMovementsExcel = async (req, res) => {
+  try {
+    const buffer = await reportservice.exportStockMovementsExcel(req.query);
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', 'attachment; filename=stock-movements.xlsx');
+    res.send(buffer);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const exportStockSummaryCSV = async (req, res) => {
+  try {
+    const csv = await reportservice.exportStockSummaryCSV(req.query);
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename=stock-summary.csv');
+    res.send(csv);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const exportStockSummaryExcel = async (req, res) => {
+  try {
+    const buffer = await reportservice.exportStockSummaryExcel(req.query);
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', 'attachment; filename=stock-summary.xlsx');
+    res.send(buffer);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 const getpurchasereport = async (req, res) => {
   try {
     const report = await reportservice.getpurchasereport();
@@ -57,6 +101,10 @@ const getlowstockreport = async (req, res) => {
 module.exports = {
   getstockreport,
   getstockmovementreport,
+  exportStockMovementsCSV,
+  exportStockMovementsExcel,
+  exportStockSummaryCSV,
+  exportStockSummaryExcel,
   getpurchasereport,
   getstocklevelsreport,
   getlowstockreport,

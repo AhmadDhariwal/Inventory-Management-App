@@ -1,28 +1,119 @@
-<section class="stock-summary" *ngIf="!loading">
+<section class="stock-summary">
+  <div class="filters-section">
+    <div class="header-section">
+      <div class="title-section">
+        <h3>Stock Summary Report</h3>
+        <p>Comprehensive inventory overview and analytics</p>
+      </div>
+      <div class="export-actions no-print">
+        <button class="btn btn-outline" (click)="exportCSV()" [disabled]="loading">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14,2 14,8 20,8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+          </svg>
+          CSV
+        </button>
+        <button class="btn btn-outline" (click)="exportExcel()" [disabled]="loading">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14,2 14,8 20,8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+          </svg>
+          Excel
+        </button>
+        <button class="btn btn-primary" (click)="printReport()" [disabled]="loading">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6,9 6,2 18,2 18,9"></polyline>
+            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+            <polyline points="6,14 6,22 18,22 18,14"></polyline>
+          </svg>
+          Print
+        </button>
+      </div>
+    </div>
+    
+    <h4>Filters</h4>
+    <div class="filters">
+      <div class="filter-group">
+        <label for="startDate">Start Date:</label>
+        <input
+          id="startDate"
+          type="date"
+          [(ngModel)]="filters.startDate"
+        />
+      </div>
 
-  <app-kpi-card
-    label="Total Products"
-    [value]="summary.totalProducts">
-  </app-kpi-card>
+      <div class="filter-group">
+        <label for="endDate">End Date:</label>
+        <input
+          id="endDate"
+          type="date"
+          [(ngModel)]="filters.endDate"
+        />
+      </div>
 
-  <app-kpi-card
-    label="Total Stock"
-    [value]="summary.totalStock">
-  </app-kpi-card>
+      <div class="filter-group">
+        <label for="warehouse">Warehouse:</label>
+        <select id="warehouse" [(ngModel)]="filters.warehouseId" aria-label="Select warehouse">
+          <option value="">All Warehouses</option>
+          <option *ngFor="let w of warehouses" [value]="w._id">
+            {{ w.name }}
+          </option>
+        </select>
+      </div>
 
-  <app-kpi-card
-    label="Low Stock Items"
-    [value]="summary.lowStockItems">
-  </app-kpi-card>
+      <div class="filter-group">
+        <label for="product">Product:</label>
+        <select id="product" [(ngModel)]="filters.productId" aria-label="Select product">
+          <option value="">All Products</option>
+          <option *ngFor="let p of products" [value]="p._id">
+            {{ p.name }}
+          </option>
+        </select>
+      </div>
 
-  <app-kpi-card
-    label="Warehouses"
-    [value]="summary.warehouses">
-  </app-kpi-card>
+      <div class="filter-actions">
+        <button class="btn btn-primary" (click)="applyFilters()" [disabled]="loading">
+          {{ loading ? 'Loading...' : 'Apply Filters' }}
+        </button>
+        <button class="btn btn-secondary" (click)="clearFilters()" [disabled]="loading">
+          Clear
+        </button>
+      </div>
+    </div>
+  </div>
 
-  <app-kpi-card
-    label="Inventory Value"
-    [value]="summary.inventoryValue">
-  </app-kpi-card>
+  <div class="summary-cards" *ngIf="!loading">
+    <app-kpi-card
+      label="Total Products"
+      [value]="summary.totalProducts">
+    </app-kpi-card>
 
+    <app-kpi-card
+      label="Total Stock"
+      [value]="summary.totalStock">
+    </app-kpi-card>
+
+    <app-kpi-card
+      label="Low Stock Items"
+      [value]="summary.lowStockItems">
+    </app-kpi-card>
+
+    <app-kpi-card
+      label="Warehouses"
+      [value]="summary.warehouses">
+    </app-kpi-card>
+
+    <app-kpi-card
+      label="Inventory Value"
+      [value]="summary.inventoryValue || 0">
+    </app-kpi-card>
+  </div>
+
+  <div class="loading" *ngIf="loading">
+    <p>Loading stock summary...</p>
+  </div>
 </section>

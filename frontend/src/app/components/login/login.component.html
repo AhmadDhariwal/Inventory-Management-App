@@ -1,4 +1,4 @@
-
+<!--
 <div class="form">
   <form [formGroup]="userForm" class="form-item" >
 
@@ -21,7 +21,7 @@
     }
 
      <label for="password">Password</label>
-<!--    <input type="text" placeholder="Write the Password" id="password" formControlName="password" required  #passwordfield> -->
+    <input type="text" placeholder="Write the Password" id="password" formControlName="password" required  #passwordfield> 
      <input [type]="show ?  'text' : 'password'" placeholder="Write the Password"  class="password" id="password" formControlName = "password">
     <button (click)="toggleShow()">{{ show ? 'Hide' : 'Show' }}</button>
 
@@ -50,7 +50,7 @@
        {{message}}
      </div>
     }
-     </div>-->
+     </div>
 
    <div>
   @if (message) {
@@ -63,4 +63,4 @@
 
      <button [routerLink]="['/']" type="submit"> Not Register? Sign Up here </button>
   </form>
-</div>
+</div> -->

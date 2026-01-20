@@ -40,7 +40,6 @@ exports.removestock = async (req, res) => {
   }
 };
 
-
 exports.getstock = async (req, res) => {
   try {
     const stock = await inventoryservice.getcurrentstock(
@@ -49,6 +48,22 @@ exports.getstock = async (req, res) => {
     );
 
     res.status(200).json({ stock });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+exports.getstocksummary = async (req, res) => {
+  try {
+    const filters = {
+      startDate: req.query.startDate,
+      endDate: req.query.endDate,
+      warehouseId: req.query.warehouseId,
+      productId: req.query.productId
+    };
+    
+    const summary = await inventoryservice.getstocksummary(filters);
+    res.status(200).json(summary);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

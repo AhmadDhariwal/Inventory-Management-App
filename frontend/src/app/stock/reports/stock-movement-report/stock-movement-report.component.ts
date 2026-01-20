@@ -25,6 +25,52 @@ export class StockMovementReportComponent implements OnInit {
 
   constructor(private stockService: StockService) {}
 
+  exportCSV(): void {
+    this.stockService.exportStockMovementsCSV({
+      type: this.selectedType !== 'ALL' ? this.selectedType : undefined,
+      warehouse: this.selectedWarehouse !== 'ALL' ? this.selectedWarehouse : undefined
+    }).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `stock-movements-${new Date().toISOString().split('T')[0]}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      },
+      error: (err) => console.error('Export failed:', err)
+    });
+  }
+
+  exportExcel(): void {
+    this.stockService.exportStockMovementsExcel({
+      type: this.selectedType !== 'ALL' ? this.selectedType : undefined,
+      warehouse: this.selectedWarehouse !== 'ALL' ? this.selectedWarehouse : undefined
+    }).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `stock-movements-${new Date().toISOString().split('T')[0]}.xlsx`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      },
+      error: (err) => console.error('Export failed:', err)
+    });
+  }
+
+  printReport(): void {
+    window.print();
+  }
+
+  trackByMovement(index: number, movement: StockMovement): string {
+    return movement._id || index.toString();
+  }
+
   ngOnInit(): void {
     this.loadStockMovements();
   }

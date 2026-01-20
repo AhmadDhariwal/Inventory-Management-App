@@ -243,9 +243,72 @@ const getstocksummary = async () => {
 };
 
 
+const exportStockMovementsCSV = async (filters = {}) => {
+  const movements = await StockMovement.find()
+    .populate("product", "name sku")
+    .populate("warehouse", "name")
+    .populate("user", "name")
+    .sort({ createdAt: -1 })
+    .lean();
+
+  const csvHeader = "Date,Product,SKU,Warehouse,Type,Quantity,Reason,User\n";
+  const csvRows = movements.map(m => 
+    `${new Date(m.createdAt).toLocaleDateString()},${m.product?.name || 'N/A'},${m.product?.sku || 'N/A'},${m.warehouse?.name || 'N/A'},${m.type},${m.quantity},${m.reason || 'N/A'},${m.user?.name || 'N/A'}`
+  ).join('\n');
+  
+  return csvHeader + csvRows;
+};
+
+const exportStockMovementsExcel = async (filters = {}) => {
+  const movements = await StockMovement.find()
+    .populate("product", "name sku")
+    .populate("warehouse", "name")
+    .populate("user", "name")
+    .sort({ createdAt: -1 })
+    .lean();
+
+  // Simple Excel format (CSV with .xlsx extension)
+  const csvHeader = "Date,Product,SKU,Warehouse,Type,Quantity,Reason,User\n";
+  const csvRows = movements.map(m => 
+    `${new Date(m.createdAt).toLocaleDateString()},${m.product?.name || 'N/A'},${m.product?.sku || 'N/A'},${m.warehouse?.name || 'N/A'},${m.type},${m.quantity},${m.reason || 'N/A'},${m.user?.name || 'N/A'}`
+  ).join('\n');
+  
+  return Buffer.from(csvHeader + csvRows);
+};
+
+const exportStockSummaryCSV = async (filters = {}) => {
+  const summary = await getstocksummary();
+  
+  const csvContent = `Metric,Value
+Total Products,${summary.totalProducts}
+Total Stock,${summary.totalStock}
+Low Stock Items,${summary.lowStockItems}
+Warehouses,${summary.warehouses}
+Inventory Value,${summary.inventoryValue}`;
+  
+  return csvContent;
+};
+
+const exportStockSummaryExcel = async (filters = {}) => {
+  const summary = await getstocksummary();
+  
+  const csvContent = `Metric,Value
+Total Products,${summary.totalProducts}
+Total Stock,${summary.totalStock}
+Low Stock Items,${summary.lowStockItems}
+Warehouses,${summary.warehouses}
+Inventory Value,${summary.inventoryValue}`;
+  
+  return Buffer.from(csvContent);
+};
+
 module.exports = {
   getstockreport,
   getstockmovementreport,
+  exportStockMovementsCSV,
+  exportStockMovementsExcel,
+  exportStockSummaryCSV,
+  exportStockSummaryExcel,
   getpurchasereport,
   getstocklevelsreport,
   getlowstockreport,

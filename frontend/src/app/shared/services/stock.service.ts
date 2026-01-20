@@ -40,7 +40,70 @@ export class StockService {
   getWarehouses(): Observable<any[]> {
     return this.http.get<any[]>(`${this.baseUrl}/api/warehouses`);
   }
-  getStockSummary(): Observable<InventorySummary> {
-    return this.http.get<InventorySummary>(`${this.baseUrl}/api/reports/summary`);
+  exportStockMovementsCSV(filters: any): Observable<Blob> {
+    const params = new URLSearchParams();
+    Object.keys(filters).forEach(key => {
+      if (filters[key]) params.append(key, filters[key]);
+    });
+    
+    return this.http.get(
+      `${this.baseUrl}/api/reports/stockmovements/export/csv?${params.toString()}`,
+      { responseType: 'blob' }
+    );
+  }
+
+  exportStockMovementsExcel(filters: any): Observable<Blob> {
+    const params = new URLSearchParams();
+    Object.keys(filters).forEach(key => {
+      if (filters[key]) params.append(key, filters[key]);
+    });
+    
+    return this.http.get(
+      `${this.baseUrl}/api/reports/stockmovements/export/excel?${params.toString()}`,
+      { responseType: 'blob' }
+    );
+  }
+
+  exportStockSummaryCSV(filters: any): Observable<Blob> {
+    const params = new URLSearchParams();
+    Object.keys(filters).forEach(key => {
+      if (filters[key]) params.append(key, filters[key]);
+    });
+    
+    return this.http.get(
+      `${this.baseUrl}/api/reports/summary/export/csv?${params.toString()}`,
+      { responseType: 'blob' }
+    );
+  }
+
+  exportStockSummaryExcel(filters: any): Observable<Blob> {
+    const params = new URLSearchParams();
+    Object.keys(filters).forEach(key => {
+      if (filters[key]) params.append(key, filters[key]);
+    });
+    
+    return this.http.get(
+      `${this.baseUrl}/api/reports/summary/export/excel?${params.toString()}`,
+      { responseType: 'blob' }
+    );
+  }
+
+  private downloadFile(blob: Blob, filename: string) {
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  }
+
+  getStockSummary(filters: any): Observable<InventorySummary> {
+    const params = new URLSearchParams();
+    if (filters.startDate) params.append('startDate', filters.startDate);
+    if (filters.endDate) params.append('endDate', filters.endDate);
+    if (filters.warehouseId) params.append('warehouseId', filters.warehouseId);
+    if (filters.productId) params.append('productId', filters.productId);
+    
+    return this.http.get<InventorySummary>(`${this.baseUrl}/api/inventory/summary?${params.toString()}`);
   }
 }
