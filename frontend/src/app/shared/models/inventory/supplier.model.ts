@@ -1,12 +1,12 @@
 export interface Supplier {
   _id: string;
   name: string;
-  contactPerson?: string;
+  contactperson?: string;
   email?: string;
   phone?: string;
   address?: string;
-  paymentTerms: 'CASH' | 'NET_15' | 'NET_30' | 'NET_60';
-  isActive: boolean;
+  paymentterms: 'CASH' | 'NET_15' | 'NET_30' | 'NET_60';
+  isactive: boolean;
   createdAt?: string;
   updatedAt?: string;
 }

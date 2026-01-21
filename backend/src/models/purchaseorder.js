@@ -29,6 +29,11 @@ const purchaseorderschema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    warehouse : {
+      type: mongoose.Schema.Types.ObjectId,
+      ref:"warehouse",
+      required:true,
+    },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

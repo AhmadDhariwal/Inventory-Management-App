@@ -4,8 +4,11 @@ const Supplier = require("../models/supplier");
 const StockMovement = require("../models/stockmovement");
 
 const createpurchaseorder = async (data, userId) => {
-  const { supplier, items } = data;
+  const { supplier, items, warehouse } = data;
 
+  if (!warehouse) {
+    throw new Error("Warehouse is required for purchase order");
+  }
   
   const supplierexists = await Supplier.findById(supplier);
   if (!supplierexists || supplierexists.status === "inactive") {
@@ -26,7 +29,7 @@ const createpurchaseorder = async (data, userId) => {
 
     await StockMovement.create({
       product: item.product,
-      warehouse: item.warehouse || null, // optional, you can add warehouse if needed
+      warehouse: warehouse,
       type: "IN",
       quantity: item.quantity,
       reason: "PURCHASE",
@@ -42,6 +45,7 @@ const createpurchaseorder = async (data, userId) => {
   const purchaseorder = await Purchaseorder.create({
     supplier,
     items,
+    warehouse,
     totalAmount,
     createdBy: userId,
   });

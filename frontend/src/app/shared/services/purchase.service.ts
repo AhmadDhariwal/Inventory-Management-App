@@ -15,7 +15,7 @@ export class PurchaseService {
     return this.http.get<PurchaseOrder[]>(this.baseUrl);
   }
 
-  createPurchaseOrder(order: PurchaseOrder): Observable<PurchaseOrder> {
+  createPurchaseOrder(order: any): Observable<PurchaseOrder> {
     return this.http.post<PurchaseOrder>(`${this.baseUrl}/add`, order);
   }
 }

@@ -13,7 +13,7 @@ exports.createsupplier = async (req, res) => {
 
 exports.getsuppliers = async (req, res) => {
   try {
-    const suppliers = await Supplier.find({ isActive: true });
+    const suppliers = await Supplier.find({ isactive: true });
     res.json(suppliers);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -52,7 +52,7 @@ exports.disablesupplier = async (req, res) => {
   try {
     const supplier = await Supplier.findByIdAndUpdate(
       req.params.id,
-      { isActive: false },
+      { isactive: false },
       { new: true }
     );
     res.json({ message: "Supplier disabled", supplier });
