@@ -98,21 +98,30 @@ export class PurchaseFormComponent implements OnInit {
       const formValue = this.purchaseForm.value;
       console.log('Form value before processing:', formValue);
 
-      const totalamount = formValue.items.reduce((sum: number, item: any) => {
+      // Ensure numeric values
+      const processedItems = formValue.items.map((item: any) => ({
+        product: item.product,
+        quantity: Number(item.quantity),
+        costprice: Number(item.costprice)
+      }));
+
+      const totalamount = processedItems.reduce((sum: number, item: any) => {
         return sum + (item.quantity * item.costprice);
       }, 0);
 
       const purchaseOrderData = {
-        ...formValue,
-        totalamount
+        supplier: formValue.supplier,
+        warehouse: formValue.warehouse,
+        items: processedItems,
+        totalamount: Number(totalamount.toFixed(2))
       };
 
-      console.log('Purchase order data being sent:', purchaseOrderData);
+    //  console.log('Purchase order data being sent:', purchaseOrderData);
 
       this.purchaseService.createPurchaseOrder(purchaseOrderData).subscribe({
         next: (data) => {
           this.loading = false;
-          console.log('Purchase order created successfully:', data);
+          //console.log('Purchase order created successfully:', data);
           // Reset form after successful creation
           this.purchaseForm.reset();
           this.purchaseForm = this.fb.group({
@@ -129,6 +138,8 @@ export class PurchaseFormComponent implements OnInit {
     } else {
       console.log('Form is invalid:', this.purchaseForm.errors);
       console.log('Form value:', this.purchaseForm.value);
+      // Mark all fields as touched to show validation errors
+      this.purchaseForm.markAllAsTouched();
     }
   }
 }

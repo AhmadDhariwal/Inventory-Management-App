@@ -4,28 +4,22 @@ const Supplier = require("../models/supplier");
 const StockMovement = require("../models/stockmovement");
 
 const createpurchaseorder = async (data, userId) => {
-  const { supplier, items, warehouse } = data;
+  const { supplier, items, warehouse, totalamount } = data;
 
   if (!warehouse) {
     throw new Error("Warehouse is required for purchase order");
   }
   
   const supplierexists = await Supplier.findById(supplier);
-  if (!supplierexists || supplierexists.status === "inactive") {
+  if (!supplierexists || supplierexists.isactive === false) {
     throw new Error("Supplier not found or inactive");
   }
-  let totalquantity = 0;
-  let totalAmount = 0;
 
   for (let item of items) {
     const product = await Product.findById(item.product);
     if (!product) {
       throw new Error("Product not found");
     }
-
-    
-    product.stockQuantity += item.quantity;
-    await product.save();
 
     await StockMovement.create({
       product: item.product,
@@ -35,18 +29,13 @@ const createpurchaseorder = async (data, userId) => {
       reason: "PURCHASE",
       user: userId,
     });
-
-    item.total= item.quantity * item.costprice;
-    totalquantity += item.quantity; 
-    totalAmount += item.total;
   }
-
 
   const purchaseorder = await Purchaseorder.create({
     supplier,
     items,
     warehouse,
-    totalAmount,
+    totalamount,
     createdBy: userId,
   });
 
@@ -54,7 +43,11 @@ const createpurchaseorder = async (data, userId) => {
 };
 
 const getallpurchaseorders = async () => {
-    return await Purchaseorder.find();
+  return await Purchaseorder.find()
+    .populate("supplier", "name")
+    .populate("warehouse", "name")
+    .populate("items.product", "name sku")
+    .populate("createdBy", "name");
 };
 module.exports = { 
   createpurchaseorder,
