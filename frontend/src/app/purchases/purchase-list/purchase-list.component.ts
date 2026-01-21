@@ -1,12 +1,252 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+import { PurchaseService } from '../../shared/services/purchase.service';
+import { SupplierService } from '../../shared/services/supplier.service';
+import { StockService } from '../../shared/services/stock.service';
+import { PurchaseOrder } from '../../shared/models/inventory/purchase-order.model';
+import { Supplier } from '../../shared/models/inventory/supplier.model';
 
 @Component({
   selector: 'app-purchase-list',
   standalone: true,
-  imports: [],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './purchase-list.component.html',
   styleUrl: './purchase-list.component.scss'
 })
-export class PurchaseListComponent {
+export class PurchaseListComponent implements OnInit {
+  purchaseOrders: PurchaseOrder[] = [];
+  filteredPurchaseOrders: PurchaseOrder[] = [];
+  suppliers: Supplier[] = [];
+  isLoading = false;
+  
+  // Search and Filter
+  searchTerm = '';
+  selectedSupplier = '';
+  
+  // Sorting
+  sortField = 'createdAt';
+  sortDirection: 'asc' | 'desc' = 'desc';
+  
+  // Pagination
+  currentPage = 1;
+  pageSize = 10;
+  totalItems = 0;
+  totalPages = 0;
+  Math = Math;
+  showExportDropdown = false;
 
+  constructor(
+    private purchaseService: PurchaseService,
+    private supplierService: SupplierService,
+    private stockService: StockService
+  ) {}
+
+  ngOnInit(): void {
+    this.loadPurchaseOrders();
+    this.loadSuppliers();
+  }
+
+  loadPurchaseOrders(): void {
+    this.isLoading = true;
+    this.purchaseService.getPurchaseOrders().subscribe({
+      next: (orders) => {
+        this.purchaseOrders = orders;
+        this.applyFiltersAndSort();
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Error loading purchase orders:', err);
+        this.isLoading = false;
+      }
+    });
+  }
+
+  loadSuppliers(): void {
+    this.supplierService.getSuppliers().subscribe({
+      next: (suppliers) => {
+        this.suppliers = suppliers;
+      },
+      error: (err) => {
+        console.error('Error loading suppliers:', err);
+      }
+    });
+  }
+
+  onSearch(): void {
+    this.currentPage = 1;
+    this.applyFiltersAndSort();
+  }
+
+  onFilter(): void {
+    this.currentPage = 1;
+    this.applyFiltersAndSort();
+  }
+
+  applyFiltersAndSort(): void {
+    let filtered = [...this.purchaseOrders];
+
+    // Apply search filter
+    if (this.searchTerm) {
+      const term = this.searchTerm.toLowerCase();
+      filtered = filtered.filter(po => 
+        po.supplier?.name?.toLowerCase().includes(term) ||
+        po.warehouse?.name?.toLowerCase().includes(term) ||
+        po.createdBy?.name?.toLowerCase().includes(term)
+      );
+    }
+
+    // Apply supplier filter
+    if (this.selectedSupplier) {
+      filtered = filtered.filter(po => po.supplier?._id === this.selectedSupplier);
+    }
+
+    // Apply sorting
+    filtered.sort((a, b) => {
+      let aValue: any;
+      let bValue: any;
+
+      switch (this.sortField) {
+        case 'supplier':
+          aValue = a.supplier?.name || '';
+          bValue = b.supplier?.name || '';
+          break;
+        case 'warehouse':
+          aValue = a.warehouse?.name || '';
+          bValue = b.warehouse?.name || '';
+          break;
+        case 'createdBy':
+          aValue = a.createdBy?.name || '';
+          bValue = b.createdBy?.name || '';
+          break;
+        case 'totalamount':
+          aValue = a.totalamount || 0;
+          bValue = b.totalamount || 0;
+          break;
+        case 'createdAt':
+          aValue = new Date(a.createdAt || 0).getTime();
+          bValue = new Date(b.createdAt || 0).getTime();
+          break;
+        default:
+          aValue = a.createdAt;
+          bValue = b.createdAt;
+      }
+
+      if (aValue < bValue) return this.sortDirection === 'asc' ? -1 : 1;
+      if (aValue > bValue) return this.sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
+
+    this.totalItems = filtered.length;
+    this.totalPages = Math.ceil(this.totalItems / this.pageSize);
+    
+    // Apply pagination
+    const startIndex = (this.currentPage - 1) * this.pageSize;
+    const endIndex = startIndex + this.pageSize;
+    this.filteredPurchaseOrders = filtered.slice(startIndex, endIndex);
+  }
+
+  sortBy(field: string): void {
+    if (this.sortField === field) {
+      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortField = field;
+      this.sortDirection = 'asc';
+    }
+    this.applyFiltersAndSort();
+  }
+
+  getSortDirection(field: string): string | null {
+    if (this.sortField === field) {
+      return this.sortDirection === 'asc' ? 'ascending' : 'descending';
+    }
+    return null;
+  }
+
+  generateOrderNumber(index: number): string {
+    const orderIndex = (this.currentPage - 1) * this.pageSize + index + 1;
+    return orderIndex.toString().padStart(4, '0');
+  }
+
+  refreshList(): void {
+    this.loadPurchaseOrders();
+  }
+
+  viewPurchaseOrder(po: PurchaseOrder): void {
+    // Navigate to purchase order details
+    console.log('View purchase order:', po);
+  }
+
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.applyFiltersAndSort();
+    }
+  }
+
+  getPageNumbers(): number[] {
+    const pages: number[] = [];
+    const maxVisible = 5;
+    let start = Math.max(1, this.currentPage - Math.floor(maxVisible / 2));
+    let end = Math.min(this.totalPages, start + maxVisible - 1);
+    
+    if (end - start + 1 < maxVisible) {
+      start = Math.max(1, end - maxVisible + 1);
+    }
+    
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+    
+    return pages;
+  }
+
+  trackByPurchaseOrder(index: number, po: PurchaseOrder): string {
+    return po._id;
+  }
+
+  trackBySupplier(index: number, supplier: Supplier): string {
+    return supplier._id;
+  }
+
+  toggleExportDropdown(): void {
+    this.showExportDropdown = !this.showExportDropdown;
+  }
+
+  exportCSV(): void {
+    this.stockService.exportPurchaseOrdersCSV({}).subscribe({
+      next: (blob) => {
+        this.downloadFile(blob, 'purchase-orders.csv');
+        this.showExportDropdown = false;
+      },
+      error: (err) => console.error('Export failed:', err)
+    });
+  }
+
+  exportExcel(): void {
+    this.stockService.exportPurchaseOrdersExcel({}).subscribe({
+      next: (blob) => {
+        this.downloadFile(blob, 'purchase-orders.xlsx');
+        this.showExportDropdown = false;
+      },
+      error: (err) => console.error('Export failed:', err)
+    });
+  }
+
+  printList(): void {
+    window.print();
+    this.showExportDropdown = false;
+  }
+
+  private downloadFile(blob: Blob, filename: string): void {
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  }
 }
+
+

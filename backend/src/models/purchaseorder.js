@@ -36,8 +36,13 @@ const purchaseorderschema = new mongoose.Schema(
     },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "user",
       required: true,
+    },
+    status: {
+      type: String,
+      enum: ["PENDING", "RECEIVED", "CANCELLED"],
+      default: "PENDING"
     },
   },
   { timestamps: true }

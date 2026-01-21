@@ -27,6 +27,10 @@
       label="Total Purchases"
       [value]="stats.totalpurchases">
     </app-kpi-card>
+    <app-kpi-card
+      label="Low Stock Items"
+      [value]="stats.lowStockItems || 0">
+    </app-kpi-card>
   </div>
    <section class="dashboard__charts">
   <app-stock-trend
@@ -34,6 +38,26 @@
     [months]="stockMonths">
   </app-stock-trend>
 </section>
+
+<section class="dashboard__low-stock" *ngIf="lowStockItems.length > 0">
+  <div class="section-header">
+    <h2>Low Stock Alert</h2>
+    <span class="alert-count">{{ lowStockItems.length }} items need attention</span>
+  </div>
+  <div class="low-stock-grid">
+    <div *ngFor="let item of lowStockItems.slice(0, 6)" class="low-stock-item">
+      <div class="item-info">
+        <h4>{{ item.productName }}</h4>
+        <p>{{ item.warehouseName }}</p>
+      </div>
+      <div class="stock-info">
+        <span class="current-stock">{{ item.availableQty }}</span>
+        <span class="min-stock">Min: {{ item.minStock }}</span>
+      </div>
+    </div>
+  </div>
+</section>
+
 <div class="dashboard__widgets">
   <app-widget-card
     *ngFor="let widget of widgets"

@@ -23,6 +23,6 @@ const stockruleschema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
-const stockrule =  mongoose.model("StockRule", stockruleschema);
+const stockrule = mongoose.model("stockrule", stockruleschema);
 module.exports = stockrule;
 

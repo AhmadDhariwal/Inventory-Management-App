@@ -29,21 +29,31 @@ export class StockSummaryComponent implements OnInit {
     productId: ''
   };
 
+  lowStockItems :any[]=[];
   warehouses: any[] = [];
   products: any[] = [];
 
   constructor(private stockService: StockService) {}
 
   ngOnInit(): void {
-    this.loadWarehouses();
-    this.loadProducts();
-    this.loadstocksummary();
+     this.loadWarehouses();
+     this.loadProducts();
+     this.loadstocksummary();
+    // this.loadlowstock();
   }
 
   loadWarehouses(): void {
     this.stockService.getWarehouses().subscribe({
       next: data => this.warehouses = data,
       error: err => console.error('Error loading warehouses:', err)
+    });
+  }
+  loadlowstock() :void{
+    this.stockService.getLowStock().subscribe({
+      next: (lowStock) => {
+        this.lowStockItems = lowStock;
+      },
+      error: (err) => console.error('Error loading low stock:', err)
     });
   }
 

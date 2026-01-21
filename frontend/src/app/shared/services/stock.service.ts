@@ -30,7 +30,7 @@ export class StockService {
   }
 
   getLowStock(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/api/reports/stockrules`);
+    return this.http.get<any[]>(`${this.baseUrl}/api/reports/lowstock`);
   }
 
   getProducts(): Observable<any[]> {
@@ -45,7 +45,7 @@ export class StockService {
     Object.keys(filters).forEach(key => {
       if (filters[key]) params.append(key, filters[key]);
     });
-    
+
     return this.http.get(
       `${this.baseUrl}/api/reports/stockmovements/export/csv?${params.toString()}`,
       { responseType: 'blob' }
@@ -57,7 +57,7 @@ export class StockService {
     Object.keys(filters).forEach(key => {
       if (filters[key]) params.append(key, filters[key]);
     });
-    
+
     return this.http.get(
       `${this.baseUrl}/api/reports/stockmovements/export/excel?${params.toString()}`,
       { responseType: 'blob' }
@@ -69,7 +69,7 @@ export class StockService {
     Object.keys(filters).forEach(key => {
       if (filters[key]) params.append(key, filters[key]);
     });
-    
+
     return this.http.get(
       `${this.baseUrl}/api/reports/summary/export/csv?${params.toString()}`,
       { responseType: 'blob' }
@@ -81,7 +81,7 @@ export class StockService {
     Object.keys(filters).forEach(key => {
       if (filters[key]) params.append(key, filters[key]);
     });
-    
+
     return this.http.get(
       `${this.baseUrl}/api/reports/summary/export/excel?${params.toString()}`,
       { responseType: 'blob' }
@@ -103,7 +103,31 @@ export class StockService {
     if (filters.endDate) params.append('endDate', filters.endDate);
     if (filters.warehouseId) params.append('warehouseId', filters.warehouseId);
     if (filters.productId) params.append('productId', filters.productId);
-    
-    return this.http.get<InventorySummary>(`${this.baseUrl}/api/inventory/summary?${params.toString()}`);
+
+    return this.http.get<InventorySummary>(`${this.baseUrl}/api/reports/summary?${params.toString()}`);
+  }
+
+  exportPurchaseOrdersCSV(filters: any): Observable<Blob> {
+    const params = new URLSearchParams();
+    Object.keys(filters).forEach(key => {
+      if (filters[key]) params.append(key, filters[key]);
+    });
+
+    return this.http.get(
+      `${this.baseUrl}/api/reports/purchases/export/csv?${params.toString()}`,
+      { responseType: 'blob' }
+    );
+  }
+
+  exportPurchaseOrdersExcel(filters: any): Observable<Blob> {
+    const params = new URLSearchParams();
+    Object.keys(filters).forEach(key => {
+      if (filters[key]) params.append(key, filters[key]);
+    });
+
+    return this.http.get(
+      `${this.baseUrl}/api/reports/purchases/export/excel?${params.toString()}`,
+      { responseType: 'blob' }
+    );
   }
 }

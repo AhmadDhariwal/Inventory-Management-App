@@ -29,6 +29,10 @@ const stockmovementschema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "user",
     required: true
+  },
+  referenceId: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: false
   }
 }, { timestamps: true });
 

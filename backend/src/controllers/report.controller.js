@@ -98,6 +98,28 @@ const getlowstockreport = async (req, res) => {
   }
 };
 
+const exportPurchaseOrdersCSV = async (req, res) => {
+  try {
+    const csv = await reportservice.exportPurchaseOrdersCSV(req.query);
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename=purchase-orders.csv');
+    res.send(csv);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const exportPurchaseOrdersExcel = async (req, res) => {
+  try {
+    const buffer = await reportservice.exportPurchaseOrdersExcel(req.query);
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', 'attachment; filename=purchase-orders.xlsx');
+    res.send(buffer);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   getstockreport,
   getstockmovementreport,
@@ -105,6 +127,8 @@ module.exports = {
   exportStockMovementsExcel,
   exportStockSummaryCSV,
   exportStockSummaryExcel,
+  exportPurchaseOrdersCSV,
+  exportPurchaseOrdersExcel,
   getpurchasereport,
   getstocklevelsreport,
   getlowstockreport,

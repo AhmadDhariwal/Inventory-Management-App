@@ -13,7 +13,7 @@ import { PurchaseListComponent } from './purchase-list/purchase-list.component';
     ReactiveFormsModule,
     PurchasesRoutingModule,
     PurchaseFormComponent,
-    PurchaseListComponent
+    PurchaseListComponent,
   ]
 })
 export class PurchasesModule { }
