@@ -6,8 +6,6 @@ import { StockMovementDetailComponent } from './stock-movement/stock-movement-de
 import { StockOverviewComponent } from './stock-overview/stock-overview.component';
 import { StockComponent } from './stock.component';
 import { StockLevelsComponent } from './stock-levels/stock-levels.component';
-import { StockSummaryComponent } from './reports/stock-summary/stock-summary.component';
-import { StockMovementReportComponent } from './reports/stock-movement-report/stock-movement-report.component';
 
 const routes: Routes = [
   {
@@ -17,28 +15,12 @@ const routes: Routes = [
       { path: '', redirectTo: 'overview', pathMatch: 'full' },
       { path: 'overview', component: StockOverviewComponent },
       { path: 'levels', component: StockLevelsComponent},
-      { path: 'movements', component: StockMovementListComponent },
-      {
-        path: 'reports',
-        children: [
-          {
-            path: 'summary',
-            component: StockSummaryComponent
-          },
-          {
-            path: 'movements',
-            component: StockMovementReportComponent
-          },
-        ]
-      }
+      { path: 'movements', component: StockMovementListComponent }
     ]
   },
   { path: 'movements/new', component: StockMovementFormComponent },
   { path: 'movements/:id', component: StockMovementDetailComponent }
 ];
-
-
-
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],

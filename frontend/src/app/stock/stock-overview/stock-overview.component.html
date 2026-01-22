@@ -29,27 +29,12 @@
 
   </div>
 
-  <!-- NAVIGATION SECTION -->
-  <div class="navigation-section">
-    <div class="navigation-cards">
-      <a routerLink="/stock/reports/summary" class="nav-card">
-        <h3>Stock Summary Report</h3>
-        <p>View comprehensive inventory reports</p>
-      </a>
-
-      <a routerLink="/stock/reports/movements" class="nav-card">
-        <h3>Stock Movement Report</h3>
-        <p>Track inventory transactions</p>
-      </a>
-    </div>
-  </div>
-
   <!-- LOW STOCK PREVIEW -->
   <section class="inventory-overview__panel">
     <header class="panel-header">
       <h2 class="panel-header__title">Critical Stock Alerts</h2>
-      <a routerLink="/stock/movements" class="panel-header__link">
-        View All Movements
+      <a routerLink="/reports" class="panel-header__link">
+        View Detailed Reports
       </a>
     </header>
 
@@ -87,126 +72,3 @@
   </section>
 
 </section>
-
-<!-- <section class="inventory-overview">
-
-   KPI SECTION
-  <div class="inventory-overview__kpis">
-
-    <div class="kpi-card kpi-card--primary">
-      <span class="kpi-card__label">Total Products</span>
-      <strong class="kpi-card__value">{{ summary.totalProducts }}</strong>
-      <span class="kpi-card__meta">Active SKUs in stock</span>
-    </div>
-
-    <div class="kpi-card">
-      <span class="kpi-card__label">Total Stock Units</span>
-      <strong class="kpi-card__value">{{ summary.totalStock }}</strong>
-      <span class="kpi-card__meta">Units available globally</span>
-    </div>
-
-    <div class="kpi-card">
-      <span class="kpi-card__label">Stock Value</span>
-      <strong class="kpi-card__value">{{ summary.inventoryValue | currency:'USD':'symbol':'1.0-0' }}</strong>
-      <span class="kpi-card__meta">Based on latest cost</span>
-    </div>
-
-    <div class="kpi-card kpi-card--warning">
-      <span class="kpi-card__label">Low Stock Items</span>
-      <strong class="kpi-card__value">{{ summary.lowStockItems }}</strong>
-      <span class="kpi-card__meta">Require immediate review</span>
-    </div>
-
-    <div class="kpi-card">
-      <span class="kpi-card__label">Warehouses</span>
-      <strong class="kpi-card__value">{{ summary.warehouses }}</strong>
-      <span class="kpi-card__meta">Active locations</span>
-    </div>
-
-  </div> -->
-
-  <!-- RECENT MOVEMENTS SECTION
-  <section class="inventory-overview__panel">
-    <header class="panel-header">
-      <h2 class="panel-header__title">Recent Stock Movements</h2>
-      <a routerLink="/stock/movements" class="panel-header__link">
-        View All Movements
-      </a>
-    </header>
-
-    <div *ngIf="loading" class="loading-message">Loading...</div>
-
-    <div *ngIf="!loading && recentMovements.length === 0" class="empty-message">
-      No recent movements found
-    </div>
-
-    <table class="data-table" *ngIf="!loading && recentMovements.length > 0">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Product</th>
-          <th>Warehouse</th>
-          <th>Type</th>
-          <th class="align-right">Quantity</th>
-          <th>Reason</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        <tr *ngFor="let movement of recentMovements">
-          <td>{{ movement.createdAt | date:'MMM dd, HH:mm' }}</td>
-          <td>{{ movement.product?.name || 'N/A' }}</td>
-          <td>{{ movement.warehouse?.name || 'N/A' }}</td>
-          <td>
-            <span class="status-badge" [ngClass]="movement.type?.toLowerCase()">
-              {{ movement.type }}
-            </span>
-          </td>
-          <td class="align-right">{{ movement.quantity }}</td>
-          <td>{{ movement.reason || 'N/A' }}</td>
-        </tr>
-      </tbody>
-    </table>
-  </section>
-
-
-  <section class="inventory-overview__panel">
-    <header class="panel-header">
-      <h2 class="panel-header__title">Critical Stock Alerts</h2>
-      <a routerLink="/stock/levels" class="panel-header__link">
-        View All Stock Levels
-      </a>
-    </header>
-
-    <div *ngIf="lowStockItems.length === 0" class="empty-message">
-      No low stock items found
-    </div>
-
-    <table class="data-table" *ngIf="lowStockItems.length > 0">
-      <thead>
-        <tr>
-          <th>Product</th>
-          <th>SKU</th>
-          <th>Warehouse</th>
-          <th class="align-right">Available</th>
-          <th class="align-right">Min Stock</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        <tr *ngFor="let item of lowStockItems">
-          <td>{{ item.productName }}</td>
-          <td>{{ item.sku }}</td>
-          <td>{{ item.warehouseName }}</td>
-          <td class="align-right">{{ item.availableQty }}</td>
-          <td class="align-right">{{ item.minStock }}</td>
-          <td>
-            <span class="status-badge status-badge--low">{{ item.status }}</span>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </section>
-
-</section> -->

@@ -1,1 +1,201 @@
-<p>product-form works!</p>
+<main class="product-form-container" role="main">
+  <div class="page-header">
+    <div class="header-content">
+      <div class="title-section">
+        <h1 id="page-title">{{ isEditMode ? 'Edit Product' : 'Create New Product' }}</h1>
+        <p class="subtitle">{{ isEditMode ? 'Update product information' : 'Add a new product to your inventory' }}</p>
+      </div>
+      <nav class="breadcrumb" aria-label="Breadcrumb navigation">
+        <ol class="breadcrumb-list">
+          <li><a href="/dashboard" aria-label="Go to dashboard">Dashboard</a></li>
+          <li><a href="/products" aria-label="Go to products">Products</a></li>
+          <li aria-current="page">{{ isEditMode ? 'Edit' : 'New' }}</li>
+        </ol>
+      </nav>
+    </div>
+  </div>
+
+  <section class="content-section" aria-labelledby="page-title">
+    <div *ngIf="isLoading" class="loading-state" role="status" aria-live="polite">
+      <div class="loading-spinner">
+        <svg class="spinner" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" opacity="0.25"/>
+          <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+        </svg>
+      </div>
+      <p>Loading product...</p>
+    </div>
+
+    <form *ngIf="!isLoading" [formGroup]="productForm" (ngSubmit)="onSubmit()" class="product-form" novalidate>
+      <div class="form-grid">
+        <!-- Basic Information -->
+        <div class="form-section">
+          <h2 class="section-title">Basic Information</h2>
+          
+          <div class="form-group">
+            <label for="name" class="form-label required">Product Name</label>
+            <input 
+              id="name"
+              type="text"
+              class="form-control"
+              formControlName="name"
+              placeholder="Enter product name"
+              [class.error]="productForm.get('name')?.invalid && productForm.get('name')?.touched"
+              aria-describedby="name-error">
+            <div id="name-error" class="error-message" *ngIf="getFieldError('name')">
+              {{ getFieldError('name') }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="sku" class="form-label required">SKU</label>
+            <input 
+              id="sku"
+              type="text"
+              class="form-control"
+              formControlName="sku"
+              placeholder="Enter SKU"
+              [class.error]="productForm.get('sku')?.invalid && productForm.get('sku')?.touched"
+              aria-describedby="sku-error">
+            <div id="sku-error" class="error-message" *ngIf="getFieldError('sku')">
+              {{ getFieldError('sku') }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="description" class="form-label">Description</label>
+            <textarea 
+              id="description"
+              class="form-control"
+              formControlName="description"
+              placeholder="Enter product description"
+              rows="3"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="category" class="form-label required">Category</label>
+            <select 
+              id="category"
+              class="form-control"
+              formControlName="category"
+              [class.error]="productForm.get('category')?.invalid && productForm.get('category')?.touched"
+              aria-describedby="category-error">
+              <option value="">Select a category</option>
+              <option *ngFor="let category of categories; trackBy: trackByCategory" [value]="category._id">
+                {{ category.name }}
+              </option>
+            </select>
+            <div id="category-error" class="error-message" *ngIf="getFieldError('category')">
+              {{ getFieldError('category') }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Pricing Information -->
+        <div class="form-section">
+          <h2 class="section-title">Pricing Information</h2>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="cost" class="form-label required">Cost Price</label>
+              <div class="input-group">
+                <span class="input-prefix">$</span>
+                <input 
+                  id="cost"
+                  type="number"
+                  class="form-control"
+                  formControlName="cost"
+                  placeholder="0.00"
+                  step="0.01"
+                  min="0"
+                  [class.error]="productForm.get('cost')?.invalid && productForm.get('cost')?.touched"
+                  aria-describedby="cost-error">
+              </div>
+              <div id="cost-error" class="error-message" *ngIf="getFieldError('cost')">
+                {{ getFieldError('cost') }}
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="price" class="form-label required">Selling Price</label>
+              <div class="input-group">
+                <span class="input-prefix">$</span>
+                <input 
+                  id="price"
+                  type="number"
+                  class="form-control"
+                  formControlName="price"
+                  placeholder="0.00"
+                  step="0.01"
+                  min="0"
+                  [class.error]="productForm.get('price')?.invalid && productForm.get('price')?.touched"
+                  aria-describedby="price-error">
+              </div>
+              <div id="price-error" class="error-message" *ngIf="getFieldError('price')">
+                {{ getFieldError('price') }}
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="status" class="form-label required">Status</label>
+            <select 
+              id="status"
+              class="form-control"
+              formControlName="status"
+              [class.error]="productForm.get('status')?.invalid && productForm.get('status')?.touched">
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+              <option value="discontinued">Discontinued</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button 
+          type="button" 
+          class="btn btn-outline" 
+          (click)="onCancel()"
+          [disabled]="isSubmitting">
+          Cancel
+        </button>
+        <button 
+          type="submit" 
+          class="btn btn-primary" 
+          [disabled]="productForm.invalid || isSubmitting">
+          <svg *ngIf="isSubmitting" class="spinner-sm" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" opacity="0.25"/>
+            <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+          </svg>
+          {{ isSubmitting ? 'Saving...' : (isEditMode ? 'Update Product' : 'Create Product') }}
+        </button>
+      </div>
+    </form>
+
+    <!-- Update Confirmation Modal -->
+    <app-confirm-modal
+      [isVisible]="showUpdateModal"
+      title="Update Product"
+      message="Are you sure you want to update this product with the changes you made?"
+      confirmText="Update"
+      cancelText="Cancel"
+      type="info"
+      (confirm)="confirmUpdate()"
+      (cancel)="cancelUpdate()">
+    </app-confirm-modal>
+
+    <!-- No Changes Modal -->
+    <app-confirm-modal
+      [isVisible]="showNoChangesModal"
+      title="No Changes Made"
+      message="You haven't made any changes to this product. Do you want to return to the products list?"
+      confirmText="Return to List"
+      cancelText="Continue Editing"
+      type="info"
+      (confirm)="confirmNoChanges()"
+      (cancel)="cancelNoChanges()">
+    </app-confirm-modal>
+  </section>
+</main>

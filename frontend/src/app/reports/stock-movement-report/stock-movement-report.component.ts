@@ -2,8 +2,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { StockMovement } from '../../../shared/models/inventory/stock-movement.model';
-import { StockService } from '../../../shared/services/stock.service';
+import { StockMovement } from '../../shared/models/inventory/stock-movement.model';
+import { StockService } from '../../shared/services/stock.service';
 
 @Component({
   selector: 'app-stock-movement-report',
@@ -102,15 +102,15 @@ export class StockMovementReportComponent implements OnInit {
 
   applyFilters(): void {
     console.log('Applying filters - Type:', this.selectedType, 'Warehouse:', this.selectedWarehouse);
-    
+
     this.filteredMovements = this.movements.filter(m => {
       const typeMatch = this.selectedType === 'ALL' || m.type === this.selectedType;
-      const warehouseMatch = this.selectedWarehouse === 'ALL' || 
+      const warehouseMatch = this.selectedWarehouse === 'ALL' ||
         (m.warehouse && m.warehouse.name === this.selectedWarehouse);
-      
+
       return typeMatch && warehouseMatch;
     });
-    
+
     console.log('Filtered movements count:', this.filteredMovements.length);
     console.log('Total movements count:', this.movements.length);
   }

@@ -13,6 +13,7 @@ const dashboardroutes = require("./src/routes/dashboard.routes");
 const productroutes = require("./src/routes/product.routes");
 const warehouseroutes = require("./src/routes/warehouse.routes");
 const stockruleroutes = require("./src/routes/stockrule.routes");
+const categoryroutes = require("./src/routes/category.routes");
 const cors = require('cors');
 const userroute = require('./src/routes/user');
 const { verifytoken,restrictto } = require('./src/middleware/auth.middleware');
@@ -51,6 +52,7 @@ app.use("/api/salesorders", salesorderroutes);
 app.use("/api/reports", reportroutes);
 app.use("/api/dashboard", dashboardroutes);
 app.use("/api/products", productroutes);
+app.use("/api/categories", categoryroutes);
 app.use("/api/warehouses", warehouseroutes);
 app.use("/api/stockrules", stockruleroutes);
 

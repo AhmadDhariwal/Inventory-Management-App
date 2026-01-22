@@ -77,15 +77,15 @@
         <tbody>
           <tr *ngFor="let m of filteredMovements; trackBy: trackByMovement">
             <td data-label="Date">{{ m.createdAt | date:'MMM d, y' }}</td>
-            <td data-label="SKU">{{ m.product.sku }}</td>
-            <td data-label="Product">{{ m.product.name }}</td>
-            <td data-label="Warehouse">{{ m.warehouse.name }}</td>
+            <td data-label="SKU">{{ m.product?.sku || 'N/A' }}</td>
+            <td data-label="Product">{{ m.product?.name || 'N/A' }}</td>
+            <td data-label="Warehouse">{{ m.warehouse?.name || 'N/A' }}</td>
             <td data-label="Type">
               <span class="movement-type" [ngClass]="m.type.toLowerCase()">{{ m.type }}</span>
             </td>
             <td data-label="Quantity" class="numeric">{{ m.quantity }}</td>
             <td data-label="Reason">{{ m.reason }}</td>
-            <td data-label="Performed By">{{ m.user.name }}</td>
+            <td data-label="Performed By">{{ m.user?.name || 'System' }}</td>
           </tr>
         </tbody>
       </table>

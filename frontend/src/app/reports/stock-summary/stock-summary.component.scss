@@ -121,12 +121,12 @@
   white-space: nowrap;
   min-width: 120px;
   justify-content: center;
-  
+
   &:focus {
     outline: none;
     box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
   }
-  
+
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
@@ -139,7 +139,7 @@
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: #ffffff;
   border-color: transparent;
-  
+
   &:hover:not(:disabled) {
     transform: translateY(-2px);
     box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
@@ -150,7 +150,7 @@
   background: #ffffff;
   color: #4a5568;
   border-color: #e2e8f0;
-  
+
   &:hover:not(:disabled) {
     background: #f7fafc;
     border-color: #cbd5e0;
@@ -204,35 +204,35 @@
   .stock-summary {
     padding: 1rem;
   }
-  
+
   .header-section {
     flex-direction: column;
     align-items: stretch;
-    
+
     .export-actions {
       justify-content: center;
     }
   }
-  
+
   .filters {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
-  
+
   .filter-actions {
     grid-column: 1 / -1;
     justify-content: stretch;
   }
-  
+
   .filter-actions .btn {
     flex: 1;
   }
-  
+
   .summary-cards {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
-  
+
   .filters-section {
     padding: 1rem;
   }
@@ -242,11 +242,11 @@
   .filter-actions {
     flex-direction: column;
   }
-  
+
   .export-actions {
     flex-direction: column;
   }
-  
+
   .btn {
     width: 100%;
   }
@@ -280,27 +280,27 @@
   .stock-summary {
     background: #0f172a;
   }
-  
+
   .filters-section {
     background: #1e293b;
     border-color: #334155;
   }
-  
+
   .filters-section h3 {
     color: #f1f5f9;
   }
-  
+
   .filter-group label {
     color: #cbd5e1;
   }
-  
+
   .filter-group input,
   .filter-group select {
     background-color: #334155;
     border-color: #475569;
     color: #f1f5f9;
   }
-  
+
   .loading {
     background: #1e293b;
     color: #cbd5e1;
@@ -318,7 +318,7 @@
   background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
   color: #ffffff;
   border-color: transparent;
-  
+
   &:hover:not(:disabled) {
     transform: translateY(-2px);
     box-shadow: 0 10px 20px rgba(72, 187, 120, 0.4);
@@ -350,13 +350,13 @@
     color: #ffffff;
     border-color: #000000;
   }
-  
+
   .btn-secondary {
     background: #ffffff;
     color: #000000;
     border-color: #000000;
   }
-  
+
   .btn-export {
     background: #000000;
     color: #ffffff;
