@@ -9,6 +9,7 @@ import { Product } from '../models/inventory/product.model';
 export class ProductService {
   private baseUrl = 'http://localhost:3000/api/products';
   private categoryUrl = 'http://localhost:3000/api/categories';
+  private inventoryUrl = 'http://localhost:3000/api/inventory';
 
   constructor(private http: HttpClient) {}
 
@@ -44,5 +45,13 @@ export class ProductService {
 
   getCategories(): Observable<any[]> {
     return this.http.get<any[]>(this.categoryUrl);
+  }
+
+  getStockLevels(productId?: string): Observable<any[]> {
+    let params = new HttpParams();
+    if (productId) {
+      params = params.set('productId', productId);
+    }
+    return this.http.get<any[]>(`${this.inventoryUrl}/stocklevels`, { params });
   }
 }

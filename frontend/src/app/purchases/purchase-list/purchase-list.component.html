@@ -23,7 +23,7 @@
             <svg class="search-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
               <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
             </svg>
-            <input 
+            <input
               id="search-input"
               type="search"
               class="search-control"
@@ -180,8 +180,8 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let po of filteredPurchaseOrders; let i = index; trackBy: trackByPurchaseOrder" 
-                role="row" 
+            <tr *ngFor="let po of filteredPurchaseOrders; let i = index; trackBy: trackByPurchaseOrder"
+                role="row"
                 class="table-row"
                 [attr.aria-rowindex]="i + 2">
               <td class="order-number" [attr.data-label]="'Order #'">
@@ -189,18 +189,18 @@
               </td>
               <td [attr.data-label]="'Supplier'">
                 <div class="supplier-info">
-                  <span class="supplier-name">{{ po.supplier?.name || 'N/A' }}</span>
+                  <span class="supplier-name">{{ po.supplier.name || 'N/A' }}</span>
                 </div>
               </td>
               <td [attr.data-label]="'Warehouse'">
-                <span class="warehouse-name">{{ po.warehouse?.name || 'N/A' }}</span>
+                <span class="warehouse-name">{{ po.warehouse.name || 'N/A' }}</span>
               </td>
               <td class="numeric" [attr.data-label]="'Total Amount'">
                 <span class="amount">{{ po.totalamount | currency:'USD':'symbol':'1.2-2' }}</span>
               </td>
               <td [attr.data-label]="'Created By'">
                 <div class="user-info">
-                  <span class="user-name">{{ po.createdBy?.name || 'Unknown' }}</span>
+                  <span class="user-name">{{ po.createdBy.name || 'Unknown' }}</span>
                 </div>
               </td>
               <td [attr.data-label]="'Date Created'">
@@ -210,8 +210,8 @@
               </td>
               <td class="actions-cell">
                 <div class="action-menu">
-                  <button type="button" 
-                          class="btn btn-ghost btn-sm" 
+                  <button type="button"
+                          class="btn btn-ghost btn-sm"
                           (click)="viewPurchaseOrder(po)"
                           [attr.aria-label]="'View purchase order PO-' + generateOrderNumber(i)">
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
@@ -234,8 +234,8 @@
         <span>Showing {{ (currentPage - 1) * pageSize + 1 }} to {{ Math.min(currentPage * pageSize, totalItems) }} of {{ totalItems }} results</span>
       </div>
       <div class="pagination-controls">
-        <button type="button" 
-                class="btn btn-ghost btn-sm" 
+        <button type="button"
+                class="btn btn-ghost btn-sm"
                 [disabled]="currentPage === 1"
                 (click)="goToPage(currentPage - 1)"
                 aria-label="Go to previous page">
@@ -245,7 +245,7 @@
           Previous
         </button>
         <span class="page-numbers">
-          <button *ngFor="let page of getPageNumbers()" 
+          <button *ngFor="let page of getPageNumbers()"
                   type="button"
                   class="page-btn"
                   [class.active]="page === currentPage"
@@ -255,8 +255,8 @@
             {{ page }}
           </button>
         </span>
-        <button type="button" 
-                class="btn btn-ghost btn-sm" 
+        <button type="button"
+                class="btn btn-ghost btn-sm"
                 [disabled]="currentPage === totalPages"
                 (click)="goToPage(currentPage + 1)"
                 aria-label="Go to next page">

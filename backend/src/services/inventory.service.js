@@ -222,9 +222,26 @@ const getstocksummary = async (filters = {}) => {
   };
 };
 
+const getstocklevels = async (productId) => {
+  const StockLevel = require('../models/stocklevel');
+  
+  let query = {};
+  if (productId) {
+    query.product = productId;
+  }
+  
+  const stockLevels = await StockLevel.find(query)
+    .populate('product', 'name sku')
+    .populate('warehouse', 'name')
+    .lean();
+  
+  return stockLevels;
+};
+
 module.exports = {
   getcurrentstock,
   addstock,
   removestock,
   getstocksummary,
+  getstocklevels,
 };

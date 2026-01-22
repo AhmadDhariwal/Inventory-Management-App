@@ -1,1 +1,104 @@
-<p>product-details works!</p>
+<main class="product-details-container" role="main">
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state" role="status" aria-live="polite">
+    <div class="loading-spinner">
+      <svg class="spinner" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" opacity="0.25"/>
+        <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+      </svg>
+    </div>
+    <p>Loading product details...</p>
+  </div>
+
+  <!-- Product Details -->
+  <section *ngIf="!loading && product" class="product-details">
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="header-content">
+        <div class="title-section">
+          <h1>{{ product.name }}</h1>
+          <p class="subtitle">{{ product.description || 'Product Details' }}</p>
+        </div>
+        <div class="header-actions">
+          <button type="button" class="btn btn-outline" (click)="goBack()">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+            </svg>
+            Back to Products
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Product Information Card -->
+    <div class="details-grid">
+      <div class="card">
+        <div class="card-header">
+          <h2>Product Information</h2>
+          <span class="sku-badge">{{ product.sku }}</span>
+        </div>
+        <div class="card-content">
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Product Name</label>
+              <span>{{ product.name }}</span>
+            </div>
+            <div class="info-item">
+              <label>SKU</label>
+              <span>{{ product.sku }}</span>
+            </div>
+            <div class="info-item">
+              <label>Category</label>
+              <span>{{ product.category?.name || 'Uncategorized' }}</span>
+            </div>
+            <div class="info-item">
+              <label>Status</label>
+              <span class="status-badge" [ngClass]="product.status.toLowerCase()">{{ product.status || 'Active' }}</span>
+            </div>
+            <div class="info-item">
+              <label>Cost Price</label>
+              <span class="amount">{{ product.cost | currency:'USD':'symbol':'1.2-2' }}</span>
+            </div>
+            <div class="info-item">
+              <label>Selling Price</label>
+              <span class="amount">{{ product.price | currency:'USD':'symbol':'1.2-2' }}</span>
+            </div>
+            <div class="info-item" *ngIf="product.description">
+              <label>Description</label>
+              <span>{{ product.description }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stock Information Card -->
+      <div class="card">
+        <div class="card-header">
+          <h2>Stock Information</h2>
+          <span class="total-stock">Total: {{ totalStock }}</span>
+        </div>
+        <div class="card-content">
+          <div *ngIf="stockLevels.length === 0" class="empty-state">
+            <p>No stock information available</p>
+          </div>
+          <div *ngIf="stockLevels.length > 0" class="stock-table">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Warehouse</th>
+                  <th class="numeric">Quantity</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let stock of stockLevels">
+                  <td>{{ stock.warehouse?.name || 'Unknown Warehouse' }}</td>
+                  <td class="numeric">{{ stock.quantity }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>

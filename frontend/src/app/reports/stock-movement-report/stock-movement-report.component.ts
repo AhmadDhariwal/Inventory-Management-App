@@ -13,9 +13,10 @@ import { StockService } from '../../shared/services/stock.service';
   styleUrls: ['./stock-movement-report.component.scss']
 })
 export class StockMovementReportComponent implements OnInit {
-
   movements: StockMovement[] = [];
   filteredMovements: StockMovement[] = [];
+  isLoading = true;
+  error: string | null = null;
 
   selectedType = 'ALL';
   selectedWarehouse = 'ALL';
@@ -76,15 +77,20 @@ export class StockMovementReportComponent implements OnInit {
   }
 
   loadStockMovements(): void {
+    this.isLoading = true;
+    this.error = null;
     this.stockService.getStockMovements().subscribe({
       next: data => {
         console.log('Raw movements data:', data);
-        this.movements = data;
+        this.movements = data || [];
         this.extractWarehouses();
         this.applyFilters();
+        this.isLoading = false;
       },
       error: err => {
         console.error('Failed to load stock movements', err);
+        this.error = 'Failed to load stock movements. Please try again.';
+        this.isLoading = false;
       }
     });
   }

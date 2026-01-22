@@ -53,6 +53,16 @@ exports.getstock = async (req, res) => {
   }
 };
 
+exports.getstocklevels = async (req, res) => {
+  try {
+    const productId = req.query.productId;
+    const stockLevels = await inventoryservice.getstocklevels(productId);
+    res.status(200).json(stockLevels);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
 exports.getstocksummary = async (req, res) => {
   try {
     const filters = {

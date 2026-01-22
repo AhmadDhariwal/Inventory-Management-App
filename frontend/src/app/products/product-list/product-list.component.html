@@ -135,6 +135,7 @@
                   </svg>
                 </span>
               </th>
+              <th scope="col">Stock Level</th>
               <th scope="col">Status</th>
               <th scope="col" class="actions-col">
                 <span class="sr-only">Actions</span>
@@ -164,13 +165,26 @@
               <td class="numeric" [attr.data-label]="'Price'">
                 <span class="amount">{{ product.price | currency:'USD':'symbol':'1.2-2' }}</span>
               </td>
+              <td class="numeric" [attr.data-label]="'Stock Level'">
+                <span class="stock-level">{{ getProductStockLevel(product._id) }}</span>
+              </td>
               <td [attr.data-label]="'Status'">
-                <span class="status-badge" [ngClass]="product.status?.toLowerCase()">
+                <span class="status-badge" [ngClass]="product.status.toLowerCase()">
                   {{ product.status || 'Active' }}
                 </span>
               </td>
               <td class="actions-cell">
                 <div class="action-menu">
+                  <button type="button"
+                          class="btn btn-ghost btn-sm"
+                          (click)="viewProduct(product._id)"
+                          [attr.aria-label]="'View details for ' + product.name">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                      <path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/>
+                      <path d="M1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+                    </svg>
+                    View
+                  </button>
                   <button type="button"
                           class="btn btn-ghost btn-sm"
                           (click)="editProduct(product._id)"

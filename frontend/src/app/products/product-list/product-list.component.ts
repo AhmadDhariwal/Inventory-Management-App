@@ -18,6 +18,7 @@ export class ProductListComponent implements OnInit {
   products: Product[] = [];
   filteredProducts: Product[] = [];
   categories: any[] = [];
+  stockLevels: any[] = [];
   isLoading = false;
 
   // Search and Filter
@@ -41,6 +42,7 @@ export class ProductListComponent implements OnInit {
   ngOnInit(): void {
     this.loadProducts();
     this.loadCategories();
+    this.loadStockLevels();
   }
 
   loadProducts(): void {
@@ -67,6 +69,17 @@ export class ProductListComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error loading categories:', err);
+      }
+    });
+  }
+
+  loadStockLevels(): void {
+    this.productService.getStockLevels().subscribe({
+      next: (data) => {
+        this.stockLevels = data;
+      },
+      error: (err) => {
+        console.error('Error loading stock levels:', err);
       }
     });
   }
@@ -144,6 +157,7 @@ export class ProductListComponent implements OnInit {
 
   refreshList(): void {
     this.loadProducts();
+    this.loadStockLevels();
   }
 
   addProduct(): void {
@@ -190,6 +204,16 @@ export class ProductListComponent implements OnInit {
   getDeleteMessage(): string {
     return `Are you sure you want to delete "${this.deleteProductName}"? This action cannot be undone.`;
   }
+
+  getProductStockLevel(productId: string): number {
+    const stockLevel = this.stockLevels.find(sl => sl.product?._id === productId);
+    return stockLevel ? stockLevel.quantity : 0;
+  }
+
+  viewProduct(id: string) {
+    this.router.navigate(['/products/details', id]);
+  }
+
 }
 
 
