@@ -62,7 +62,7 @@ export class OverviewComponent implements OnInit{
     // Load stock summary for low stock count
     this.stockService.getStockSummary({}).subscribe({
       next: summary => {
-        this.stats.lowStockItems = summary.lowStockItems || 0;
+        this.stats.lowStockItems = summary.lowStockItems;
         this.updateWidgets();
       },
       error: err => console.error('Failed to load stock summary', err)

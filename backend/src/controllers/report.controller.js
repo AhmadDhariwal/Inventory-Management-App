@@ -120,6 +120,22 @@ const exportPurchaseOrdersExcel = async (req, res) => {
   }
 };
 
+const getproductreport = async (req, res) => {
+  try {
+    const { category } = req.query;
+
+    const data = await reportService.getproductreport(category);
+
+    res.status(200).json(data);
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to fetch product stock report",
+      error: error.message
+    });
+  }
+};
+
+
 module.exports = {
   getstockreport,
   getstockmovementreport,
@@ -132,5 +148,6 @@ module.exports = {
   getpurchasereport,
   getstocklevelsreport,
   getlowstockreport,
-  getstocksummary
+  getstocksummary,
+  getproductreport,
 };

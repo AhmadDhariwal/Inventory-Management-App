@@ -14,5 +14,6 @@ router.get("/lowstock", reportcontroller.getlowstockreport);
 router.get("/summary",reportcontroller.getstocksummary);
 router.get("/summary/export/csv", reportcontroller.exportStockSummaryCSV);
 router.get("/summary/export/excel", reportcontroller.exportStockSummaryExcel);
+router.get("/productreport",reportcontroller.getproductreport);
 
 module.exports = router;

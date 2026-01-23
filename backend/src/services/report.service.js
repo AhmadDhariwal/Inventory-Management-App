@@ -482,6 +482,34 @@ const exportPurchaseOrdersExcel = async (filters = {}) => {
   return Buffer.from(csvHeader + csvRows);
 };
 
+const getproductreport = async (category) => {
+ const filter = {};
+
+  if (category && category !== "ALL") {
+    filter["product.category"] = category;
+  }
+
+  const report = await StockLevel.find()
+    .populate({
+      path: "product",
+      select: "name sku category",
+      populate: {
+        path: "category",
+        select: "name"
+      }
+    })
+    .populate("warehouse", "name");
+
+  // Transform response (VERY IMPORTANT)
+  return report.map(item => ({
+    product: item.product.name,
+    sku: item.product.sku,
+    category: item.product.category?.name || "N/A",
+    warehouse: item.warehouse.name,
+    quantity: item.quantity
+  }));
+};
+
 module.exports = {
   getstockreport,
   getstockmovementreport,
@@ -494,5 +522,6 @@ module.exports = {
   getpurchasereport,
   getstocklevelsreport,
   getlowstockreport,
-  getstocksummary
+  getstocksummary,
+  getproductreport,
 };
