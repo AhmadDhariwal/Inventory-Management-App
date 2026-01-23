@@ -22,19 +22,28 @@ export class PurchaseDetailsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const orderId = this.route.snapshot.paramMap.get('id')!;
-    this.loadPurchaseOrder(orderId);
+    const orderId = this.route.snapshot.paramMap.get('id');
+    console.log('Purchase Details - Order ID:', orderId);
+    if (orderId) {
+      this.loadPurchaseOrder(orderId);
+    } else {
+      console.error('No order ID provided');
+      this.loading = false;
+    }
   }
 
   loadPurchaseOrder(id: string): void {
+    console.log('Loading purchase order with ID:', id);
     this.purchaseService.getPurchaseOrderById(id).subscribe({
       next: (order) => {
+        console.log('Purchase order loaded:', order);
         this.purchaseOrder = order;
         this.loading = false;
       },
       error: (err) => {
         console.error('Error loading purchase order:', err);
         this.loading = false;
+        // You could add a user-friendly error message here
       }
     });
   }

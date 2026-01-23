@@ -17,7 +17,7 @@
       <div class="header-content">
         <div class="title-section">
           <h1>Purchase Order Details</h1>
-          <p class="subtitle">Order from {{ purchaseOrder.supplier?.name }}</p>
+          <p class="subtitle">Order from {{ purchaseOrder.supplier.name }}</p>
         </div>
         <div class="header-actions">
           <button type="button" class="btn btn-outline" (click)="goBack()">
@@ -43,15 +43,15 @@
           <div class="info-grid">
             <div class="info-item">
               <label>Supplier</label>
-              <span>{{ purchaseOrder.supplier?.name || 'N/A' }}</span>
+              <span>{{ purchaseOrder.supplier.name || 'N/A' }}</span>
             </div>
             <div class="info-item">
               <label>Warehouse</label>
-              <span>{{ purchaseOrder.warehouse?.name || 'N/A' }}</span>
+              <span>{{ purchaseOrder.warehouse.name || 'N/A' }}</span>
             </div>
             <div class="info-item">
               <label>Created By</label>
-              <span>{{ purchaseOrder.createdBy?.name || 'N/A' }}</span>
+              <span>{{ purchaseOrder.createdBy.name || 'N/A' }}</span>
             </div>
             <div class="info-item">
               <label>Order Date</label>
@@ -73,7 +73,7 @@
       <div class="card">
         <div class="card-header">
           <h2>Order Items</h2>
-          <span class="item-count">{{ purchaseOrder.items?.length || 0 }} products</span>
+          <span class="item-count">{{ purchaseOrder.items.length || 0 }} products</span>
         </div>
         <div class="card-content">
           <div *ngIf="!purchaseOrder.items || purchaseOrder.items.length === 0" class="empty-state">
@@ -92,14 +92,14 @@
               </thead>
               <tbody>
                 <tr *ngFor="let item of purchaseOrder.items">
-                  <td>{{ item.product?.name || 'N/A' }}</td>
+                  <td>{{ item.product.name || 'N/A' }}</td>
                   <td>
-                    <span class="sku-badge">{{ item.product?.sku || 'N/A' }}</span>
+                    <span class="sku-badge">{{ item.product.sku || 'N/A' }}</span>
                   </td>
                   <td class="numeric">{{ item.quantity }}</td>
-                  <td class="numeric">{{ item.unitprice | currency:'USD':'symbol':'1.2-2' }}</td>
+                  <td class="numeric">{{ item.costprice | currency:'USD':'symbol':'1.2-2' }}</td>
                   <td class="numeric">
-                    <span class="amount">{{ (item.quantity * item.unitprice) | currency:'USD':'symbol':'1.2-2' }}</span>
+                    <span class="amount">{{ (item.quantity * item.costprice) | currency:'USD':'symbol':'1.2-2' }}</span>
                   </td>
                 </tr>
               </tbody>

@@ -56,7 +56,7 @@
             <td>{{ item.category || 'N/A' }}</td>
             <td>{{ item.warehouseName }}</td>
             <td>{{ item.availableQty }}</td>
-            <td>{{ item.reservedQty || 0 }}</td>
+            <td>{{ item.reservedQty  }}</td>
             <td>{{ item.reorderLevel || 'N/A' }}</td>
             <td>
               <span class="status-badge" [ngClass]="item.status?.toLowerCase()">

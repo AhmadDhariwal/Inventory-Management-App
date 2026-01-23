@@ -11,6 +11,7 @@ router.get(
   inventorycontroller.getstock
 );
 router.get("/stocklevels", verifytoken, inventorycontroller.getstocklevels);
+router.put("/stocklevels/:id", verifytoken, inventorycontroller.updatestocklevel);
 router.get("/summary", verifytoken, inventorycontroller.getstocksummary);
 
 module.exports = router;

@@ -63,6 +63,28 @@ exports.getstocklevels = async (req, res) => {
   }
 };
 
+exports.updatestocklevel = async (req, res) => {
+  try {
+    console.log('Update stock level request received');
+    console.log('Stock Level ID:', req.params.id);
+    console.log('Update Data:', req.body);
+    console.log('User ID from token:', req.userid);
+    
+    const stockLevelId = req.params.id;
+    const updateData = req.body;
+    const updatedStockLevel = await inventoryservice.updatestocklevel(stockLevelId, updateData);
+    
+    console.log('Stock level update successful');
+    res.status(200).json({
+      message: "Stock level updated successfully",
+      data: updatedStockLevel
+    });
+  } catch (error) {
+    console.error('Error in updatestocklevel controller:', error);
+    res.status(400).json({ error: error.message });
+  }
+};
+
 exports.getstocksummary = async (req, res) => {
   try {
     const filters = {

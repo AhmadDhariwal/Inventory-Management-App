@@ -32,47 +32,59 @@
 
     <!-- Product Information Card -->
     <div class="details-grid">
-      <div class="card">
+      <div class="card product-card">
         <div class="card-header">
           <h2>Product Information</h2>
           <span class="sku-badge">{{ product.sku }}</span>
         </div>
         <div class="card-content">
-          <div class="info-grid">
-            <div class="info-item">
-              <label>Product Name</label>
-              <span>{{ product.name }}</span>
-            </div>
-            <div class="info-item">
-              <label>SKU</label>
-              <span>{{ product.sku }}</span>
-            </div>
-            <div class="info-item">
-              <label>Category</label>
-              <span>{{ product.category?.name || 'Uncategorized' }}</span>
-            </div>
-            <div class="info-item">
-              <label>Status</label>
-              <span class="status-badge" [ngClass]="product.status.toLowerCase()">{{ product.status || 'Active' }}</span>
-            </div>
-            <div class="info-item">
-              <label>Cost Price</label>
-              <span class="amount">{{ product.cost | currency:'USD':'symbol':'1.2-2' }}</span>
-            </div>
-            <div class="info-item">
-              <label>Selling Price</label>
-              <span class="amount">{{ product.price | currency:'USD':'symbol':'1.2-2' }}</span>
-            </div>
-            <div class="info-item" *ngIf="product.description">
-              <label>Description</label>
-              <span>{{ product.description }}</span>
+          <div class="product-info-wrapper">
+            <div class="table-responsive">
+              <table class="product-info-table">
+                <tbody>
+                  <tr>
+                    <td class="label-cell">Product Name</td>
+                    <td class="value-cell">{{ product.name }}</td>
+                  </tr>
+                  <tr>
+                    <td class="label-cell">SKU</td>
+                    <td class="value-cell">{{ product.sku }}</td>
+                  </tr>
+                  <tr>
+                    <td class="label-cell">Category</td>
+                    <td class="value-cell">{{ product.category?.name || 'Uncategorized' }}</td>
+                  </tr>
+                  <tr>
+                    <td class="label-cell">Status</td>
+                    <td class="value-cell">
+                      <span class="status-badge" [ngClass]="product.status.toLowerCase()">{{ product.status || 'Active' }}</span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="label-cell">Cost Price</td>
+                    <td class="value-cell">
+                      <span class="amount">{{ product.cost | currency:'USD':'symbol':'1.2-2' }}</span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="label-cell">Selling Price</td>
+                    <td class="value-cell">
+                      <span class="amount">{{ product.price | currency:'USD':'symbol':'1.2-2' }}</span>
+                    </td>
+                  </tr>
+                  <tr *ngIf="product.description">
+                    <td class="label-cell">Description</td>
+                    <td class="value-cell">{{ product.description }}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Stock Information Card -->
-      <div class="card">
+      <div class="card stock-card">
         <div class="card-header">
           <h2>Stock Information</h2>
           <span class="total-stock">Total: {{ totalStock }}</span>
@@ -81,43 +93,50 @@
           <div *ngIf="stockLevels.length === 0" class="empty-state">
             <p>No stock information available</p>
           </div>
-          <div *ngIf="stockLevels.length > 0" class="stock-table">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Warehouse</th>
-                  <th class="numeric">Available</th>
-                  <th class="numeric">Reserved</th>
-                  <th class="numeric">Min Stock</th>
-                  <th class="numeric">Reorder Level</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let stock of stockLevels">
-                  <td>{{ stock.warehouse?.name || 'Unknown Warehouse' }}</td>
-                  <td class="numeric">{{ stock.quantity || 0 }}</td>
-                  <td class="numeric">{{ stock.reservedQuantity || 0 }}</td>
-                  <td class="numeric">
-                    <input type="number" [(ngModel)]="stock.minStock" min="0" class="stock-input">
-                  </td>
-                  <td class="numeric">
-                    <input type="number" [(ngModel)]="stock.reorderLevel" min="0" class="stock-input">
-                  </td>
-                  <td>
-                    <span class="status-badge" [ngClass]="getStockStatus(stock)">
-                      {{ getStockStatusText(stock) }}
-                    </span>
-                  </td>
-                  <td>
-                    <button class="btn btn-sm btn-primary" (click)="updateStockRule(stock)">
-                      Update
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <div *ngIf="stockLevels.length > 0" class="stock-table-wrapper">
+            <div class="table-responsive">
+              <table class="stock-table">
+                <thead>
+                  <tr>
+                    <th class="warehouse-col">Warehouse</th>
+                    <th class="numeric-col">Available</th>
+                    <th class="numeric-col">Reserved</th>
+                    <th class="numeric-col">Min Stock</th>
+                    <th class="numeric-col">Reorder Level</th>
+                    <th class="status-col">Status</th>
+                    <th class="actions-col">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let stock of stockLevels">
+                    <td class="warehouse-cell">{{ stock.warehouse?.name || 'Unknown' }}</td>
+                    <td class="numeric-cell">{{ stock.quantity || 0 }}</td>
+                    <td class="numeric-cell">
+                      <input type="number" [(ngModel)]="stock.reservedQuantity" min="0" class="stock-input">
+                    </td>
+                    <td class="numeric-cell">
+                      <input type="number" [(ngModel)]="stock.minStock" min="0" class="stock-input">
+                    </td>
+                    <td class="numeric-cell">
+                      <input type="number" [(ngModel)]="stock.reorderLevel" min="0" class="stock-input">
+                    </td>
+                    <td class="status-cell">
+                      <span class="status-badge" [ngClass]="getStockStatus(stock)">
+                        {{ getStockStatusText(stock) }}
+                      </span>
+                    </td>
+                    <td class="actions-cell">
+                      <button class="btn btn-sm btn-primary" (click)="updateStockRule(stock)">
+                        <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+                          <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+                        </svg>
+                        Update
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>

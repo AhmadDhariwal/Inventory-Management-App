@@ -175,6 +175,7 @@ export class PurchaseListComponent implements OnInit {
   }
 
   viewPurchaseOrder(po: PurchaseOrder): void {
+    console.log('Navigating to purchase details:', po._id);
     this.router.navigate(['/purchases/details', po._id]);
   }
 

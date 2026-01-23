@@ -289,13 +289,38 @@ const getstocklevels = async (productId) => {
       ruleMap.set(rule.warehouse.toString(), rule);
     });
 
-    // Build result
+    // Get stock levels from StockLevel collection
+    const stockLevels = await StockLevel.find({ product: productId })
+      .populate('warehouse', 'name')
+      .lean();
+
+    // Build result with actual stock levels
     const result = [];
     
     if (stockAggregation.length > 0) {
       for (const stock of stockAggregation) {
+        // Find or create stock level record
+        let stockLevel = await StockLevel.findOne({
+          product: productId,
+          warehouse: stock._id
+        });
+        
+        if (!stockLevel) {
+          stockLevel = await StockLevel.create({
+            product: productId,
+            warehouse: stock._id,
+            quantity: Math.max(0, stock.quantity),
+            reservedQuantity: 0
+          });
+        } else {
+          // Update quantity to match actual stock movements
+          stockLevel.quantity = Math.max(0, stock.quantity);
+          await stockLevel.save();
+        }
+        
         const rule = ruleMap.get(stock._id.toString());
         result.push({
+          _id: stockLevel._id,
           product: {
             _id: product._id,
             name: product.name,
@@ -306,15 +331,31 @@ const getstocklevels = async (productId) => {
           quantity: Math.max(0, stock.quantity),
           reorderLevel: rule?.reorderLevel || 0,
           minStock: rule?.minStock || 0,
-          reservedQuantity: 0
+          reservedQuantity: stockLevel.reservedQuantity || 0
         });
       }
     } else {
-      // No stock movements, show 0 for first warehouse
-      const warehouses = await Warehouse.find({ isActive: true }).limit(1).lean();
+      // No stock movements, check if there are any warehouses
+      const warehouses = await Warehouse.find({ isActive: true }).lean();
       if (warehouses.length > 0) {
+        // Create stock level for first warehouse if none exists
+        let stockLevel = await StockLevel.findOne({
+          product: productId,
+          warehouse: warehouses[0]._id
+        });
+        
+        if (!stockLevel) {
+          stockLevel = await StockLevel.create({
+            product: productId,
+            warehouse: warehouses[0]._id,
+            quantity: 0,
+            reservedQuantity: 0
+          });
+        }
+        
         const rule = ruleMap.get(warehouses[0]._id.toString());
         result.push({
+          _id: stockLevel._id,
           product: {
             _id: product._id,
             name: product.name,
@@ -325,7 +366,7 @@ const getstocklevels = async (productId) => {
           quantity: 0,
           reorderLevel: rule?.reorderLevel || 0,
           minStock: rule?.minStock || 0,
-          reservedQuantity: 0
+          reservedQuantity: stockLevel.reservedQuantity || 0
         });
       }
     }
@@ -364,14 +405,34 @@ const getstocklevels = async (productId) => {
     }).lean();
     
     return {
+      _id: level._id, // Include the stock level ID for updates
       ...level,
       reorderLevel: stockRule?.reorderLevel || 0,
       minStock: stockRule?.minStock || 0,
-      reservedQuantity: 0
+      reservedQuantity: level.reservedQuantity || 0
     };
   }));
   
   return enrichedLevels;
+};
+
+const updatestocklevel = async (stockLevelId, updateData) => {
+  console.log('Updating stock level ID:', stockLevelId);
+  console.log('Update data:', updateData);
+  
+  const stockLevel = await StockLevel.findByIdAndUpdate(
+    stockLevelId,
+    updateData,
+    { new: true }
+  ).populate('product', 'name sku')
+   .populate('warehouse', 'name');
+   
+  if (!stockLevel) {
+    throw new Error('Stock level not found');
+  }
+  
+  console.log('Updated stock level:', stockLevel);
+  return stockLevel;
 };
 
 module.exports = {
@@ -380,4 +441,5 @@ module.exports = {
   removestock,
   getstocksummary,
   getstocklevels,
+  updatestocklevel,
 };

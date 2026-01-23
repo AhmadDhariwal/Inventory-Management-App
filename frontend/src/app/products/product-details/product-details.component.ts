@@ -67,7 +67,8 @@ export class ProductDetailsComponent implements OnInit {
     const quantity = stock.quantity || 0;
     const reorderLevel = stock.reorderLevel || 0;
     const minStock = stock.minStock || 0;
-    
+
+
     if (quantity <= minStock) return 'critical';
     if (quantity <= reorderLevel) return 'low';
     return 'ok';
@@ -83,8 +84,11 @@ export class ProductDetailsComponent implements OnInit {
   }
 
   updateStockRule(stock: any): void {
-    console.log('Updating stock rule:', stock);
-    
+    console.log('Updating stock rule and level:', stock);
+    console.log('Stock ID:', stock._id);
+    console.log('Reserved Quantity:', stock.reservedQuantity);
+
+    // Update stock rule (min stock and reorder level)
     this.stockRuleService.createOrUpdateStockRule({
       product: this.product._id,
       warehouse: stock.warehouse._id,
@@ -93,11 +97,35 @@ export class ProductDetailsComponent implements OnInit {
     }).subscribe({
       next: (result) => {
         console.log('Stock rule updated successfully:', result);
-        alert('Stock rule updated successfully!');
+
+        // Update stock level (reserved quantity)
+        if (stock._id) {
+          console.log('Updating stock level with ID:', stock._id);
+          console.log('Sending data:', { reservedQuantity: Number(stock.reservedQuantity) || 0 });
+
+          this.productService.updateStockLevel(stock._id, {
+            reservedQuantity: Number(stock.reservedQuantity) || 0
+          }).subscribe({
+            next: (stockResult) => {
+              console.log('Stock level updated successfully:', stockResult);
+              this.router.navigate(['/products']);
+            },
+            error: (err) => {
+              console.error('Full error object:', err);
+              console.error('Error status:', err.status);
+              console.error('Error message:', err.message);
+              console.error('Error body:', err.error);
+              alert('Stock rule updated but failed to update reserved quantity. Check console for details.');
+            }
+          });
+        } else {
+          console.log('No stock level ID found, skipping reserved quantity update');
+          this.router.navigate(['/products']);
+        }
       },
       error: (err) => {
         console.error('Error updating stock rule:', err);
-        alert('Error updating stock rule: ' + err.error?.error);
+        alert('Error updating stock rule: ' + (err.error?.error || err.message));
       }
     });
   }

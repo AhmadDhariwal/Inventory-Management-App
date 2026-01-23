@@ -55,4 +55,8 @@ export class ProductService {
     return this.http.get<any[]>(`${this.inventoryUrl}/stocklevels`, { params });
   }
 
+  updateStockLevel(stockLevelId: string, data: any): Observable<any> {
+    return this.http.put<any>(`${this.inventoryUrl}/stocklevels/${stockLevelId}`, data);
+  }
+
 }

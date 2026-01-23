@@ -356,45 +356,11 @@ const getstocklevelsreport = async () => {
 //   return lowStock;
 // };
 const getlowstockreport = async () => {
-  // Calculate low stock from stock movements and rules
-  const lowStock = await StockMovement.aggregate([
-    {
-      $group: {
-        _id: {
-          product: "$product",
-          warehouse: "$warehouse"
-        },
-        availableQty: {
-          $sum: {
-            $cond: [
-              { $eq: ["$type", "IN"] },
-              "$quantity",
-              { $multiply: ["$quantity", -1] }
-            ]
-          }
-        }
-      }
-    },
-    {
-      $lookup: {
-        from: "products",
-        localField: "_id.product",
-        foreignField: "_id",
-        as: "productInfo"
-      }
-    },
-    {
-      $lookup: {
-        from: "warehouses",
-        localField: "_id.warehouse",
-        foreignField: "_id",
-        as: "warehouseInfo"
-      }
-    },
+  const lowStock = await StockLevel.aggregate([
     {
       $lookup: {
         from: "stockrules",
-        let: { product: "$_id.product", warehouse: "$_id.warehouse" },
+        let: { product: "$product", warehouse: "$warehouse" },
         pipeline: [
           {
             $match: {
@@ -410,34 +376,40 @@ const getlowstockreport = async () => {
         as: "rule"
       }
     },
+    { $unwind: "$rule" },
     {
       $match: {
-        $or: [
-          {
-            $and: [
-              { "rule.0": { $exists: true } },
-              { $expr: { $lte: ["$availableQty", { $arrayElemAt: ["$rule.minStock", 0] }] } }
-            ]
-          },
-          {
-            $and: [
-              { "rule.0": { $exists: false } },
-              { $expr: { $lte: ["$availableQty", 10] } }
-            ]
-          }
-        ]
+        $expr: {
+          $lte: ["$quantity", "$rule.minStock"]
+        }
+      }
+    },
+    {
+      $lookup: {
+        from: "products",
+        localField: "product",
+        foreignField: "_id",
+        as: "productInfo"
+      }
+    },
+    {
+      $lookup: {
+        from: "warehouses",
+        localField: "warehouse",
+        foreignField: "_id",
+        as: "warehouseInfo"
       }
     },
     {
       $project: {
-        productId: "$_id.product",
-        warehouseId: "$_id.warehouse",
+        productId: "$product",
+        warehouseId: "$warehouse",
         productName: { $arrayElemAt: ["$productInfo.name", 0] },
         sku: { $arrayElemAt: ["$productInfo.sku", 0] },
         warehouseName: { $arrayElemAt: ["$warehouseInfo.name", 0] },
-        availableQty: "$availableQty",
-        minStock: { $arrayElemAt: ["$rule.minStock", 0] },
-        reorderLevel: { $arrayElemAt: ["$rule.reorderLevel", 0] },
+        availableQty: "$quantity",
+        minStock: "$rule.minStock",
+        reorderLevel: "$rule.reorderLevel",
         status: "LOW"
       }
     }
