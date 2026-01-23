@@ -68,7 +68,16 @@ const getallpurchaseorders = async () => {
     .populate("warehouse", "name")
     .populate("createdBy", "name");
 };
+const getpurchaseorderbyid = async (id) => {
+  return await Purchaseorder.findById(id)
+    .populate("supplier", "name email")
+    .populate("items.product", "name sku")
+    .populate("warehouse", "name")
+    .populate("createdBy", "name");
+};
+
 module.exports = { 
   createpurchaseorder,
-  getallpurchaseorders
+  getallpurchaseorders,
+  getpurchaseorderbyid
  };

@@ -123,8 +123,7 @@ const exportPurchaseOrdersExcel = async (req, res) => {
 const getproductreport = async (req, res) => {
   try {
     const { category } = req.query;
-
-    const data = await reportService.getproductreport(category);
+    const data = await reportservice.getproductreport(category);
 
     res.status(200).json(data);
   } catch (error) {

@@ -24,6 +24,12 @@ const routes: Routes = [
     loadComponent: () =>
       import('./purchase-report/purchase-report.component')
         .then(m => m.PurchaseReportComponent)
+  },
+  {
+    path : 'product',
+    loadComponent :() =>
+      import('./product-report/product-report.component')
+    .then(m => m.ProductReportComponent)
   }
 ];
 

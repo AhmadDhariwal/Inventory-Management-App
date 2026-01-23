@@ -1,4 +1,4 @@
-.product-details-container {
+.purchase-details-container {
   padding: 2rem;
   max-width: 1200px;
   margin: 0 auto;
@@ -40,6 +40,7 @@
     margin: 0 0 0.5rem 0;
     font-size: 2rem;
     font-weight: 600;
+    color: #1f2937;
   }
   
   .subtitle {
@@ -79,22 +80,35 @@
   }
 }
 
-.sku-badge {
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  
+  &.pending {
+    background: #fef3c7;
+    color: #92400e;
+  }
+  
+  &.received {
+    background: #d1fae5;
+    color: #065f46;
+  }
+  
+  &.cancelled {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+}
+
+.item-count {
   background: #f3f4f6;
   color: #374151;
   padding: 0.25rem 0.75rem;
   border-radius: 4px;
   font-size: 0.875rem;
   font-weight: 500;
-}
-
-.total-stock {
-  background: #dbeafe;
-  color: #1e40af;
-  padding: 0.25rem 0.75rem;
-  border-radius: 4px;
-  font-size: 0.875rem;
-  font-weight: 600;
 }
 
 .info-grid {
@@ -116,38 +130,6 @@
   
   span {
     font-weight: 500;
-  }
-}
-
-.status-badge {
-  padding: 0.25rem 0.75rem;
-  border-radius: 4px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  
-  &.active {
-    background: #d1fae5;
-    color: #065f46;
-  }
-  
-  &.inactive {
-    background: #fee2e2;
-    color: #991b1b;
-  }
-  
-  &.ok {
-    background: #d1fae5;
-    color: #065f46;
-  }
-  
-  &.low {
-    background: #fef3c7;
-    color: #92400e;
-  }
-  
-  &.critical {
-    background: #fee2e2;
-    color: #991b1b;
   }
 }
 
@@ -178,6 +160,16 @@
   }
 }
 
+.sku-badge {
+  background: #f3f4f6;
+  color: #374151;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: monospace;
+}
+
 .empty-state {
   text-align: center;
   padding: 2rem;
@@ -194,6 +186,8 @@
   text-decoration: none;
   cursor: pointer;
   transition: all 0.2s;
+  border: none;
+  font-size: 0.875rem;
   
   &.btn-outline {
     background: white;
@@ -219,25 +213,5 @@
   
   .info-grid {
     grid-template-columns: 1fr;
-  }
-}
-
-.btn-sm {
-  padding: 0.25rem 0.75rem;
-  font-size: 0.75rem;
-}
-
-.stock-input {
-  width: 80px;
-  padding: 0.25rem 0.5rem;
-  border: 1px solid #d1d5db;
-  border-radius: 4px;
-  font-size: 0.875rem;
-  text-align: center;
-  
-  &:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
   }
 }

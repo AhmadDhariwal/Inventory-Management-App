@@ -4,6 +4,7 @@ const stockrulecontroller = require("../controllers/stockrule.controller");
 const { verifytoken } = require("../middleware/auth.middleware");
 
 router.post("/", verifytoken, stockrulecontroller.createstockrule);
+router.post("/upsert", verifytoken, stockrulecontroller.createorupdatestockrule);
 router.get("/", verifytoken, stockrulecontroller.getstockrules);
 router.get("/:id", verifytoken, stockrulecontroller.getstockruleById);
 router.put("/:id", verifytoken, stockrulecontroller.updatestockrule);

@@ -86,13 +86,35 @@
               <thead>
                 <tr>
                   <th>Warehouse</th>
-                  <th class="numeric">Quantity</th>
+                  <th class="numeric">Available</th>
+                  <th class="numeric">Reserved</th>
+                  <th class="numeric">Min Stock</th>
+                  <th class="numeric">Reorder Level</th>
+                  <th>Status</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 <tr *ngFor="let stock of stockLevels">
                   <td>{{ stock.warehouse?.name || 'Unknown Warehouse' }}</td>
-                  <td class="numeric">{{ stock.quantity }}</td>
+                  <td class="numeric">{{ stock.quantity || 0 }}</td>
+                  <td class="numeric">{{ stock.reservedQuantity || 0 }}</td>
+                  <td class="numeric">
+                    <input type="number" [(ngModel)]="stock.minStock" min="0" class="stock-input">
+                  </td>
+                  <td class="numeric">
+                    <input type="number" [(ngModel)]="stock.reorderLevel" min="0" class="stock-input">
+                  </td>
+                  <td>
+                    <span class="status-badge" [ngClass]="getStockStatus(stock)">
+                      {{ getStockStatusText(stock) }}
+                    </span>
+                  </td>
+                  <td>
+                    <button class="btn btn-sm btn-primary" (click)="updateStockRule(stock)">
+                      Update
+                    </button>
+                  </td>
                 </tr>
               </tbody>
             </table>

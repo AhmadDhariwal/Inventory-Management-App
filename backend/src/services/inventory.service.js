@@ -1,8 +1,10 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const Product = require("../models/product");
 const Warehouse = require("../models/warehouse");
 const stockmovement = require("../models/stockmovement");
-//const user = require('../models/user');
+const StockLevel = require("../models/stocklevel");
+const StockRule = require("../models/stockrule");
 
 const getcurrentstock = async (productId, warehouseId) => {
   const movements = await stockmovement.find({
@@ -25,6 +27,16 @@ const getcurrentstock = async (productId, warehouseId) => {
 };
 
 
+const updateStockLevel = async (productId, warehouseId) => {
+  const currentStock = await getcurrentstock(productId, warehouseId);
+  
+  await StockLevel.findOneAndUpdate(
+    { product: productId, warehouse: warehouseId },
+    { quantity: currentStock },
+    { upsert: true, new: true }
+  );
+};
+
 const addstock = async ({ productId, warehouseId, quantity, reason, userId }) => {
   if (quantity <= 0) {
     throw new Error("Quantity must be greater than zero");
@@ -44,6 +56,9 @@ const addstock = async ({ productId, warehouseId, quantity, reason, userId }) =>
     reason,
     user: userId,
   });
+
+  // Update StockLevel collection
+  await updateStockLevel(productId, warehouseId);
 
   return movement;
 };
@@ -67,6 +82,9 @@ const removestock = async ({ productId, warehouseId, quantity, reason, userId })
     reason,
     user: userId,
   });
+
+  // Update StockLevel collection
+  await updateStockLevel(productId, warehouseId);
 
   return movement;
 };
@@ -223,19 +241,137 @@ const getstocksummary = async (filters = {}) => {
 };
 
 const getstocklevels = async (productId) => {
-  const StockLevel = require('../models/stocklevel');
-  
-  let query = {};
+  // If specific product requested, get its stock levels
   if (productId) {
-    query.product = productId;
+    // Calculate stock from movements
+    const stockAggregation = await stockmovement.aggregate([
+      { $match: { product: new mongoose.Types.ObjectId(productId) } },
+      {
+        $group: {
+          _id: "$warehouse",
+          quantity: {
+            $sum: {
+              $cond: [
+                { $eq: ["$type", "IN"] },
+                "$quantity",
+                { $multiply: ["$quantity", -1] }
+              ]
+            }
+          }
+        }
+      },
+      {
+        $lookup: {
+          from: "warehouses",
+          localField: "_id",
+          foreignField: "_id",
+          as: "warehouse"
+        }
+      },
+      {
+        $unwind: "$warehouse"
+      }
+    ]);
+
+    // Get product info
+    const product = await Product.findById(productId)
+      .populate('category', 'name')
+      .lean();
+
+    if (!product) {
+      return [];
+    }
+
+    // Get stock rules
+    const stockRules = await StockRule.find({ product: productId }).lean();
+    const ruleMap = new Map();
+    stockRules.forEach(rule => {
+      ruleMap.set(rule.warehouse.toString(), rule);
+    });
+
+    // Build result
+    const result = [];
+    
+    if (stockAggregation.length > 0) {
+      for (const stock of stockAggregation) {
+        const rule = ruleMap.get(stock._id.toString());
+        result.push({
+          product: {
+            _id: product._id,
+            name: product.name,
+            sku: product.sku,
+            category: product.category
+          },
+          warehouse: stock.warehouse,
+          quantity: Math.max(0, stock.quantity),
+          reorderLevel: rule?.reorderLevel || 0,
+          minStock: rule?.minStock || 0,
+          reservedQuantity: 0
+        });
+      }
+    } else {
+      // No stock movements, show 0 for first warehouse
+      const warehouses = await Warehouse.find({ isActive: true }).limit(1).lean();
+      if (warehouses.length > 0) {
+        const rule = ruleMap.get(warehouses[0]._id.toString());
+        result.push({
+          product: {
+            _id: product._id,
+            name: product.name,
+            sku: product.sku,
+            category: product.category
+          },
+          warehouse: warehouses[0],
+          quantity: 0,
+          reorderLevel: rule?.reorderLevel || 0,
+          minStock: rule?.minStock || 0,
+          reservedQuantity: 0
+        });
+      }
+    }
+
+    return result;
   }
-  
-  const stockLevels = await StockLevel.find(query)
-    .populate('product', 'name sku')
+
+  // Get all stock levels if no specific product
+  const stockLevels = await StockLevel.find({})
+    .populate({
+      path: 'product',
+      select: 'name sku category',
+      populate: {
+        path: 'category',
+        select: 'name'
+      }
+    })
     .populate('warehouse', 'name')
     .lean();
   
-  return stockLevels;
+  // Get stock rules for reorder levels
+  const enrichedLevels = await Promise.all(stockLevels.map(async (level) => {
+    // Check if product and warehouse exist
+    if (!level.product || !level.warehouse) {
+      return {
+        ...level,
+        reorderLevel: 0,
+        minStock: 0,
+        reservedQuantity: 0
+      };
+    }
+    
+    const stockRule = await StockRule.findOne({
+      product: level.product._id,
+      warehouse: level.warehouse._id
+    }).lean();
+    
+    return {
+      ...level,
+      reorderLevel: stockRule?.reorderLevel || 0,
+      minStock: stockRule?.minStock || 0,
+      reservedQuantity: 0
+    };
+  }));
+  
+  return enrichedLevels;
 };
 
 module.exports = {

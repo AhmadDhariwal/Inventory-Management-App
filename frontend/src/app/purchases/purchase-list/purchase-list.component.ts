@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { PurchaseService } from '../../shared/services/purchase.service';
 import { SupplierService } from '../../shared/services/supplier.service';
 import { StockService } from '../../shared/services/stock.service';
@@ -40,7 +40,8 @@ export class PurchaseListComponent implements OnInit {
   constructor(
     private purchaseService: PurchaseService,
     private supplierService: SupplierService,
-    private stockService: StockService
+    private stockService: StockService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -174,8 +175,7 @@ export class PurchaseListComponent implements OnInit {
   }
 
   viewPurchaseOrder(po: PurchaseOrder): void {
-    // Navigate to purchase order details
-    console.log('View purchase order:', po);
+    this.router.navigate(['/purchases/details', po._id]);
   }
 
   goToPage(page: number): void {

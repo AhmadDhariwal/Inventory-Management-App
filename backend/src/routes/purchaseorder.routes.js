@@ -5,5 +5,6 @@ const {verifytoken} = require("../middleware/auth.middleware");
 
 router.post("/add", verifytoken , purchaseordercontroller.createpurchaseorder);
 router.get("/",purchaseordercontroller.getallpurchaseorders);
+router.get("/:id", purchaseordercontroller.getpurchaseorderbyid);
 
 module.exports = router;

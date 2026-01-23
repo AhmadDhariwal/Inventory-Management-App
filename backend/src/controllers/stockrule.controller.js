@@ -56,10 +56,27 @@ const deletestockrule = async (req, res) => {
   }
 };
 
+const createorupdatestockrule = async (req, res) => {
+  try {
+    const { product, warehouse, minStock, reorderLevel } = req.body;
+    
+    const stockrule = await StockRule.findOneAndUpdate(
+      { product, warehouse },
+      { minStock, reorderLevel },
+      { upsert: true, new: true }
+    ).populate("product", "name sku").populate("warehouse", "name");
+    
+    res.json(stockrule);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
 module.exports = {
   createstockrule,
   getstockrules,
   getstockruleById,
   updatestockrule,
-  deletestockrule
+  deletestockrule,
+  createorupdatestockrule
 };

@@ -206,8 +206,10 @@ export class ProductListComponent implements OnInit {
   }
 
   getProductStockLevel(productId: string): number {
-    const stockLevel = this.stockLevels.find(sl => sl.product?._id === productId);
-    return stockLevel ? stockLevel.quantity : 0;
+    const totalStock = this.stockLevels
+      .filter(sl => sl.product?._id === productId || sl.product === productId)
+      .reduce((sum, sl) => sum + (sl.quantity || 0), 0);
+    return totalStock;
   }
 
   viewProduct(id: string) {

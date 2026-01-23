@@ -26,6 +26,19 @@ catch(error){
 }
 }
 
+const getpurchaseorderbyid = async (req, res) => {
+  try {
+    const purchaseorder = await purchaseorderservice.getpurchaseorderbyid(req.params.id);
+    if (!purchaseorder) {
+      return res.status(404).json({ error: 'Purchase order not found' });
+    }
+    res.status(200).json(purchaseorder);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
 module.exports = { createpurchaseorder,
-  getallpurchaseorders
+  getallpurchaseorders,
+  getpurchaseorderbyid
  };

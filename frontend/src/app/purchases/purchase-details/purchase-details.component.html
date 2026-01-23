@@ -1,0 +1,112 @@
+<main class="purchase-details-container" role="main">
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state" role="status" aria-live="polite">
+    <div class="loading-spinner">
+      <svg class="spinner" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" opacity="0.25"/>
+        <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+      </svg>
+    </div>
+    <p>Loading purchase order details...</p>
+  </div>
+
+  <!-- Purchase Order Details -->
+  <section *ngIf="!loading && purchaseOrder" class="purchase-details">
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="header-content">
+        <div class="title-section">
+          <h1>Purchase Order Details</h1>
+          <p class="subtitle">Order from {{ purchaseOrder.supplier?.name }}</p>
+        </div>
+        <div class="header-actions">
+          <button type="button" class="btn btn-outline" (click)="goBack()">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+            </svg>
+            Back to Purchase Orders
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Order Information -->
+    <div class="details-grid">
+      <div class="card">
+        <div class="card-header">
+          <h2>Order Information</h2>
+          <span class="status-badge" [ngClass]="purchaseOrder.status?.toLowerCase()">
+            {{ purchaseOrder.status || 'PENDING' }}
+          </span>
+        </div>
+        <div class="card-content">
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Supplier</label>
+              <span>{{ purchaseOrder.supplier?.name || 'N/A' }}</span>
+            </div>
+            <div class="info-item">
+              <label>Warehouse</label>
+              <span>{{ purchaseOrder.warehouse?.name || 'N/A' }}</span>
+            </div>
+            <div class="info-item">
+              <label>Created By</label>
+              <span>{{ purchaseOrder.createdBy?.name || 'N/A' }}</span>
+            </div>
+            <div class="info-item">
+              <label>Order Date</label>
+              <span>{{ purchaseOrder.createdAt | date:'MMM d, y' }}</span>
+            </div>
+            <div class="info-item">
+              <label>Total Amount</label>
+              <span class="amount">{{ purchaseOrder.totalamount | currency:'USD':'symbol':'1.2-2' }}</span>
+            </div>
+            <div class="info-item">
+              <label>Total Items</label>
+              <span>{{ getTotalItems() }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order Items -->
+      <div class="card">
+        <div class="card-header">
+          <h2>Order Items</h2>
+          <span class="item-count">{{ purchaseOrder.items?.length || 0 }} products</span>
+        </div>
+        <div class="card-content">
+          <div *ngIf="!purchaseOrder.items || purchaseOrder.items.length === 0" class="empty-state">
+            <p>No items in this order</p>
+          </div>
+          <div *ngIf="purchaseOrder.items && purchaseOrder.items.length > 0" class="items-table">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>SKU</th>
+                  <th class="numeric">Quantity</th>
+                  <th class="numeric">Unit Price</th>
+                  <th class="numeric">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of purchaseOrder.items">
+                  <td>{{ item.product?.name || 'N/A' }}</td>
+                  <td>
+                    <span class="sku-badge">{{ item.product?.sku || 'N/A' }}</span>
+                  </td>
+                  <td class="numeric">{{ item.quantity }}</td>
+                  <td class="numeric">{{ item.unitprice | currency:'USD':'symbol':'1.2-2' }}</td>
+                  <td class="numeric">
+                    <span class="amount">{{ (item.quantity * item.unitprice) | currency:'USD':'symbol':'1.2-2' }}</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>

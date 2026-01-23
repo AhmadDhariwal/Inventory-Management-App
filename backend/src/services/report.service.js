@@ -125,7 +125,18 @@ const getpurchasereport = async () => {
 //   return levels;
 // };
 const getstocklevelsreport = async () => {
-  const levels = await StockMovement.aggregate([
+  // Get all products with their categories
+  const products = await Product.find()
+    .populate('category', 'name')
+    .lean();
+
+  // Get all warehouses
+  const warehouses = await Warehouse.find({ isActive: true })
+    .select('name')
+    .lean();
+
+  // Calculate stock levels from movements for all product-warehouse combinations
+  const stockAggregation = await StockMovement.aggregate([
     {
       $group: {
         _id: {
@@ -161,6 +172,14 @@ const getstocklevelsreport = async () => {
     },
     {
       $lookup: {
+        from: "categories",
+        localField: "productInfo.category",
+        foreignField: "_id",
+        as: "categoryInfo"
+      }
+    },
+    {
+      $lookup: {
         from: "stockrules",
         let: { product: "$_id.product", warehouse: "$_id.warehouse" },
         pipeline: [
@@ -185,8 +204,11 @@ const getstocklevelsreport = async () => {
         productName: { $arrayElemAt: ["$productInfo.name", 0] },
         sku: { $arrayElemAt: ["$productInfo.sku", 0] },
         cost: { $arrayElemAt: ["$productInfo.cost", 0] },
+        price: { $arrayElemAt: ["$productInfo.price", 0] },
+        category: { $arrayElemAt: ["$categoryInfo.name", 0] },
         warehouseName: { $arrayElemAt: ["$warehouseInfo.name", 0] },
         availableQty: "$availableQty",
+        reservedQty: { $literal: 0 }, // TODO: Implement reserved quantity
         minStock: { $arrayElemAt: ["$stockRule.minStock", 0] },
         reorderLevel: { $arrayElemAt: ["$stockRule.reorderLevel", 0] },
         totalValue: {
@@ -197,16 +219,63 @@ const getstocklevelsreport = async () => {
         },
         status: {
           $cond: [
-            { $lte: ["$availableQty", 10] },
-            "CRITICAL",
-            { $cond: [{ $lte: ["$availableQty", 30] }, "LOW", "OK"] }
+            { $lte: ["$availableQty", { $arrayElemAt: ["$stockRule.minStock", 0] }] },
+            "LOW",
+            "OK"
           ]
         }
       }
     }
   ]);
 
-  return levels;
+  // Add products with no stock movements
+  const stockMap = new Map();
+  stockAggregation.forEach(item => {
+    stockMap.set(item.productId.toString(), item);
+  });
+
+  const allLevels = [];
+  
+  // Ensure all products appear in at least one warehouse
+  products.forEach(product => {
+    const productId = product._id.toString();
+    let hasStock = false;
+    
+    warehouses.forEach(warehouse => {
+      const key = `${productId}-${warehouse._id}`;
+      const existingStock = stockAggregation.find(s => 
+        s.productId.toString() === productId && 
+        s.warehouseId.toString() === warehouse._id.toString()
+      );
+      
+      if (existingStock) {
+        allLevels.push(existingStock);
+        hasStock = true;
+      }
+    });
+    
+    // If product has no stock in any warehouse, add it with 0 quantity in first warehouse
+    if (!hasStock && warehouses.length > 0) {
+      allLevels.push({
+        productId: product._id,
+        warehouseId: warehouses[0]._id,
+        productName: product.name,
+        sku: product.sku,
+        cost: product.cost,
+        price: product.price,
+        category: product.category?.name || 'Uncategorized',
+        warehouseName: warehouses[0].name,
+        availableQty: 0,
+        reservedQty: 0,
+        minStock: 0,
+        reorderLevel: 0,
+        totalValue: 0,
+        status: 'OK'
+      });
+    }
+  });
+
+  return allLevels;
 };
 // const getlowstockreport = async () => {
 //   const lowStock = await StockMovement.aggregate([
@@ -287,11 +356,45 @@ const getstocklevelsreport = async () => {
 //   return lowStock;
 // };
 const getlowstockreport = async () => {
-  const lowStock = await StockLevel.aggregate([
+  // Calculate low stock from stock movements and rules
+  const lowStock = await StockMovement.aggregate([
+    {
+      $group: {
+        _id: {
+          product: "$product",
+          warehouse: "$warehouse"
+        },
+        availableQty: {
+          $sum: {
+            $cond: [
+              { $eq: ["$type", "IN"] },
+              "$quantity",
+              { $multiply: ["$quantity", -1] }
+            ]
+          }
+        }
+      }
+    },
+    {
+      $lookup: {
+        from: "products",
+        localField: "_id.product",
+        foreignField: "_id",
+        as: "productInfo"
+      }
+    },
+    {
+      $lookup: {
+        from: "warehouses",
+        localField: "_id.warehouse",
+        foreignField: "_id",
+        as: "warehouseInfo"
+      }
+    },
     {
       $lookup: {
         from: "stockrules",
-        let: { product: "$product", warehouse: "$warehouse" },
+        let: { product: "$_id.product", warehouse: "$_id.warehouse" },
         pipeline: [
           {
             $match: {
@@ -307,40 +410,34 @@ const getlowstockreport = async () => {
         as: "rule"
       }
     },
-    { $unwind: "$rule" },
     {
       $match: {
-        $expr: {
-          $lte: ["$quantity", "$rule.minStock"]
-        }
-      }
-    },
-    {
-      $lookup: {
-        from: "products",
-        localField: "product",
-        foreignField: "_id",
-        as: "productInfo"
-      }
-    },
-    {
-      $lookup: {
-        from: "warehouses",
-        localField: "warehouse",
-        foreignField: "_id",
-        as: "warehouseInfo"
+        $or: [
+          {
+            $and: [
+              { "rule.0": { $exists: true } },
+              { $expr: { $lte: ["$availableQty", { $arrayElemAt: ["$rule.minStock", 0] }] } }
+            ]
+          },
+          {
+            $and: [
+              { "rule.0": { $exists: false } },
+              { $expr: { $lte: ["$availableQty", 10] } }
+            ]
+          }
+        ]
       }
     },
     {
       $project: {
-        productId: "$product",
-        warehouseId: "$warehouse",
+        productId: "$_id.product",
+        warehouseId: "$_id.warehouse",
         productName: { $arrayElemAt: ["$productInfo.name", 0] },
         sku: { $arrayElemAt: ["$productInfo.sku", 0] },
         warehouseName: { $arrayElemAt: ["$warehouseInfo.name", 0] },
-        availableQty: "$quantity",
-        minStock: "$rule.minStock",
-        reorderLevel: "$rule.reorderLevel",
+        availableQty: "$availableQty",
+        minStock: { $arrayElemAt: ["$rule.minStock", 0] },
+        reorderLevel: { $arrayElemAt: ["$rule.reorderLevel", 0] },
         status: "LOW"
       }
     }
@@ -483,31 +580,94 @@ const exportPurchaseOrdersExcel = async (filters = {}) => {
 };
 
 const getproductreport = async (category) => {
- const filter = {};
+  // Get all products first
+  const products = await Product.find()
+    .populate('category', 'name')
+    .lean();
 
-  if (category && category !== "ALL") {
-    filter["product.category"] = category;
-  }
-
-  const report = await StockLevel.find()
-    .populate({
-      path: "product",
-      select: "name sku category",
-      populate: {
-        path: "category",
-        select: "name"
+  // Calculate stock levels from stock movements
+  const stockAggregation = await StockMovement.aggregate([
+    {
+      $group: {
+        _id: {
+          product: "$product",
+          warehouse: "$warehouse"
+        },
+        quantity: {
+          $sum: {
+            $cond: [
+              { $eq: ["$type", "IN"] },
+              "$quantity",
+              { $multiply: ["$quantity", -1] }
+            ]
+          }
+        }
       }
-    })
-    .populate("warehouse", "name");
+    },
+    {
+      $lookup: {
+        from: "warehouses",
+        localField: "_id.warehouse",
+        foreignField: "_id",
+        as: "warehouseInfo"
+      }
+    },
+    {
+      $project: {
+        productId: "$_id.product",
+        warehouseId: "$_id.warehouse",
+        warehouse: { $arrayElemAt: ["$warehouseInfo.name", 0] },
+        quantity: "$quantity"
+      }
+    }
+  ]);
 
-  // Transform response (VERY IMPORTANT)
-  return report.map(item => ({
-    product: item.product.name,
-    sku: item.product.sku,
-    category: item.product.category?.name || "N/A",
-    warehouse: item.warehouse.name,
-    quantity: item.quantity
-  }));
+  // Create a map of calculated stock levels by product ID
+  const stockMap = new Map();
+  stockAggregation.forEach(stock => {
+    const key = stock.productId.toString();
+    if (!stockMap.has(key)) {
+      stockMap.set(key, []);
+    }
+    stockMap.get(key).push({
+      warehouse: stock.warehouse || 'N/A',
+      quantity: stock.quantity || 0
+    });
+  });
+
+  // Get all warehouses for products without stock movements
+  const warehouses = await Warehouse.find({ isActive: true }).select('name').lean();
+
+  const result = [];
+  
+  products.forEach(product => {
+    const productId = product._id.toString();
+    const productStocks = stockMap.get(productId);
+    
+    if (productStocks && productStocks.length > 0) {
+      // Product has stock movements
+      productStocks.forEach(stock => {
+        result.push({
+          product: product.name || 'N/A',
+          sku: product.sku || 'N/A',
+          category: product.category?.name || 'N/A',
+          warehouse: stock.warehouse,
+          quantity: stock.quantity
+        });
+      });
+    } else {
+      // Product has no stock movements, show with 0 quantity for first warehouse
+      result.push({
+        product: product.name || 'N/A',
+        sku: product.sku || 'N/A',
+        category: product.category?.name || 'N/A',
+        warehouse: warehouses[0]?.name || 'N/A',
+        quantity: 0
+      });
+    }
+  });
+
+  return result;
 };
 
 module.exports = {
