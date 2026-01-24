@@ -8,6 +8,7 @@ import { PurchaseOrder } from '../models/inventory/purchase-order.model';
 })
 export class PurchaseService {
   private baseUrl = 'http://localhost:3000/api/purchaseorders';
+  private reportsUrl = 'http://localhost:3000/api/reports';
 
   constructor(private http: HttpClient) {}
 
@@ -22,5 +23,22 @@ export class PurchaseService {
   createPurchaseOrder(order: any): Observable<PurchaseOrder> {
     return this.http.post<PurchaseOrder>(`${this.baseUrl}/add`, order);
   }
-  
+
+  // Purchase Reports
+  getPurchaseReport(): Observable<PurchaseOrder[]> {
+    return this.http.get<PurchaseOrder[]>(`${this.reportsUrl}/purchases`);
+  }
+
+  exportPurchaseReportCSV(): Observable<Blob> {
+    return this.http.get(`${this.reportsUrl}/purchase/export-csv`, {
+      responseType: 'blob'
+    });
+  }
+
+  exportPurchaseReportExcel(): Observable<Blob> {
+    return this.http.get(`${this.reportsUrl}/purchase/export-excel`, {
+      responseType: 'blob'
+    });
+  }
+
 }
