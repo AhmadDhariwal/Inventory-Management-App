@@ -1,0 +1,16 @@
+<div class="settings-container">
+  <aside class="settings-sidebar">
+    <h3>Settings</h3>
+    <nav>
+      <a routerLink="account" routerLinkActive="active">Account</a>
+      <a routerLink="organization" routerLinkActive="active">Organization</a>
+      <a routerLink="inventory" routerLinkActive="active">Inventory</a>
+      <a routerLink="notifications" routerLinkActive="active">Notifications</a>
+      <a routerLink="security" routerLinkActive="active">Security</a>
+    </nav>
+  </aside>
+
+  <section class="settings-content">
+    <router-outlet></router-outlet>
+  </section>
+</div>
