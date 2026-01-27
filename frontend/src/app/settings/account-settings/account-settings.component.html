@@ -23,9 +23,9 @@
           <div class="form-grid">
             <div class="form-group">
               <label for="firstName">First Name</label>
-              <input 
-                id="firstName" 
-                type="text" 
+              <input
+                id="firstName"
+                type="text"
                 class="form-control"
                 formControlName="firstName"
                 [readonly]="!isEditMode"
@@ -34,12 +34,12 @@
                 First name is required
               </div>
             </div>
-            
+
             <div class="form-group">
               <label for="lastName">Last Name</label>
-              <input 
-                id="lastName" 
-                type="text" 
+              <input
+                id="lastName"
+                type="text"
                 class="form-control"
                 formControlName="lastName"
                 [readonly]="!isEditMode"
@@ -49,41 +49,41 @@
               </div>
             </div>
           </div>
-          
+
           <div class="form-group">
             <label for="email">Email Address</label>
-            <input 
-              id="email" 
-              type="email" 
+            <input
+              id="email"
+              type="email"
               class="form-control"
               formControlName="email"
               readonly
               placeholder="your.email@example.com">
             <small class="help-text">Email cannot be changed. Contact support if needed.</small>
           </div>
-          
+
           <div class="form-group">
             <label for="phone">Phone Number</label>
-            <input 
-              id="phone" 
-              type="tel" 
+            <input
+              id="phone"
+              type="tel"
               class="form-control"
               formControlName="phone"
               [readonly]="!isEditMode"
               placeholder="+1 (555) 123-4567">
           </div>
-          
+
           <div class="form-group">
             <label for="department">Department</label>
-            <input 
-              id="department" 
-              type="text" 
+            <input
+              id="department"
+              type="text"
               class="form-control"
               formControlName="department"
               [readonly]="!isEditMode"
               placeholder="Enter your department">
           </div>
-          
+
           <div class="form-actions" *ngIf="isEditMode">
             <button type="button" class="btn btn-outline" (click)="cancelEdit()">
               Cancel
@@ -112,7 +112,7 @@
             Change Password
           </button>
         </div>
-        
+
         <div class="security-item">
           <div class="security-info">
             <h3>Two-Factor Authentication</h3>
@@ -122,7 +122,7 @@
             {{ twoFactorEnabled ? 'Disable' : 'Enable' }}
           </button>
         </div>
-        
+
         <div class="security-item">
           <div class="security-info">
             <h3>Active Sessions</h3>
@@ -154,7 +154,7 @@
             Export
           </button>
         </div>
-        
+
         <div class="action-item danger-zone">
           <div class="action-info">
             <h3>Sign Out</h3>
