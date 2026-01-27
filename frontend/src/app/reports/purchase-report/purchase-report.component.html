@@ -1,14 +1,13 @@
-<div class="purchase-report-page">
-
+<div class="purchase-report">
   <!-- PAGE HEADER -->
   <div class="page-header">
     <div class="header-content">
-      <h1>Purchase Report</h1>
-      <p>Comprehensive purchase order analysis and insights</p>
+      <h1 class="page-title">Purchase Report</h1>
+      <p class="page-subtitle">Comprehensive purchase order analysis and insights</p>
     </div>
     <div class="header-actions">
-      <button type="button" class="btn btn-secondary" (click)="exportReport('csv')" [disabled]="loading">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <button type="button" class="btn btn-outline" (click)="exportReport('csv')" [disabled]="loading">
+        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
           <polyline points="7,10 12,15 17,10"/>
           <line x1="12" y1="15" x2="12" y2="3"/>
@@ -16,7 +15,7 @@
         Export CSV
       </button>
       <button type="button" class="btn btn-primary" (click)="refreshData()" [disabled]="loading">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" [class.spinning]="loading">
           <polyline points="23,4 23,10 17,10"/>
           <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
         </svg>
@@ -26,146 +25,164 @@
   </div>
 
   <!-- FILTERS -->
-  <div class="filters-section">
-    <div class="filter-group">
-      <label for="dateRange">Date Range</label>
-      <select id="dateRange" [(ngModel)]="selectedDateRange" (change)="applyFilters()" class="filter-select">
-        <option value="all">All Time</option>
-        <option value="today">Today</option>
-        <option value="week">This Week</option>
-        <option value="month">This Month</option>
-        <option value="quarter">This Quarter</option>
-        <option value="year">This Year</option>
-      </select>
-    </div>
+  <div class="filters-card">
+    <div class="filters-grid">
+      <div class="filter-group">
+        <label for="dateRange" class="filter-label">Date Range</label>
+        <select id="dateRange" [(ngModel)]="selectedDateRange" (change)="applyFilters()" class="filter-select">
+          <option value="all">All Time</option>
+          <option value="today">Today</option>
+          <option value="week">This Week</option>
+          <option value="month">This Month</option>
+          <option value="quarter">This Quarter</option>
+          <option value="year">This Year</option>
+        </select>
+      </div>
 
-    <div class="filter-group">
-      <label for="status">Status</label>
-      <select id="status" [(ngModel)]="selectedStatus" (change)="applyFilters()" class="filter-select">
-        <option value="all">All Status</option>
-        <option value="pending">Pending</option>
-        <option value="approved">Approved</option>
-        <option value="received">Received</option>
-        <option value="cancelled">Cancelled</option>
-      </select>
-    </div>
+      <div class="filter-group">
+        <label for="status" class="filter-label">Status</label>
+        <select id="status" [(ngModel)]="selectedStatus" (change)="applyFilters()" class="filter-select">
+          <option value="all">All Status</option>
+          <option value="pending">Pending</option>
+          <option value="approved">Approved</option>
+          <option value="received">Received</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+      </div>
 
-    <div class="filter-group">
-      <label for="supplier">Supplier</label>
-      <select id="supplier" [(ngModel)]="selectedSupplier" (change)="applyFilters()" class="filter-select">
-        <option value="all">All Suppliers</option>
-        <option *ngFor="let supplier of suppliers" [value]="supplier._id">
-          {{ supplier.name }}
-        </option>
-      </select>
-    </div>
+      <div class="filter-group">
+        <label for="supplier" class="filter-label">Supplier</label>
+        <select id="supplier" [(ngModel)]="selectedSupplier" (change)="applyFilters()" class="filter-select">
+          <option value="all">All Suppliers</option>
+          <option *ngFor="let supplier of suppliers" [value]="supplier._id">
+            {{ supplier.name }}
+          </option>
+        </select>
+      </div>
 
-    <div class="filter-group">
-      <label for="search">Search</label>
-      <div class="search-input">
-        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="11" cy="11" r="8"/>
-          <path d="m21 21-4.35-4.35"/>
-        </svg>
-        <input
-          id="search"
-          type="text"
-          placeholder="Search by reference or supplier..."
-          [(ngModel)]="searchText"
-          (input)="applyFilters()"
-        />
+      <div class="filter-group search-group">
+        <label for="search" class="filter-label">Search</label>
+        <div class="search-input">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="m21 21-4.35-4.35"/>
+          </svg>
+          <input
+            id="search"
+            type="text"
+            placeholder="Search orders..."
+            [(ngModel)]="searchText"
+            (input)="applyFilters()"
+            class="search-field"
+          />
+        </div>
       </div>
     </div>
   </div>
 
   <!-- SUMMARY CARDS -->
-  <div class="summary-cards">
+  <div class="summary-grid">
     <div class="summary-card">
-      <div class="card-icon orders">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
-          <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
-        </svg>
+      <div class="card-header">
+        <div class="card-icon orders">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+            <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+          </svg>
+        </div>
+        <h3 class="card-title">Total Orders</h3>
       </div>
-      <div class="card-content">
-        <h3>Total Orders</h3>
-        <div class="card-value">{{ summary.totalOrders | number }}</div>
-        <div class="card-change positive" *ngIf="summary.ordersChange > 0">
-          ↗ {{ summary.ordersChange }}% vs last period
-        </div>
-        <div class="card-change negative" *ngIf="summary.ordersChange < 0">
-          ↘ {{ Math.abs(summary.ordersChange) }}% vs last period
-        </div>
+      <div class="card-value">{{ summary.totalOrders | number }}</div>
+      <div class="card-change positive" *ngIf="summary.ordersChange > 0">
+        <svg class="change-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="23,6 13.5,15.5 8.5,10.5 1,18"/>
+        </svg>
+        {{ summary.ordersChange }}% vs last period
+      </div>
+      <div class="card-change negative" *ngIf="summary.ordersChange < 0">
+        <svg class="change-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="1,18 10.5,8.5 15.5,13.5 23,6"/>
+        </svg>
+        {{ Math.abs(summary.ordersChange) }}% vs last period
       </div>
     </div>
 
     <div class="summary-card">
-      <div class="card-icon amount">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="12" y1="1" x2="12" y2="23"/>
-          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-        </svg>
+      <div class="card-header">
+        <div class="card-icon amount">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="1" x2="12" y2="23"/>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+        </div>
+        <h3 class="card-title">Total Amount</h3>
       </div>
-      <div class="card-content">
-        <h3>Total Amount</h3>
-        <div class="card-value">{{ summary.totalAmount | currency:'USD':'symbol':'1.0-0' }}</div>
-        <div class="card-change positive" *ngIf="summary.amountChange > 0">
-          ↗ {{ summary.amountChange }}% vs last period
-        </div>
-        <div class="card-change negative" *ngIf="summary.amountChange < 0">
-          ↘ {{ Math.abs(summary.amountChange) }}% vs last period
-        </div>
+      <div class="card-value">{{ summary.totalAmount | currency:'USD':'symbol':'1.0-0' }}</div>
+      <div class="card-change positive" *ngIf="summary.amountChange > 0">
+        <svg class="change-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="23,6 13.5,15.5 8.5,10.5 1,18"/>
+        </svg>
+        {{ summary.amountChange }}% vs last period
+      </div>
+      <div class="card-change negative" *ngIf="summary.amountChange < 0">
+        <svg class="change-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="1,18 10.5,8.5 15.5,13.5 23,6"/>
+        </svg>
+        {{ Math.abs(summary.amountChange) }}% vs last period
       </div>
     </div>
 
     <div class="summary-card">
-      <div class="card-icon suppliers">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-          <circle cx="9" cy="7" r="4"/>
-          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-        </svg>
+      <div class="card-header">
+        <div class="card-icon suppliers">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+        </div>
+        <h3 class="card-title">Active Suppliers</h3>
       </div>
-      <div class="card-content">
-        <h3>Active Suppliers</h3>
-        <div class="card-value">{{ summary.activeSuppliers | number }}</div>
-        <div class="card-meta">{{ summary.totalSuppliers }} total suppliers</div>
-      </div>
+      <div class="card-value">{{ summary.activeSuppliers | number }}</div>
+      <div class="card-meta">of {{ summary.totalSuppliers }} total</div>
     </div>
 
     <div class="summary-card">
-      <div class="card-icon avg">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="18" y1="20" x2="18" y2="10"/>
-          <line x1="12" y1="20" x2="12" y2="4"/>
-          <line x1="6" y1="20" x2="6" y2="14"/>
-        </svg>
+      <div class="card-header">
+        <div class="card-icon avg">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="20" x2="18" y2="10"/>
+            <line x1="12" y1="20" x2="12" y2="4"/>
+            <line x1="6" y1="20" x2="6" y2="14"/>
+          </svg>
+        </div>
+        <h3 class="card-title">Avg Order Value</h3>
       </div>
-      <div class="card-content">
-        <h3>Avg Order Value</h3>
-        <div class="card-value">{{ summary.avgOrderValue | currency:'USD':'symbol':'1.0-0' }}</div>
-        <div class="card-meta">Per purchase order</div>
-      </div>
+      <div class="card-value">{{ summary.avgOrderValue | currency:'USD':'symbol':'1.0-0' }}</div>
+      <div class="card-meta">per order</div>
     </div>
   </div>
 
   <!-- DATA TABLE -->
-  <div class="table-section">
+  <div class="table-card">
     <div class="table-header">
-      <h2>Purchase Orders</h2>
-      <div class="table-controls">
-        <div class="results-info">
-          Showing {{ filteredPurchases.length }} of {{ purchases.length }} orders
-        </div>
-        <div class="pagination-controls" *ngIf="totalPages > 1">
+      <div class="table-title">
+        <h2>Purchase Orders</h2>
+        <span class="results-count">{{ filteredPurchases.length }} of {{ purchases.length }} orders</span>
+      </div>
+      <div class="table-actions" *ngIf="totalPages > 1">
+        <div class="pagination">
           <button
             type="button"
             class="pagination-btn"
             [disabled]="currentPage === 1"
             (click)="changePage(currentPage - 1)"
+            title="previous page"
           >
-            Previous
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="15,18 9,12 15,6"/>
+            </svg>
           </button>
           <span class="page-info">{{ currentPage }} of {{ totalPages }}</span>
           <button
@@ -173,126 +190,129 @@
             class="pagination-btn"
             [disabled]="currentPage === totalPages"
             (click)="changePage(currentPage + 1)"
+            title="nextpage"
           >
-            Next
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="9,18 15,12 9,6"/>
+            </svg>
           </button>
         </div>
       </div>
     </div>
 
-    <div class="table-wrapper">
+    <div class="table-container">
+      <!-- Loading State -->
       <div *ngIf="loading" class="loading-state">
         <div class="loading-spinner"></div>
-        <p>Loading purchase data...</p>
+        <div class="loading-text">
+          <h3>Loading purchase data...</h3>
+          <p>Please wait while we fetch your reports</p>
+        </div>
       </div>
 
+      <!-- Empty State -->
       <div *ngIf="!loading && filteredPurchases.length === 0" class="empty-state">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="10"/>
-          <path d="M16 16s-1.5-2-4-2-4 2-4 2"/>
-          <line x1="9" y1="9" x2="9.01" y2="9"/>
-          <line x1="15" y1="9" x2="15.01" y2="9"/>
-        </svg>
+        <div class="empty-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+        </div>
         <h3>No purchase orders found</h3>
-        <p>Try adjusting your filters or date range</p>
+        <p>Try adjusting your filters or date range to see more results</p>
       </div>
 
-      <table class="data-table" *ngIf="!loading && paginatedPurchases.length > 0">
-        <thead>
-          <tr>
-            <th>
-              <button type="button" class="sort-btn" (click)="sortBy('_id')">
-                Reference
-                <svg *ngIf="sortField === '_id'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <polyline [attr.points]="sortDirection === 'asc' ? '6,9 12,15 18,9' : '18,15 12,9 6,15'"/>
-                </svg>
-              </button>
-            </th>
-            <th>
-              <button type="button" class="sort-btn" (click)="sortBy('createdAt')">
-                Date
-                <svg *ngIf="sortField === 'createdAt'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <polyline [attr.points]="sortDirection === 'asc' ? '6,9 12,15 18,9' : '18,15 12,9 6,15'"/>
-                </svg>
-              </button>
-            </th>
-            <th>Supplier</th>
-            <th>
-              <button type="button" class="sort-btn" (click)="sortBy('status')">
-                Status
-                <svg *ngIf="sortField === 'status'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <polyline [attr.points]="sortDirection === 'asc' ? '6,9 12,15 18,9' : '18,15 12,9 6,15'"/>
-                </svg>
-              </button>
-            </th>
-            <th class="text-right">
-              <button type="button" class="sort-btn" (click)="sortBy('totalamount')">
-                Amount
-                <svg *ngIf="sortField === 'totalamount'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <polyline [attr.points]="sortDirection === 'asc' ? '6,9 12,15 18,9' : '18,15 12,9 6,15'"/>
-                </svg>
-              </button>
-            </th>
-            <th>Items</th>
-            <th class="text-center">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let purchase of paginatedPurchases" class="table-row">
-            <td>
-              <div class="reference-cell">
-                <strong>{{ purchase._id }}</strong>
-              </div>
-            </td>
-            <td>
-              <div class="date-cell">
-                {{ purchase.createdAt | date:'MMM dd, yyyy' }}
-                <div class="time">{{ purchase.createdAt | date:'HH:mm' }}</div>
-              </div>
-            </td>
-            <td>
-              <div class="supplier-cell">
-                <div class="supplier-name">{{ purchase.supplier.name || 'N/A' }}</div>
-                <div class="supplier-email">{{ purchase.supplier.email || '' }}</div>
-              </div>
-            </td>
-            <td>
-              <span class="status-badge" [ngClass]="'status-' + (purchase.status || 'pending').toLowerCase()">
-                <span class="status-dot"></span>
-                {{ (purchase.status || 'PENDING') | titlecase }}
-              </span>
-            </td>
-            <td class="text-right">
-              <div class="amount-cell">
-                <strong>{{ purchase.totalamount | currency:'USD':'symbol':'1.0-0' }}</strong>
-              </div>
-            </td>
-            <td>
-              <div class="items-cell">
-                <span class="items-count">{{ purchase.items.length || 0 }} items</span>
-                <div class="items-preview" *ngIf="purchase.items.length > 0">
-                  {{ getItemsPreview(purchase.items) }}
+      <!-- Data Table -->
+      <div class="table-wrapper" *ngIf="!loading && paginatedPurchases.length > 0">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th class="sortable" (click)="sortBy('_id')">
+                <div class="th-content">
+                  <span>Reference</span>
+                  <svg *ngIf="sortField === '_id'" class="sort-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline [attr.points]="sortDirection === 'asc' ? '6,9 12,15 18,9' : '18,15 12,9 6,15'"/>
+                  </svg>
                 </div>
-              </div>
-            </td>
-            <td class="text-center">
-              <button
-                type="button"
-                class="action-btn"
-                (click)="viewPurchaseDetails(purchase)"
-                title="Purchase Details"
-                                [attr.aria-label]="'View details for ' + purchase._id"
-              >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                  <circle cx="12" cy="12" r="3"/>
-                </svg>
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+              </th>
+              <th class="sortable" (click)="sortBy('createdAt')">
+                <div class="th-content">
+                  <span>Date</span>
+                  <svg *ngIf="sortField === 'createdAt'" class="sort-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline [attr.points]="sortDirection === 'asc' ? '6,9 12,15 18,9' : '18,15 12,9 6,15'"/>
+                  </svg>
+                </div>
+              </th>
+              <th>Supplier</th>
+              <th class="sortable" (click)="sortBy('status')">
+                <div class="th-content">
+                  <span>Status</span>
+                  <svg *ngIf="sortField === 'status'" class="sort-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline [attr.points]="sortDirection === 'asc' ? '6,9 12,15 18,9' : '18,15 12,9 6,15'"/>
+                  </svg>
+                </div>
+              </th>
+              <th class="sortable amount-col" (click)="sortBy('totalamount')">
+                <div class="th-content">
+                  <span>Amount</span>
+                  <svg *ngIf="sortField === 'totalamount'" class="sort-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline [attr.points]="sortDirection === 'asc' ? '6,9 12,15 18,9' : '18,15 12,9 6,15'"/>
+                  </svg>
+                </div>
+              </th>
+              <th>Items</th>
+              <th class="actions-col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let purchase of paginatedPurchases" class="table-row">
+              <td class="reference-col">
+                <div class="reference-id">{{ purchase._id }}</div>
+              </td>
+              <td class="date-col">
+                <div class="date-main">{{ purchase.createdAt | date:'MMM dd, yyyy' }}</div>
+                <div class="date-time">{{ purchase.createdAt | date:'HH:mm' }}</div>
+              </td>
+              <td class="supplier-col">
+                <div class="supplier-info">
+                  <div class="supplier-name">{{ purchase.supplier.name || 'N/A' }}</div>
+                  <div class="supplier-email" *ngIf="purchase.supplier.email">{{ purchase.supplier.email }}</div>
+                </div>
+              </td>
+              <td class="status-col">
+                <span class="status-badge" [ngClass]="'status-' + (purchase.status || 'pending').toLowerCase()">
+                  <span class="status-indicator"></span>
+                  {{ (purchase.status || 'PENDING') | titlecase }}
+                </span>
+              </td>
+              <td class="amount-col">
+                <div class="amount-value">{{ purchase.totalamount | currency:'USD':'symbol':'1.0-0' }}</div>
+              </td>
+              <td class="items-col">
+                <div class="items-info">
+                  <div class="items-count">{{ purchase.items.length || 0 }} items</div>
+                  <div class="items-preview" *ngIf="purchase.items.length > 0">
+                    {{ getItemsPreview(purchase.items) }}
+                  </div>
+                </div>
+              </td>
+              <td class="actions-col">
+                <button
+                  type="button"
+                  class="action-btn"
+                  (click)="viewPurchaseDetails(purchase)"
+                  title="viewPurchaseDetails"
+                  [attr.aria-label]="'View details for order ' + purchase._id"
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
-
 </div>

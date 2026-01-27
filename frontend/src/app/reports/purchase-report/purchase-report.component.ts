@@ -95,7 +95,9 @@ export class PurchaseReportComponent implements OnInit {
 
   private calculateSummary(): void {
     const totalOrders = this.purchases.length;
-    const totalAmount = this.purchases.reduce((sum, p) => sum + (p.totalamount || 0), 0);
+
+    const totalAmount = this.purchases.reduce((sum, p) => sum + (p.totalamount ?? 0),0);
+    console.log("total amount is ",totalAmount);
     const activeSuppliers = new Set(this.purchases.map(p => p.supplier?._id).filter(Boolean)).size;
     const avgOrderValue = totalOrders > 0 ? totalAmount / totalOrders : 0;
 

@@ -30,13 +30,13 @@ export class PurchaseService {
   }
 
   exportPurchaseReportCSV(): Observable<Blob> {
-    return this.http.get(`${this.reportsUrl}/purchase/export-csv`, {
+    return this.http.get(`${this.reportsUrl}/purchases/export/csv`, {
       responseType: 'blob'
     });
   }
 
   exportPurchaseReportExcel(): Observable<Blob> {
-    return this.http.get(`${this.reportsUrl}/purchase/export-excel`, {
+    return this.http.get(`${this.reportsUrl}/purchases/export/excel`, {
       responseType: 'blob'
     });
   }
