@@ -1,174 +1,185 @@
-<div class="account-settings-container">
-  <div class="page-header">
-    <h1>Account Settings</h1>
-    <p class="subtitle">Manage your personal information and account preferences</p>
-  </div>
+<div class="settings-page">
+  <header class="page-header">
+    <h1 class="page-title">Account Settings</h1>
+    <p class="page-description">Manage your personal information and account preferences</p>
+  </header>
 
-  <div class="settings-grid">
-    <!-- Profile Information Card -->
-    <div class="card profile-card">
+  <div class="settings-sections">
+    <!-- Profile Information -->
+    <section class="settings-card">
       <div class="card-header">
         <div class="header-content">
-          <h2>Profile Information</h2>
-          <button type="button" class="btn btn-outline btn-sm" (click)="toggleEditMode()">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-              <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
-            </svg>
-            {{ isEditMode ? 'Cancel' : 'Edit' }}
+          <div>
+            <h2 class="card-title">Profile Information</h2>
+            <p class="card-description">Update your personal details and contact information</p>
+          </div>
+          <button 
+            type="button" 
+            class="btn btn-secondary"
+            (click)="toggleEditMode()"
+            [disabled]="isLoading">
+            {{ isEditMode ? 'Cancel' : 'Edit Profile' }}
           </button>
         </div>
       </div>
-      <div class="card-content">
-        <form [formGroup]="profileForm" (ngSubmit)="updateProfile()">
-          <div class="form-grid">
-            <div class="form-group">
-              <label for="firstName">First Name</label>
-              <input 
-                id="firstName" 
-                type="text" 
-                class="form-control"
-                formControlName="firstName"
-                [readonly]="!isEditMode"
-                placeholder="Enter your first name">
-              <div *ngIf="profileForm.get('firstName')?.invalid && profileForm.get('firstName')?.touched" class="error-message">
-                First name is required
-              </div>
-            </div>
-            
-            <div class="form-group">
-              <label for="lastName">Last Name</label>
-              <input 
-                id="lastName" 
-                type="text" 
-                class="form-control"
-                formControlName="lastName"
-                [readonly]="!isEditMode"
-                placeholder="Enter your last name">
-              <div *ngIf="profileForm.get('lastName')?.invalid && profileForm.get('lastName')?.touched" class="error-message">
-                Last name is required
-              </div>
+      
+      <form [formGroup]="profileForm" (ngSubmit)="updateProfile()" class="form">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="firstName" class="form-label">First Name *</label>
+            <input
+              id="firstName"
+              formControlName="firstName"
+              type="text"
+              class="form-input"
+              [readonly]="!isEditMode"
+              placeholder="Enter your first name" />
+            <div class="form-error" *ngIf="profileForm.get('firstName')?.invalid && profileForm.get('firstName')?.touched">
+              First name is required (minimum 2 characters)
             </div>
           </div>
-          
+
           <div class="form-group">
-            <label for="email">Email Address</label>
-            <input 
-              id="email" 
-              type="email" 
-              class="form-control"
+            <label for="lastName" class="form-label">Last Name *</label>
+            <input
+              id="lastName"
+              formControlName="lastName"
+              type="text"
+              class="form-input"
+              [readonly]="!isEditMode"
+              placeholder="Enter your last name" />
+            <div class="form-error" *ngIf="profileForm.get('lastName')?.invalid && profileForm.get('lastName')?.touched">
+              Last name is required (minimum 2 characters)
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="email" class="form-label">Email Address *</label>
+            <input
+              id="email"
               formControlName="email"
+              type="email"
+              class="form-input"
               readonly
-              placeholder="your.email@example.com">
-            <small class="help-text">Email cannot be changed. Contact support if needed.</small>
+              placeholder="your.email@company.com" />
+            <small class="form-help">Email cannot be changed. Contact administrator if needed.</small>
           </div>
-          
+
           <div class="form-group">
-            <label for="phone">Phone Number</label>
-            <input 
-              id="phone" 
-              type="tel" 
-              class="form-control"
+            <label for="phone" class="form-label">Phone Number</label>
+            <input
+              id="phone"
               formControlName="phone"
+              type="tel"
+              class="form-input"
               [readonly]="!isEditMode"
-              placeholder="+1 (555) 123-4567">
+              placeholder="+1 (555) 123-4567" />
           </div>
-          
+
           <div class="form-group">
-            <label for="department">Department</label>
-            <input 
-              id="department" 
-              type="text" 
-              class="form-control"
+            <label for="department" class="form-label">Department</label>
+            <input
+              id="department"
               formControlName="department"
+              type="text"
+              class="form-input"
               [readonly]="!isEditMode"
-              placeholder="Enter your department">
+              placeholder="e.g., Sales, Operations, IT" />
           </div>
-          
-          <div class="form-actions" *ngIf="isEditMode">
-            <button type="button" class="btn btn-outline" (click)="cancelEdit()">
-              Cancel
-            </button>
-            <button type="submit" class="btn btn-primary" [disabled]="profileForm.invalid || isLoading">
-              <span *ngIf="isLoading" class="loading-spinner"></span>
-              {{ isLoading ? 'Saving...' : 'Save Changes' }}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        </div>
+        
+        <div class="form-actions" *ngIf="isEditMode">
+          <button type="button" class="btn btn-secondary" (click)="cancelEdit()">
+            Cancel
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="profileForm.invalid || isLoading">
+            <span *ngIf="isLoading">Saving...</span>
+            <span *ngIf="!isLoading">Save Changes</span>
+          </button>
+        </div>
+      </form>
+    </section>
 
-    <!-- Security Settings Card -->
-    <div class="card security-card">
+    <!-- Security Settings -->
+    <section class="settings-card">
       <div class="card-header">
-        <h2>Security Settings</h2>
+        <h2 class="card-title">Security & Privacy</h2>
+        <p class="card-description">Manage your account security and privacy settings</p>
       </div>
-      <div class="card-content">
-        <div class="security-item">
-          <div class="security-info">
-            <h3>Password</h3>
-            <p>Last changed {{ getPasswordLastChanged() }}</p>
+      
+      <div class="form">
+        <div class="security-items">
+          <div class="security-item">
+            <div class="security-info">
+              <h3 class="security-title">Password</h3>
+              <p class="security-description">Last changed {{ getPasswordLastChanged() }}</p>
+            </div>
+            <button type="button" class="btn btn-secondary" (click)="changePassword()">
+              Change Password
+            </button>
           </div>
-          <button type="button" class="btn btn-outline btn-sm" (click)="changePassword()">
-            Change Password
-          </button>
-        </div>
-        
-        <div class="security-item">
-          <div class="security-info">
-            <h3>Two-Factor Authentication</h3>
-            <p>{{ twoFactorEnabled ? 'Enabled' : 'Not enabled' }}</p>
-          </div>
-          <button type="button" class="btn btn-outline btn-sm" (click)="toggleTwoFactor()">
-            {{ twoFactorEnabled ? 'Disable' : 'Enable' }}
-          </button>
-        </div>
-        
-        <div class="security-item">
-          <div class="security-info">
-            <h3>Active Sessions</h3>
-            <p>{{ activeSessions }} active session(s)</p>
-          </div>
-          <button type="button" class="btn btn-outline btn-sm" (click)="viewSessions()">
-            Manage Sessions
-          </button>
-        </div>
-      </div>
-    </div>
 
-    <!-- Account Actions Card -->
-    <div class="card actions-card">
+          <div class="security-item">
+            <div class="security-info">
+              <h3 class="security-title">Two-Factor Authentication</h3>
+              <p class="security-description">
+                {{ twoFactorEnabled ? 'Enabled' : 'Disabled' }} - 
+                {{ twoFactorEnabled ? 'Your account is protected with 2FA' : 'Add an extra layer of security' }}
+              </p>
+            </div>
+            <button 
+              type="button" 
+              class="btn"
+              [class.btn-primary]="!twoFactorEnabled"
+              [class.btn-secondary]="twoFactorEnabled"
+              (click)="toggleTwoFactor()">
+              {{ twoFactorEnabled ? 'Disable' : 'Enable' }} 2FA
+            </button>
+          </div>
+
+          <div class="security-item">
+            <div class="security-info">
+              <h3 class="security-title">Active Sessions</h3>
+              <p class="security-description">{{ activeSessions }} active session(s) on your account</p>
+            </div>
+            <button type="button" class="btn btn-secondary" (click)="viewSessions()">
+              Manage Sessions
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Data & Privacy -->
+    <section class="settings-card">
       <div class="card-header">
-        <h2>Account Actions</h2>
+        <h2 class="card-title">Data & Privacy</h2>
+        <p class="card-description">Control your data and privacy preferences</p>
       </div>
-      <div class="card-content">
-        <div class="action-item">
-          <div class="action-info">
-            <h3>Export Data</h3>
-            <p>Download a copy of your account data</p>
+      
+      <div class="form">
+        <div class="data-actions">
+          <div class="data-item">
+            <div class="data-info">
+              <h3 class="data-title">Export Account Data</h3>
+              <p class="data-description">Download a copy of your account information and data</p>
+            </div>
+            <button type="button" class="btn btn-secondary" (click)="exportData()">
+              Export Data
+            </button>
           </div>
-          <button type="button" class="btn btn-outline btn-sm" (click)="exportData()">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-              <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
-              <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/>
-            </svg>
-            Export
-          </button>
-        </div>
-        
-        <div class="action-item danger-zone">
-          <div class="action-info">
-            <h3>Sign Out</h3>
-            <p>Sign out from your account on this device</p>
+
+          <div class="data-item danger-zone">
+            <div class="data-info">
+              <h3 class="data-title">Sign Out</h3>
+              <p class="data-description">Sign out from your current session</p>
+            </div>
+            <button type="button" class="btn btn-danger" (click)="logout()">
+              Sign Out
+            </button>
           </div>
-          <button type="button" class="btn btn-danger btn-sm" (click)="logout()">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-              <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z"/>
-              <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"/>
-            </svg>
-            Sign Out
-          </button>
         </div>
       </div>
-    </div>
+    </section>
   </div>
 </div>

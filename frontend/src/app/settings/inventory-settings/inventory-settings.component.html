@@ -1,1 +1,225 @@
-<p>inventory-settings works!</p>
+<div class="settings-page">
+  <header class="page-header">
+    <h1 class="page-title">Inventory Settings</h1>
+    <p class="page-description">Configure stock management, valuation methods, and automation rules</p>
+  </header>
+
+  <div class="settings-sections">
+    <!-- Stock Management -->
+    <section class="settings-card">
+      <div class="card-header">
+        <h2 class="card-title">Stock Management</h2>
+        <p class="card-description">Configure stock levels, thresholds, and tracking preferences</p>
+      </div>
+      
+      <form [formGroup]="stockForm" (ngSubmit)="onSaveStock()" class="form">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="lowStockThreshold" class="form-label">Low Stock Threshold *</label>
+            <input
+              id="lowStockThreshold"
+              formControlName="lowStockThreshold"
+              type="number"
+              class="form-input"
+              min="1"
+              placeholder="10" />
+            <small class="form-help">Alert when stock falls below this level</small>
+            <div class="form-error" *ngIf="stockForm.get('lowStockThreshold')?.invalid && stockForm.get('lowStockThreshold')?.touched">
+              Low stock threshold must be at least 1
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="criticalStockThreshold" class="form-label">Critical Stock Threshold *</label>
+            <input
+              id="criticalStockThreshold"
+              formControlName="criticalStockThreshold"
+              type="number"
+              class="form-input"
+              min="1"
+              placeholder="5" />
+            <small class="form-help">Critical alert when stock is extremely low</small>
+            <div class="form-error" *ngIf="stockForm.get('criticalStockThreshold')?.invalid && stockForm.get('criticalStockThreshold')?.touched">
+              Critical stock threshold must be at least 1
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="reorderPoint" class="form-label">Reorder Point *</label>
+            <input
+              id="reorderPoint"
+              formControlName="reorderPoint"
+              type="number"
+              class="form-input"
+              min="1"
+              placeholder="20" />
+            <small class="form-help">Trigger reorder when stock reaches this level</small>
+          </div>
+
+          <div class="form-group">
+            <label for="maxStockLevel" class="form-label">Maximum Stock Level *</label>
+            <input
+              id="maxStockLevel"
+              formControlName="maxStockLevel"
+              type="number"
+              class="form-input"
+              min="1"
+              placeholder="1000" />
+            <small class="form-help">Maximum inventory capacity</small>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3 class="section-title">Tracking Options</h3>
+          <div class="checkbox-group">
+            <label class="checkbox-item">
+              <input type="checkbox" formControlName="enableNegativeStock" class="form-checkbox">
+              <span class="checkbox-label">Allow Negative Stock</span>
+              <small class="checkbox-help">Permit sales when stock is below zero</small>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" formControlName="trackSerialNumbers" class="form-checkbox">
+              <span class="checkbox-label">Track Serial Numbers</span>
+              <small class="checkbox-help">Enable serial number tracking for products</small>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" formControlName="trackBatchNumbers" class="form-checkbox">
+              <span class="checkbox-label">Track Batch Numbers</span>
+              <small class="checkbox-help">Enable batch/lot number tracking</small>
+            </label>
+          </div>
+        </div>
+        
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" [disabled]="stockForm.invalid">
+            Save Stock Settings
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Inventory Valuation -->
+    <section class="settings-card">
+      <div class="card-header">
+        <h2 class="card-title">Inventory Valuation</h2>
+        <p class="card-description">Configure costing methods and valuation preferences</p>
+      </div>
+      
+      <form [formGroup]="valuationForm" (ngSubmit)="onSaveValuation()" class="form">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="costingMethod" class="form-label">Costing Method *</label>
+            <select id="costingMethod" formControlName="costingMethod" class="form-select">
+              <option value="FIFO">FIFO (First In, First Out)</option>
+              <option value="LIFO">LIFO (Last In, First Out)</option>
+              <option value="AVERAGE">Weighted Average Cost</option>
+              <option value="STANDARD">Standard Cost</option>
+            </select>
+            <small class="form-help">Method used to calculate inventory costs</small>
+          </div>
+
+          <div class="form-group">
+            <label for="roundingPrecision" class="form-label">Rounding Precision *</label>
+            <select id="roundingPrecision" formControlName="roundingPrecision" class="form-select">
+              <option value="0">0 decimal places</option>
+              <option value="1">1 decimal place</option>
+              <option value="2">2 decimal places</option>
+              <option value="3">3 decimal places</option>
+              <option value="4">4 decimal places</option>
+            </select>
+            <small class="form-help">Decimal precision for cost calculations</small>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3 class="section-title">Cost Inclusions</h3>
+          <div class="checkbox-group">
+            <label class="checkbox-item">
+              <input type="checkbox" formControlName="includeShippingCosts" class="form-checkbox">
+              <span class="checkbox-label">Include Shipping Costs</span>
+              <small class="checkbox-help">Add shipping costs to inventory valuation</small>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" formControlName="includeTaxInCost" class="form-checkbox">
+              <span class="checkbox-label">Include Tax in Cost</span>
+              <small class="checkbox-help">Include purchase tax in inventory cost</small>
+            </label>
+          </div>
+        </div>
+        
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" [disabled]="valuationForm.invalid">
+            Save Valuation Settings
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Automation & Alerts -->
+    <section class="settings-card">
+      <div class="card-header">
+        <h2 class="card-title">Automation & Alerts</h2>
+        <p class="card-description">Configure automated processes and notification preferences</p>
+      </div>
+      
+      <form [formGroup]="automationForm" (ngSubmit)="onSaveAutomation()" class="form">
+        <div class="form-section">
+          <h3 class="section-title">Automation Rules</h3>
+          <div class="checkbox-group">
+            <label class="checkbox-item">
+              <input type="checkbox" formControlName="autoReorder" class="form-checkbox">
+              <span class="checkbox-label">Automatic Reordering</span>
+              <small class="checkbox-help">Automatically create purchase orders when stock is low</small>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" formControlName="autoReceiveOrders" class="form-checkbox">
+              <span class="checkbox-label">Auto-Receive Orders</span>
+              <small class="checkbox-help">Automatically receive orders when delivered</small>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" formControlName="enableBarcodeScan" class="form-checkbox">
+              <span class="checkbox-label">Barcode Scanning</span>
+              <small class="checkbox-help">Enable barcode scanning for inventory operations</small>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3 class="section-title">Alert Settings</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="alertDaysBefore" class="form-label">Expiry Alert Days *</label>
+              <input
+                id="alertDaysBefore"
+                formControlName="alertDaysBefore"
+                type="number"
+                class="form-input"
+                min="1"
+                placeholder="30" />
+              <small class="form-help">Days before expiry to send alerts</small>
+            </div>
+          </div>
+          
+          <div class="checkbox-group">
+            <label class="checkbox-item">
+              <input type="checkbox" formControlName="sendLowStockAlerts" class="form-checkbox">
+              <span class="checkbox-label">Low Stock Alerts</span>
+              <small class="checkbox-help">Send notifications when stock is low</small>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" formControlName="sendExpiryAlerts" class="form-checkbox">
+              <span class="checkbox-label">Expiry Alerts</span>
+              <small class="checkbox-help">Send notifications for expiring products</small>
+            </label>
+          </div>
+        </div>
+        
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" [disabled]="automationForm.invalid">
+            Save Automation Settings
+          </button>
+        </div>
+      </form>
+    </section>
+  </div>
+</div>

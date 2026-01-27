@@ -24,7 +24,9 @@ const { verifytoken,restrictto } = require('./src/middleware/auth.middleware');
 const app = express();
 const port = 3000;
 
-const allowedOrigins = ['http://localhost:4200'];
+const allowedOrigins = ['http://localhost:4200',
+  'http://localhost:61135'
+];
 
 app.use(cors({
   origin: allowedOrigins,

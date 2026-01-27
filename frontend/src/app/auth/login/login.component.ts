@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule,FormControl } from '@angular/forms';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { AuthService, LoginRequest } from '../../shared/services/auth.service';
 
@@ -49,12 +49,12 @@ export class LoginComponent implements OnInit {
       if (params['returnUrl']) {
         this.returnUrl = params['returnUrl'];
       }
-      
+
       if (params['message']) {
         this.successMessage = params['message'];
         setTimeout(() => this.successMessage = '', 5000);
       }
-      
+
       if (params['error']) {
         switch (params['error']) {
           case 'insufficient_permissions':
@@ -98,7 +98,7 @@ export class LoginComponent implements OnInit {
       next: (response) => {
         this.loading = false;
         this.successMessage = 'Login successful! Redirecting...';
-        
+
         setTimeout(() => {
           this.router.navigate([this.returnUrl]);
         }, 1000);
