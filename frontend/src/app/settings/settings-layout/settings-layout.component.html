@@ -1,16 +1,41 @@
 <div class="settings-container">
   <aside class="settings-sidebar">
-    <h3>Settings</h3>
-    <nav>
-      <a routerLink="account" routerLinkActive="active">Account</a>
-      <a routerLink="organization" routerLinkActive="active">Organization</a>
-      <a routerLink="inventory" routerLinkActive="active">Inventory</a>
-      <a routerLink="notifications" routerLinkActive="active">Notifications</a>
-      <a routerLink="security" routerLinkActive="active">Security</a>
+    <div class="sidebar-header">
+      <h2 class="sidebar-title">Settings</h2>
+      <p class="sidebar-subtitle">Manage your preferences</p>
+    </div>
+    
+    <nav class="settings-nav">
+      <div class="nav-section">
+        <h3 class="nav-section-title">General</h3>
+        <a routerLink="account" routerLinkActive="active" class="nav-item">
+          <span>Account Settings</span>
+        </a>
+        <a routerLink="business" routerLinkActive="active" class="nav-item">
+          <span>Business Settings</span>
+        </a>
+      </div>
+      
+      <div class="nav-section">
+        <h3 class="nav-section-title">Operations</h3>
+        <a routerLink="inventory" routerLinkActive="active" class="nav-item">
+          <span>Inventory Settings</span>
+        </a>
+      </div>
+      
+      <div class="nav-section">
+        <h3 class="nav-section-title">Security & Privacy</h3>
+        <a routerLink="security" routerLinkActive="active" class="nav-item">
+          <span>Security Settings</span>
+        </a>
+        <a routerLink="notifications" routerLinkActive="active" class="nav-item">
+          <span>Notifications</span>
+        </a>
+      </div>
     </nav>
   </aside>
 
-  <section class="settings-content">
+  <main class="settings-content">
     <router-outlet></router-outlet>
-  </section>
+  </main>
 </div>

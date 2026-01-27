@@ -1,1 +1,215 @@
-<p>business-settings works!</p>
+<div class="settings-page">
+  <header class="page-header">
+    <h1 class="page-title">Business Settings</h1>
+    <p class="page-description">Configure your organization's basic information and preferences</p>
+  </header>
+
+  <div class="settings-sections">
+    <!-- Company Information -->
+    <section class="settings-card">
+      <div class="card-header">
+        <h2 class="card-title">Company Information</h2>
+        <p class="card-description">Basic details about your organization</p>
+      </div>
+      
+      <form [formGroup]="companyForm" (ngSubmit)="onSaveCompany()" class="form">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="companyName" class="form-label">Company Name *</label>
+            <input
+              id="companyName"
+              formControlName="companyName"
+              type="text"
+              class="form-input"
+              placeholder="Enter your company name" />
+            <div class="form-error" *ngIf="companyForm.get('companyName')?.invalid && companyForm.get('companyName')?.touched">
+              Company name is required
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="industry" class="form-label">Industry</label>
+            <select id="industry" formControlName="industry" class="form-select">
+              <option value="">Select Industry</option>
+              <option value="retail">Retail</option>
+              <option value="manufacturing">Manufacturing</option>
+              <option value="wholesale">Wholesale</option>
+              <option value="services">Services</option>
+              <option value="technology">Technology</option>
+              <option value="healthcare">Healthcare</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
+          <div class="form-group full-width">
+            <label for="address" class="form-label">Business Address</label>
+            <textarea
+              id="address"
+              formControlName="address"
+              class="form-textarea"
+              rows="3"
+              placeholder="Enter your business address"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="phone" class="form-label">Phone Number</label>
+            <input
+              id="phone"
+              formControlName="phone"
+              type="tel"
+              class="form-input"
+              placeholder="+1 (555) 123-4567" />
+          </div>
+
+          <div class="form-group">
+            <label for="email" class="form-label">Business Email</label>
+            <input
+              id="email"
+              formControlName="email"
+              type="email"
+              class="form-input"
+              placeholder="contact@company.com" />
+          </div>
+        </div>
+        
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" [disabled]="companyForm.invalid">
+            Save Company Information
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Regional Settings -->
+    <section class="settings-card">
+      <div class="card-header">
+        <h2 class="card-title">Regional Settings</h2>
+        <p class="card-description">Configure currency, timezone, and localization preferences</p>
+      </div>
+      
+      <form [formGroup]="regionalForm" (ngSubmit)="onSaveRegional()" class="form">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="currency" class="form-label">Currency *</label>
+            <select id="currency" formControlName="currency" class="form-select">
+              <option value="">Select Currency</option>
+              <option value="USD">USD - US Dollar</option>
+              <option value="EUR">EUR - Euro</option>
+              <option value="GBP">GBP - British Pound</option>
+              <option value="PKR">PKR - Pakistani Rupee</option>
+              <option value="INR">INR - Indian Rupee</option>
+              <option value="CAD">CAD - Canadian Dollar</option>
+              <option value="AUD">AUD - Australian Dollar</option>
+            </select>
+            <div class="form-error" *ngIf="regionalForm.get('currency')?.invalid && regionalForm.get('currency')?.touched">
+              Currency is required
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="timezone" class="form-label">Timezone *</label>
+            <select id="timezone" formControlName="timezone" class="form-select">
+              <option value="">Select Timezone</option>
+              <option value="UTC">UTC - Coordinated Universal Time</option>
+              <option value="America/New_York">EST - Eastern Time</option>
+              <option value="America/Chicago">CST - Central Time</option>
+              <option value="America/Denver">MST - Mountain Time</option>
+              <option value="America/Los_Angeles">PST - Pacific Time</option>
+              <option value="Europe/London">GMT - Greenwich Mean Time</option>
+              <option value="Europe/Paris">CET - Central European Time</option>
+              <option value="Asia/Karachi">PKT - Pakistan Time</option>
+              <option value="Asia/Kolkata">IST - India Time</option>
+            </select>
+            <div class="form-error" *ngIf="regionalForm.get('timezone')?.invalid && regionalForm.get('timezone')?.touched">
+              Timezone is required
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="dateFormat" class="form-label">Date Format</label>
+            <select id="dateFormat" formControlName="dateFormat" class="form-select">
+              <option value="MM/DD/YYYY">MM/DD/YYYY (US)</option>
+              <option value="DD/MM/YYYY">DD/MM/YYYY (UK)</option>
+              <option value="YYYY-MM-DD">YYYY-MM-DD (ISO)</option>
+              <option value="DD.MM.YYYY">DD.MM.YYYY (German)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="language" class="form-label">Language</label>
+            <select id="language" formControlName="language" class="form-select">
+              <option value="en">English</option>
+              <option value="es">Spanish</option>
+              <option value="fr">French</option>
+              <option value="de">German</option>
+              <option value="ur">Urdu</option>
+              <option value="hi">Hindi</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" [disabled]="regionalForm.invalid">
+            Save Regional Settings
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Business Preferences -->
+    <section class="settings-card">
+      <div class="card-header">
+        <h2 class="card-title">Business Preferences</h2>
+        <p class="card-description">Configure operational settings and preferences</p>
+      </div>
+      
+      <form [formGroup]="preferencesForm" (ngSubmit)="onSavePreferences()" class="form">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="fiscalYearStart" class="form-label">Fiscal Year Start</label>
+            <select id="fiscalYearStart" formControlName="fiscalYearStart" class="form-select">
+              <option value="01">January</option>
+              <option value="04">April</option>
+              <option value="07">July</option>
+              <option value="10">October</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="workingDays" class="form-label">Working Days</label>
+            <select id="workingDays" formControlName="workingDays" class="form-select">
+              <option value="monday-friday">Monday to Friday</option>
+              <option value="monday-saturday">Monday to Saturday</option>
+              <option value="sunday-thursday">Sunday to Thursday</option>
+              <option value="custom">Custom</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Business Features</label>
+            <div class="checkbox-group">
+              <label class="checkbox-item">
+                <input type="checkbox" formControlName="enableMultiLocation" class="form-checkbox">
+                <span class="checkbox-label">Multi-location support</span>
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" formControlName="enableTaxCalculation" class="form-checkbox">
+                <span class="checkbox-label">Automatic tax calculation</span>
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" formControlName="enableDiscounts" class="form-checkbox">
+                <span class="checkbox-label">Discount management</span>
+              </label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">
+            Save Preferences
+          </button>
+        </div>
+      </form>
+    </section>
+  </div>
+</div>

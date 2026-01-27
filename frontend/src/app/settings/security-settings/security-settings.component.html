@@ -1,1 +1,178 @@
-<p>security-settings works!</p>
+<div class="settings-page">
+  <header class="page-header">
+    <h1 class="page-title">Security Settings</h1>
+    <p class="page-description">Configure security policies and access controls for your organization</p>
+  </header>
+
+  <div class="settings-sections">
+    <!-- Security Policies -->
+    <section class="settings-card">
+      <div class="card-header">
+        <h2 class="card-title">Security Policies</h2>
+        <p class="card-description">Configure authentication and session security settings</p>
+      </div>
+      
+      <form [formGroup]="securityForm" (ngSubmit)="onSaveSecurity()" class="form">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="sessionTimeout" class="form-label">Session Timeout (minutes) *</label>
+            <input
+              id="sessionTimeout"
+              formControlName="sessionTimeout"
+              type="number"
+              class="form-input"
+              min="5"
+              placeholder="30" />
+            <small class="form-help">Automatically log out users after inactivity</small>
+            <div class="form-error" *ngIf="securityForm.get('sessionTimeout')?.invalid && securityForm.get('sessionTimeout')?.touched">
+              Session timeout must be at least 5 minutes
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="passwordExpiry" class="form-label">Password Expiry (days) *</label>
+            <input
+              id="passwordExpiry"
+              formControlName="passwordExpiry"
+              type="number"
+              class="form-input"
+              min="30"
+              placeholder="90" />
+            <small class="form-help">Force password change after specified days</small>
+            <div class="form-error" *ngIf="securityForm.get('passwordExpiry')?.invalid && securityForm.get('passwordExpiry')?.touched">
+              Password expiry must be at least 30 days
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="maxLoginAttempts" class="form-label">Max Login Attempts *</label>
+            <input
+              id="maxLoginAttempts"
+              formControlName="maxLoginAttempts"
+              type="number"
+              class="form-input"
+              min="3"
+              placeholder="5" />
+            <small class="form-help">Lock account after failed login attempts</small>
+            <div class="form-error" *ngIf="securityForm.get('maxLoginAttempts')?.invalid && securityForm.get('maxLoginAttempts')?.touched">
+              Must allow at least 3 login attempts
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3 class="section-title">Security Features</h3>
+          <div class="checkbox-group">
+            <label class="checkbox-item">
+              <input type="checkbox" formControlName="requireStrongPassword" class="form-checkbox">
+              <span class="checkbox-label">Require Strong Passwords</span>
+              <small class="checkbox-help">Enforce complex password requirements</small>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" formControlName="enableTwoFactor" class="form-checkbox">
+              <span class="checkbox-label">Enable Two-Factor Authentication</span>
+              <small class="checkbox-help">Require 2FA for all user accounts</small>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" formControlName="enableAuditLog" class="form-checkbox">
+              <span class="checkbox-label">Enable Audit Logging</span>
+              <small class="checkbox-help">Track all user activities and system changes</small>
+            </label>
+          </div>
+        </div>
+        
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" [disabled]="securityForm.invalid">
+            Save Security Settings
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Access Control -->
+    <section class="settings-card">
+      <div class="card-header">
+        <h2 class="card-title">Access Control</h2>
+        <p class="card-description">Configure user access restrictions and authentication methods</p>
+      </div>
+      
+      <form [formGroup]="accessForm" (ngSubmit)="onSaveAccess()" class="form">
+        <div class="form-grid">
+          <div class="form-group full-width">
+            <label for="allowedIPs" class="form-label">Allowed IP Addresses</label>
+            <textarea
+              id="allowedIPs"
+              formControlName="allowedIPs"
+              class="form-textarea"
+              rows="3"
+              placeholder="192.168.1.0/24&#10;10.0.0.0/8&#10;172.16.0.0/12"></textarea>
+            <small class="form-help">Enter IP addresses or ranges (one per line). Leave empty to allow all IPs.</small>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3 class="section-title">Access Restrictions</h3>
+          <div class="checkbox-group">
+            <label class="checkbox-item">
+              <input type="checkbox" formControlName="restrictByLocation" class="form-checkbox">
+              <span class="checkbox-label">Restrict by Geographic Location</span>
+              <small class="checkbox-help">Block access from unauthorized countries/regions</small>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" formControlName="enableSSO" class="form-checkbox">
+              <span class="checkbox-label">Enable Single Sign-On (SSO)</span>
+              <small class="checkbox-help">Allow authentication through external identity providers</small>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" formControlName="requireApproval" class="form-checkbox">
+              <span class="checkbox-label">Require Admin Approval</span>
+              <small class="checkbox-help">New user accounts require administrator approval</small>
+            </label>
+          </div>
+        </div>
+        
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" [disabled]="accessForm.invalid">
+            Save Access Settings
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Security Status -->
+    <section class="settings-card">
+      <div class="card-header">
+        <h2 class="card-title">Security Status</h2>
+        <p class="card-description">Current security status and recommendations</p>
+      </div>
+      
+      <div class="form">
+        <div class="status-items">
+          <div class="status-item status-good">
+            <div class="status-icon">✅</div>
+            <div class="status-info">
+              <h3 class="status-title">SSL Certificate</h3>
+              <p class="status-description">Valid SSL certificate installed and active</p>
+            </div>
+          </div>
+
+          <div class="status-item status-warning">
+            <div class="status-icon">⚠️</div>
+            <div class="status-info">
+              <h3 class="status-title">Password Policy</h3>
+              <p class="status-description">Consider enabling stronger password requirements</p>
+            </div>
+          </div>
+
+          <div class="status-item status-good">
+            <div class="status-icon">✅</div>
+            <div class="status-info">
+              <h3 class="status-title">System Updates</h3>
+              <p class="status-description">All security updates are current</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>

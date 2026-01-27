@@ -1,1 +1,81 @@
-<p>notification-settings works!</p>
+<div class="settings-page">
+  <header class="page-header">
+    <h1 class="page-title">Notification Settings</h1>
+    <p class="page-description">Configure how and when you receive notifications</p>
+  </header>
+
+  <div class="settings-sections">
+    <section class="settings-card">
+      <div class="card-header">
+        <h2 class="card-title">Notification Preferences</h2>
+        <p class="card-description">Choose your preferred notification methods and types</p>
+      </div>
+      
+      <form [formGroup]="notificationForm" (ngSubmit)="onSave()" class="form">
+        <div class="form-section">
+          <h3 class="section-title">Delivery Methods</h3>
+          <div class="checkbox-group">
+            <label class="checkbox-item">
+              <input type="checkbox" formControlName="emailNotifications" class="form-checkbox">
+              <span class="checkbox-label">Email Notifications</span>
+              <small class="checkbox-help">Receive notifications via email</small>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" formControlName="smsNotifications" class="form-checkbox">
+              <span class="checkbox-label">SMS Notifications</span>
+              <small class="checkbox-help">Receive critical alerts via SMS</small>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" formControlName="pushNotifications" class="form-checkbox">
+              <span class="checkbox-label">Push Notifications</span>
+              <small class="checkbox-help">Receive browser push notifications</small>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3 class="section-title">Alert Types</h3>
+          <div class="checkbox-group">
+            <label class="checkbox-item">
+              <input type="checkbox" formControlName="lowStockAlerts" class="form-checkbox">
+              <span class="checkbox-label">Low Stock Alerts</span>
+              <small class="checkbox-help">Get notified when inventory is running low</small>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" formControlName="orderUpdates" class="form-checkbox">
+              <span class="checkbox-label">Order Updates</span>
+              <small class="checkbox-help">Notifications for order status changes</small>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" formControlName="systemMaintenance" class="form-checkbox">
+              <span class="checkbox-label">System Maintenance</span>
+              <small class="checkbox-help">Alerts about system updates and maintenance</small>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3 class="section-title">Reports</h3>
+          <div class="checkbox-group">
+            <label class="checkbox-item">
+              <input type="checkbox" formControlName="weeklyReports" class="form-checkbox">
+              <span class="checkbox-label">Weekly Reports</span>
+              <small class="checkbox-help">Receive weekly inventory summary reports</small>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" formControlName="monthlyReports" class="form-checkbox">
+              <span class="checkbox-label">Monthly Reports</span>
+              <small class="checkbox-help">Receive monthly business performance reports</small>
+            </label>
+          </div>
+        </div>
+        
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">
+            Save Notification Settings
+          </button>
+        </div>
+      </form>
+    </section>
+  </div>
+</div>
