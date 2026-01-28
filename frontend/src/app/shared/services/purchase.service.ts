@@ -24,6 +24,10 @@ export class PurchaseService {
     return this.http.post<PurchaseOrder>(`${this.baseUrl}/add`, order);
   }
 
+  deletePurchaseOrder(id: string): Observable<{success: boolean, message: string}> {
+    return this.http.delete<{success: boolean, message: string}>(`${this.baseUrl}/${id}`);
+  }
+
   // Purchase Reports
   getPurchaseReport(): Observable<PurchaseOrder[]> {
     return this.http.get<PurchaseOrder[]>(`${this.reportsUrl}/purchases`);

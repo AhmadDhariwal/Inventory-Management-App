@@ -38,7 +38,26 @@ const getpurchaseorderbyid = async (req, res) => {
   }
 };
 
+const deletepurchaseorder = async (req, res) => {
+  try {
+    const result = await purchaseorderservice.deletepurchaseorder(
+      req.params.id,
+      req.user.id
+    );
+    res.status(200).json({
+      success: true,
+      message: result.message
+    });
+  } catch (error) {
+    res.status(400).json({ 
+      success: false,
+      error: error.message 
+    });
+  }
+};
+
 module.exports = { createpurchaseorder,
   getallpurchaseorders,
-  getpurchaseorderbyid
+  getpurchaseorderbyid,
+  deletepurchaseorder
  };

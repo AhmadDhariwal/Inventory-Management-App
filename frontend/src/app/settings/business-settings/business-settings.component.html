@@ -11,8 +11,8 @@
         <h2 class="card-title">Company Information</h2>
         <p class="card-description">Basic details about your organization</p>
       </div>
-      
-      <form [formGroup]="companyForm" (ngSubmit)="onSaveCompany()" class="form">
+
+      <form [formGroup]="companyForm" (ngSubmit)="onSaveCompany()" class="form" *ngIf="companyForm">
         <div class="form-grid">
           <div class="form-group">
             <label for="companyName" class="form-label">Company Name *</label>
@@ -71,7 +71,7 @@
               placeholder="contact@company.com" />
           </div>
         </div>
-        
+
         <div class="form-actions">
           <button type="submit" class="btn btn-primary" [disabled]="companyForm.invalid">
             Save Company Information
@@ -86,8 +86,8 @@
         <h2 class="card-title">Regional Settings</h2>
         <p class="card-description">Configure currency, timezone, and localization preferences</p>
       </div>
-      
-      <form [formGroup]="regionalForm" (ngSubmit)="onSaveRegional()" class="form">
+
+      <form [formGroup]="regionalForm" (ngSubmit)="onSaveRegional()" class="form" *ngIf="regionalForm">
         <div class="form-grid">
           <div class="form-group">
             <label for="currency" class="form-label">Currency *</label>
@@ -147,7 +147,7 @@
             </select>
           </div>
         </div>
-        
+
         <div class="form-actions">
           <button type="submit" class="btn btn-primary" [disabled]="regionalForm.invalid">
             Save Regional Settings
@@ -162,8 +162,8 @@
         <h2 class="card-title">Business Preferences</h2>
         <p class="card-description">Configure operational settings and preferences</p>
       </div>
-      
-      <form [formGroup]="preferencesForm" (ngSubmit)="onSavePreferences()" class="form">
+
+      <form [formGroup]="preferencesForm" (ngSubmit)="onSavePreferences()" class="form" *ngIf="preferencesForm">
         <div class="form-grid">
           <div class="form-group">
             <label for="fiscalYearStart" class="form-label">Fiscal Year Start</label>
@@ -203,9 +203,9 @@
             </div>
           </div>
         </div>
-        
+
         <div class="form-actions">
-          <button type="submit" class="btn btn-primary">
+          <button type="submit" class="btn btn-primary" [disabled]="preferencesForm.invalid">
             Save Preferences
           </button>
         </div>

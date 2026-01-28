@@ -507,6 +507,15 @@
     background: #f7fafc;
     color: #2d3748;
   }
+  
+  &.btn-danger {
+    color: #e53e3e;
+    
+    &:hover:not(:disabled) {
+      background: #fed7d7;
+      color: #c53030;
+    }
+  }
 }
 
 .btn-sm {

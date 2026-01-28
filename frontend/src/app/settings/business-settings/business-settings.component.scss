@@ -1,1 +1,130 @@
 @import '../shared-settings.scss';
+
+.settings-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.page-header {
+  margin-bottom: 2rem;
+  .page-title {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 0.25rem;
+  }
+  .page-description {
+    color: #666;
+    font-size: 1rem;
+  }
+}
+
+.settings-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.settings-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  padding: 2rem;
+}
+
+.card-header {
+  margin-bottom: 1.5rem;
+  .card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+  .card-description {
+    color: #888;
+    font-size: 0.95rem;
+  }
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem 2rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-label {
+  font-weight: 500;
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.form-textarea {
+  resize: vertical;
+}
+
+.form-error {
+  color: #d32f2f;
+  font-size: 0.9rem;
+}
+
+.form-actions {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn {
+  padding: 0.5rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  background: #1976d2;
+  color: #fff;
+  font-weight: 500;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  &:hover:enabled {
+    background: #1565c0;
+  }
+  &:disabled {
+    background: #b0bec5;
+    cursor: not-allowed;
+  }
+}
+
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.checkbox-label {
+  font-size: 1rem;
+}
