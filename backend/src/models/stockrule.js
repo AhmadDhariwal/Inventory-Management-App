@@ -1,28 +1,74 @@
 const mongoose = require("mongoose");
 
-const stockruleschema = new mongoose.Schema({
-  product: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "product",
-    required: true
+const stockRuleSchema = new mongoose.Schema({
+  allowNegativeStock: {
+    type: Boolean,
+    default: false,
+    description: "Allow stock to go below zero"
   },
-  warehouse: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "warehouse",
-    required: true
-  },
-  minStock: {
+  lowStockThreshold: {
     type: Number,
-    required: true,
-    min: 0
+    default: 10,
+    min: 0,
+    description: "Minimum stock level before alert"
   },
-  reorderLevel: {
+  criticalStockThreshold: {
     type: Number,
-    required: true,
-    min: 0
+    default: 5,
+    min: 0,
+    description: "Critical stock level for urgent alerts"
+  },
+  enableLowStockAlert: {
+    type: Boolean,
+    default: true,
+    description: "Enable low stock notifications"
+  },
+  autoUpdateStock: {
+    type: Boolean,
+    default: true,
+    description: "Auto update stock on purchase/sales"
+  },
+  defaultWarehouse: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Warehouse",
+    description: "Default warehouse for operations"
+  },
+  requireApprovalForRemoval: {
+    type: Boolean,
+    default: false,
+    description: "Require approval for stock removal"
+  },
+  autoReceivePurchase: {
+    type: Boolean,
+    default: false,
+    description: "Auto receive purchase orders"
+  },
+  autoDeductSales: {
+    type: Boolean,
+    default: true,
+    description: "Auto deduct stock on sales"
+  },
+  enableBarcodeScanning: {
+    type: Boolean,
+    default: true,
+    description: "Enable barcode scanning features"
+  },
+  trackSerialNumbers: {
+    type: Boolean,
+    default: false,
+    description: "Track individual serial numbers"
+  },
+  trackBatchNumbers: {
+    type: Boolean,
+    default: false,
+    description: "Track batch/lot numbers"
   }
-}, { timestamps: true });
+}, { 
+  timestamps: true,
+  collection: 'stockrules'
+});
 
-const stockrule = mongoose.model("stockrule", stockruleschema);
-module.exports = stockrule;
+// Ensure only one stock rule document exists
+stockRuleSchema.index({}, { unique: true });
 
+module.exports = mongoose.model("StockRule", stockRuleSchema);

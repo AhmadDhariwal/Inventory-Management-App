@@ -1,13 +1,17 @@
 const express = require("express");
 const router = express.Router();
-const stockrulecontroller = require("../controllers/stockrule.controller");
-const { verifytoken } = require("../middleware/auth.middleware");
+const stockRuleController = require("../controllers/stockrule.controller");
+const { verifytoken, restrictto } = require("../middleware/auth.middleware");
 
-router.post("/", verifytoken, stockrulecontroller.createstockrule);
-router.post("/upsert", verifytoken, stockrulecontroller.createorupdatestockrule);
-router.get("/", verifytoken, stockrulecontroller.getstockrules);
-router.get("/:id", verifytoken, stockrulecontroller.getstockruleById);
-router.put("/:id", verifytoken, stockrulecontroller.updatestockrule);
-router.delete("/:id", verifytoken, stockrulecontroller.deletestockrule);
+// Stock rule management routes
+router.get("/", verifytoken, stockRuleController.getStockRules);
+router.put("/", verifytoken, restrictto(["admin"]), stockRuleController.updateStockRules);
+
+// Product-specific stock rules
+router.post("/product-rule", verifytoken, stockRuleController.createOrUpdateProductStockRule);
+
+// Utility routes
+router.get("/check-stock/:quantity", verifytoken, stockRuleController.checkStockLevel);
+router.get("/default-warehouse", verifytoken, stockRuleController.getDefaultWarehouse);
 
 module.exports = router;

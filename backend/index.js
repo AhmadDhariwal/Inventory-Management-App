@@ -25,7 +25,7 @@ const app = express();
 const port = 3000;
 
 const allowedOrigins = ['http://localhost:4200',
-  'http://localhost:61361'
+  'http://localhost:56692'
 ];
 
 app.use(cors({
