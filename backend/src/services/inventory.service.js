@@ -4,7 +4,7 @@ const Product = require("../models/product");
 const Warehouse = require("../models/warehouse");
 const stockmovement = require("../models/stockmovement");
 const StockLevel = require("../models/stocklevel");
-const StockRule = require("../models/stockrule");
+const ProductStockRule = require("../models/stock-rule");
 
 const getcurrentstock = async (productId, warehouseId) => {
   const movements = await stockmovement.find({
@@ -28,10 +28,18 @@ const getcurrentstock = async (productId, warehouseId) => {
 
 
 const updateStockLevel = async (productId, warehouseId) => {
+  // Validate ObjectIds to prevent injection
+  if (!mongoose.Types.ObjectId.isValid(productId)) {
+    throw new Error('Invalid product ID');
+  }
+  if (!mongoose.Types.ObjectId.isValid(warehouseId)) {
+    throw new Error('Invalid warehouse ID');
+  }
+  
   const currentStock = await getcurrentstock(productId, warehouseId);
   
   await StockLevel.findOneAndUpdate(
-    { product: productId, warehouse: warehouseId },
+    { product: new mongoose.Types.ObjectId(productId), warehouse: new mongoose.Types.ObjectId(warehouseId) },
     { quantity: currentStock },
     { upsert: true, new: true }
   );
@@ -283,7 +291,7 @@ const getstocklevels = async (productId) => {
     }
 
     // Get stock rules
-    const stockRules = await StockRule.find({ product: productId }).lean();
+    const stockRules = await ProductStockRule.find({ product: productId }).lean();
     const ruleMap = new Map();
     stockRules.forEach(rule => {
       ruleMap.set(rule.warehouse.toString(), rule);
@@ -399,7 +407,7 @@ const getstocklevels = async (productId) => {
       };
     }
     
-    const stockRule = await StockRule.findOne({
+    const stockRule = await ProductStockRule.findOne({
       product: level.product._id,
       warehouse: level.warehouse._id
     }).lean();

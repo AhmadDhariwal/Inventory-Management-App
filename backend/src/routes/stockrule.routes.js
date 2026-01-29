@@ -9,6 +9,7 @@ router.put("/", verifytoken, restrictto(["admin"]), stockRuleController.updateSt
 
 // Product-specific stock rules
 router.post("/product-rule", verifytoken, stockRuleController.createOrUpdateProductStockRule);
+router.get("/product-rule/:productId/:warehouseId", verifytoken, stockRuleController.getProductStockRule);
 
 // Utility routes
 router.get("/check-stock/:quantity", verifytoken, stockRuleController.checkStockLevel);

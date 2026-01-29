@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { StockRule, StockRuleResponse, StockLevelCheck } from '../models/inventory/stock-rule.model';
+import { ProductStockRule, ProductStockRuleResponse, ProductStockRuleRequest } from '../models/inventory/product-stock-rule.model';
 
 @Injectable({ 
   providedIn: 'root' 
@@ -31,8 +32,17 @@ export class StockRuleService {
   }
 
   // Create or update individual stock rule for product/warehouse
-  createOrUpdateStockRule(data: any): Observable<any> {
-    return this.http.post<any>(`${this.baseUrl}/product-rule`, data);
+  createOrUpdateStockRule(data: ProductStockRuleRequest): Observable<ProductStockRule> {
+    return this.http.post<ProductStockRuleResponse>(`${this.baseUrl}/product-rule`, data).pipe(
+      map(response => response.data)
+    );
+  }
+
+  // Get individual stock rule for product/warehouse
+  getProductStockRule(productId: string, warehouseId: string): Observable<ProductStockRule> {
+    return this.http.get<ProductStockRuleResponse>(`${this.baseUrl}/product-rule/${productId}/${warehouseId}`).pipe(
+      map(response => response.data)
+    );
   }
 
   // Check stock level against rules

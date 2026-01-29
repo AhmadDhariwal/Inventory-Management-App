@@ -3,8 +3,10 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ProductService } from '../../shared/services/product.service';
 import { StockRuleService } from '../../shared/services/stock-rule.service';
 import { Product } from '../../shared/models/inventory/product.model';
+import { ProductStockRuleRequest } from '../../shared/models/inventory/product-stock-rule.model';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-product-details',
@@ -18,6 +20,7 @@ export class ProductDetailsComponent implements OnInit {
   stockLevels: any[] = [];
   totalStock = 0;
   loading = true;
+  updating = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -27,9 +30,11 @@ export class ProductDetailsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const productId = this.route.snapshot.paramMap.get('id')!;
-    this.loadProduct(productId);
-    this.loadStockLevels(productId);
+    const productId = this.route.snapshot.paramMap.get('id');
+    if (productId) {
+      this.loadProduct(productId);
+      this.loadStockLevels(productId);
+    }
   }
 
   loadProduct(id: string): void {
@@ -38,7 +43,8 @@ export class ProductDetailsComponent implements OnInit {
         this.product = product;
       },
       error: (err) => {
-        console.error('Error loading product:', err);
+        const sanitizedError = String(err.message || 'Unknown error').replace(/[\r\n\t]/g, ' ');
+        console.error('Error loading product:', sanitizedError);
         this.loading = false;
       }
     });
@@ -47,14 +53,34 @@ export class ProductDetailsComponent implements OnInit {
   loadStockLevels(productId: string): void {
     this.productService.getStockLevels(productId).subscribe({
       next: (stockLevels) => {
-        console.log('Stock levels for product:', stockLevels);
         this.stockLevels = stockLevels;
-        this.totalStock = stockLevels.reduce((sum, s) => sum + (s.quantity || 0), 0);
+        this.totalStock = stockLevels.reduce((sum: number, s: any) => sum + (s.quantity || 0), 0);
         this.loading = false;
+        // Load existing stock rules for each stock level
+        this.loadExistingStockRules();
       },
       error: (err) => {
-        console.error('Error loading stock levels:', err);
+        const sanitizedError = String(err.message || 'Unknown error').replace(/[\r\n\t]/g, ' ');
+        console.error('Error loading stock levels:', sanitizedError);
         this.loading = false;
+      }
+    });
+  }
+
+  loadExistingStockRules(): void {
+    this.stockLevels.forEach(stock => {
+      if (stock.product && stock.warehouse) {
+        this.stockRuleService.getProductStockRule(stock.product._id, stock.warehouse._id).subscribe({
+          next: (rule) => {
+            stock.reorderLevel = rule.reorderLevel;
+            stock.minStock = rule.minStock;
+          },
+          error: () => {
+            // Rule doesn't exist, use defaults
+            stock.reorderLevel = stock.reorderLevel || 0;
+            stock.minStock = stock.minStock || 0;
+          }
+        });
       }
     });
   }
@@ -67,7 +93,6 @@ export class ProductDetailsComponent implements OnInit {
     const quantity = stock.quantity || 0;
     const reorderLevel = stock.reorderLevel || 0;
     const minStock = stock.minStock || 0;
-
 
     if (quantity <= minStock) return 'critical';
     if (quantity <= reorderLevel) return 'low';
@@ -84,49 +109,54 @@ export class ProductDetailsComponent implements OnInit {
   }
 
   updateStockRule(stock: any): void {
-    console.log('Updating stock rule and level:', stock);
-    console.log('Stock ID:', stock._id);
-    console.log('Reserved Quantity:', stock.reservedQuantity);
+    if (this.updating) return;
+
+    this.updating = true;
+    const updates = [];
 
     // Update stock rule (min stock and reorder level)
-    this.stockRuleService.createOrUpdateStockRule({
-      product: this.product._id,
-      warehouse: stock.warehouse._id,
-      reorderLevel: Number(stock.reorderLevel) || 0,
-      minStock: Number(stock.minStock) || 0
-    }).subscribe({
-      next: (result) => {
-        console.log('Stock rule updated successfully:', result);
+    if (this.product && stock.warehouse) {
+      const stockRuleData: ProductStockRuleRequest = {
+        product: this.product._id,
+        warehouse: stock.warehouse._id,
+        reorderLevel: Number(stock.reorderLevel) || 0,
+        minStock: Number(stock.minStock) || 0
+      };
+      const stockRuleUpdate = this.stockRuleService.createOrUpdateStockRule(stockRuleData);
+      updates.push(stockRuleUpdate);
+    }
 
-        // Update stock level (reserved quantity)
-        if (stock._id) {
-          console.log('Updating stock level with ID:', stock._id);
-          console.log('Sending data:', { reservedQuantity: Number(stock.reservedQuantity) || 0 });
+    // Update stock level (reserved quantity)
+    if (stock._id) {
+      const stockLevelUpdate = this.productService.updateStockLevel(stock._id, {
+         reservedQuantity: Number(stock.reservedQuantity) || 0,
+        minStock : Number(stock.minStock) || 0,
+        reorderLevel: Number(stock.reorderLevel) || 0
+      });
+      updates.push(stockLevelUpdate);
+    }
 
-          this.productService.updateStockLevel(stock._id, {
-            reservedQuantity: Number(stock.reservedQuantity) || 0
-          }).subscribe({
-            next: (stockResult) => {
-              console.log('Stock level updated successfully:', stockResult);
-              this.router.navigate(['/products']);
-            },
-            error: (err) => {
-              console.error('Full error object:', err);
-              console.error('Error status:', err.status);
-              console.error('Error message:', err.message);
-              console.error('Error body:', err.error);
-              alert('Stock rule updated but failed to update reserved quantity. Check console for details.');
-            }
-          });
-        } else {
-          console.log('No stock level ID found, skipping reserved quantity update');
-          this.router.navigate(['/products']);
+    if (updates.length > 0) {
+      forkJoin(updates).subscribe({
+        next: (results) => {
+          console.log('Stock updates completed successfully');
+          this.updating = false;
+          // Reload stock levels to reflect changes
+          if (this.product) {
+            this.loadStockLevels(this.product._id);
+          }
+        },
+        error: (err) => {
+          const sanitizedError = String(err.error?.error || err.message || 'Unknown error').replace(/[\r\n\t]/g, ' ');
+          console.error('Error updating stock:', sanitizedError);
+          alert('Error updating stock: ' + sanitizedError);
+          this.updating = false;
         }
-      },
-      error: (err) => {
-        console.error('Error updating stock rule:', err);
-        alert('Error updating stock rule: ' + (err.error?.error || err.message));
-      }
-    });
+      });
+    } else {
+      this.updating = false;
+      alert('No valid data to update');
+    }
   }
 }
+
