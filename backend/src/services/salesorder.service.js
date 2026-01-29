@@ -2,16 +2,15 @@ const SalesOrder = require("../models/salesorder");
 const Product = require("../models/product");
 const StockMovement = require("../models/stockmovement");
 const Inventory = require("../models/model");
-const stockRuleService = require("./stockrule.service");
+const StockLevel = require("../models/stocklevel");
 
 const createsalesorder = async (data, userId) => {
   const { items } = data;
 
   let totalamount = 0;
   let totalquantity = 0;
-  const warnings = [];
 
-  // RULE ENFORCEMENT: Check each item against stock rules
+  // Check each item against current stock
   for (let item of items) {
     const product = await Product.findById(item.product);
 
@@ -27,48 +26,37 @@ const createsalesorder = async (data, userId) => {
 
     const currentStock = inventory ? inventory.quantity : 0;
 
-    // CRITICAL: Validate against stock rules
-    try {
-      const validation = await stockRuleService.validateStockTransaction(
-        item.product,
-        item.warehouse,
-        item.quantity,
-        'deduct'
-      );
-      
-      // Add warnings to response
-      warnings.push(...validation.warnings);
-      
-    } catch (error) {
-      throw new Error(`Stock validation failed for ${product.name}: ${error.message}`);
+    // Check if sufficient stock available
+    if (currentStock < item.quantity) {
+      throw new Error(`Insufficient stock for ${product.name}. Available: ${currentStock}, Required: ${item.quantity}`);
     }
 
-    // Check if auto-deduction is enabled
-    const shouldAutoDeduct = await stockRuleService.shouldAutoDeductSales();
-    
-    if (shouldAutoDeduct) {
-      // Update inventory
-      if (inventory) {
-        inventory.quantity -= item.quantity;
-        await inventory.save();
-      }
-
-      // Update product stock (legacy support)
-      if (product.stockQuantity >= item.quantity) {
-        product.stockQuantity -= item.quantity;
-        await product.save();
-      }
-
-      // Create stock movement
-      await StockMovement.create({
-        product: item.product,
-        warehouse: item.warehouse || null,
-        type: "OUT",
-        quantity: item.quantity,
-        reason: "SALE",
-        user: userId,
-      });
+    // Auto-deduct stock (always enabled)
+    if (inventory) {
+      inventory.quantity -= item.quantity;
+      await inventory.save();
     }
+
+    // Update stock level
+    const stockLevel = await StockLevel.findOne({
+      product: item.product,
+      warehouse: item.warehouse
+    });
+
+    if (stockLevel) {
+      stockLevel.quantity -= item.quantity;
+      await stockLevel.save();
+    }
+
+    // Create stock movement
+    await StockMovement.create({
+      product: item.product,
+      warehouse: item.warehouse || null,
+      type: "OUT",
+      quantity: item.quantity,
+      reason: "SALE",
+      user: userId,
+    });
     
     item.total = item.quantity * item.sellingPrice;
     totalquantity += item.quantity;
@@ -82,10 +70,7 @@ const createsalesorder = async (data, userId) => {
     status: 'pending'
   });
 
-  return {
-    salesorder,
-    warnings
-  };
+  return salesorder;
 };
 
 const getallsalesorders = async () => {

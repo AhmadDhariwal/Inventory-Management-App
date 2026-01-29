@@ -4,7 +4,6 @@ const Supplier = require("../models/supplier");
 const StockMovement = require("../models/stockmovement");
 const StockLevel = require("../models/stocklevel");
 const Inventory = require("../models/model");
-const stockRuleService = require("./stockrule.service");
 
 const createpurchaseorder = async (data, userId) => {
   const { supplier, items, warehouse, totalamount } = data;
@@ -16,51 +15,27 @@ const createpurchaseorder = async (data, userId) => {
     throw new Error("Supplier not found or inactive");
   }
 
-  // Check if auto-receive is enabled
-  const shouldAutoReceive = await stockRuleService.shouldAutoReceivePurchase();
-  const status = shouldAutoReceive ? "RECEIVED" : "PENDING";
-
-  // Create Purchase Order
+  // Create Purchase Order with PENDING status (no auto-receive)
   const purchaseorder = await Purchaseorder.create({
     supplier,
     items,
     warehouse,
     totalamount,
     createdBy: userId,
-    status
+    status: "PENDING"
   });
-
-  // Process stock updates if auto-receive is enabled
-  if (shouldAutoReceive) {
-    await processPurchaseOrderReceipt(purchaseorder._id, userId);
-  }
 
   return purchaseorder;
 };
 
-// New: Process purchase order receipt
+// Process purchase order receipt
 const processPurchaseOrderReceipt = async (purchaseOrderId, userId) => {
   const purchaseorder = await Purchaseorder.findById(purchaseOrderId);
   if (!purchaseorder) throw new Error("Purchase order not found");
 
-  const warnings = [];
-
   for (let item of purchaseorder.items) {
     const product = await Product.findById(item.product);
     if (!product) throw new Error("Product not found");
-
-    // Validate stock transaction (adding stock)
-    try {
-      const validation = await stockRuleService.validateStockTransaction(
-        item.product,
-        purchaseorder.warehouse,
-        item.quantity,
-        'add'
-      );
-      warnings.push(...validation.warnings);
-    } catch (error) {
-      console.warn(`Stock validation warning: ${error.message}`);
-    }
 
     // Create stock movement
     await StockMovement.create({
@@ -90,7 +65,7 @@ const processPurchaseOrderReceipt = async (purchaseOrderId, userId) => {
       });
     }
 
-    // Update stock level (legacy support)
+    // Update stock level
     const stock = await StockLevel.findOne({
       product: item.product,
       warehouse: purchaseorder.warehouse
@@ -103,7 +78,10 @@ const processPurchaseOrderReceipt = async (purchaseOrderId, userId) => {
       await StockLevel.create({
         product: item.product,
         warehouse: purchaseorder.warehouse,
-        quantity: item.quantity
+        quantity: item.quantity,
+        reservedQuantity: 0,
+        reorderLevel: 0,
+        minStock: 0
       });
     }
   }
@@ -113,7 +91,7 @@ const processPurchaseOrderReceipt = async (purchaseOrderId, userId) => {
   purchaseorder.receivedAt = new Date();
   await purchaseorder.save();
 
-  return { purchaseorder, warnings };
+  return { purchaseorder };
 };
 
 const getallpurchaseorders = async () => {
@@ -132,12 +110,12 @@ const getpurchaseorderbyid = async (id) => {
     .populate("createdBy", "name");
 };
 
-// New: Receive purchase order manually
+// Receive purchase order manually
 const receivepurchaseorder = async (id, userId) => {
   return await processPurchaseOrderReceipt(id, userId);
 };
 
-// New: Delete purchase order
+// Delete purchase order
 const deletepurchaseorder = async (id, userId) => {
   try {
     const purchaseorder = await Purchaseorder.findById(id);

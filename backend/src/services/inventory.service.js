@@ -4,7 +4,6 @@ const Product = require("../models/product");
 const Warehouse = require("../models/warehouse");
 const stockmovement = require("../models/stockmovement");
 const StockLevel = require("../models/stocklevel");
-const ProductStockRule = require("../models/stock-rule");
 
 const getcurrentstock = async (productId, warehouseId) => {
   const movements = await stockmovement.find({
@@ -290,13 +289,6 @@ const getstocklevels = async (productId) => {
       return [];
     }
 
-    // Get stock rules
-    const stockRules = await ProductStockRule.find({ product: productId }).lean();
-    const ruleMap = new Map();
-    stockRules.forEach(rule => {
-      ruleMap.set(rule.warehouse.toString(), rule);
-    });
-
     // Get stock levels from StockLevel collection
     const stockLevels = await StockLevel.find({ product: productId })
       .populate('warehouse', 'name')
@@ -318,7 +310,9 @@ const getstocklevels = async (productId) => {
             product: productId,
             warehouse: stock._id,
             quantity: Math.max(0, stock.quantity),
-            reservedQuantity: 0
+            reservedQuantity: 0,
+            reorderLevel: 0,
+            minStock: 0
           });
         } else {
           // Update quantity to match actual stock movements
@@ -326,7 +320,6 @@ const getstocklevels = async (productId) => {
           await stockLevel.save();
         }
         
-        const rule = ruleMap.get(stock._id.toString());
         result.push({
           _id: stockLevel._id,
           product: {
@@ -337,8 +330,8 @@ const getstocklevels = async (productId) => {
           },
           warehouse: stock.warehouse,
           quantity: Math.max(0, stock.quantity),
-          reorderLevel: rule?.reorderLevel || 0,
-          minStock: rule?.minStock || 0,
+          reorderLevel: stockLevel.reorderLevel || 0,
+          minStock: stockLevel.minStock || 0,
           reservedQuantity: stockLevel.reservedQuantity || 0
         });
       }
@@ -357,11 +350,12 @@ const getstocklevels = async (productId) => {
             product: productId,
             warehouse: warehouses[0]._id,
             quantity: 0,
-            reservedQuantity: 0
+            reservedQuantity: 0,
+            reorderLevel: 0,
+            minStock: 0
           });
         }
         
-        const rule = ruleMap.get(warehouses[0]._id.toString());
         result.push({
           _id: stockLevel._id,
           product: {
@@ -372,8 +366,8 @@ const getstocklevels = async (productId) => {
           },
           warehouse: warehouses[0],
           quantity: 0,
-          reorderLevel: rule?.reorderLevel || 0,
-          minStock: rule?.minStock || 0,
+          reorderLevel: stockLevel.reorderLevel || 0,
+          minStock: stockLevel.minStock || 0,
           reservedQuantity: stockLevel.reservedQuantity || 0
         });
       }
@@ -395,8 +389,8 @@ const getstocklevels = async (productId) => {
     .populate('warehouse', 'name')
     .lean();
   
-  // Get stock rules for reorder levels
-  const enrichedLevels = await Promise.all(stockLevels.map(async (level) => {
+  // Return enriched levels with reorder and min stock from the stock level itself
+  const enrichedLevels = stockLevels.map(level => {
     // Check if product and warehouse exist
     if (!level.product || !level.warehouse) {
       return {
@@ -407,19 +401,14 @@ const getstocklevels = async (productId) => {
       };
     }
     
-    const stockRule = await ProductStockRule.findOne({
-      product: level.product._id,
-      warehouse: level.warehouse._id
-    }).lean();
-    
     return {
       _id: level._id, // Include the stock level ID for updates
       ...level,
-      reorderLevel: stockRule?.reorderLevel || 0,
-      minStock: stockRule?.minStock || 0,
+      reorderLevel: level.reorderLevel || 0,
+      minStock: level.minStock || 0,
       reservedQuantity: level.reservedQuantity || 0
     };
-  }));
+  });
   
   return enrichedLevels;
 };

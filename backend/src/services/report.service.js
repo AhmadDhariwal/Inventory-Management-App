@@ -1,7 +1,6 @@
 const Product = require("../models/product");
 const StockMovement = require("../models/stockmovement");
 const StockLevel = require("../models/stocklevel");
-const StockRule = require("../models/stockrule");
 const User = require("../models/user");
 const Warehouse = require("../models/warehouse");
 const PurchaseOrder = require("../models/purchaseorder");
@@ -125,157 +124,31 @@ const getpurchasereport = async () => {
 //   return levels;
 // };
 const getstocklevelsreport = async () => {
-  // Get all products with their categories
-  const products = await Product.find()
-    .populate('category', 'name')
+  // Get stock levels directly from StockLevel collection
+  const stockLevels = await StockLevel.find()
+    .populate('product', 'name sku cost price category')
+    .populate('warehouse', 'name')
+    .populate('product.category', 'name')
     .lean();
 
-  // Get all warehouses
-  const warehouses = await Warehouse.find({ isActive: true })
-    .select('name')
-    .lean();
+  const result = stockLevels.map(level => ({
+    productId: level.product?._id,
+    warehouseId: level.warehouse?._id,
+    productName: level.product?.name || 'N/A',
+    sku: level.product?.sku || 'N/A',
+    cost: level.product?.cost || 0,
+    price: level.product?.price || 0,
+    category: level.product?.category?.name || 'Uncategorized',
+    warehouseName: level.warehouse?.name || 'N/A',
+    availableQty: level.quantity || 0,
+    reservedQty: level.reservedQuantity || 0,
+    minStock: level.minStock || 0,
+    reorderLevel: level.reorderLevel || 0,
+    totalValue: (level.quantity || 0) * (level.product?.cost || 0),
+    status: (level.quantity || 0) <= (level.minStock || 0) ? 'LOW' : 'OK'
+  }));
 
-  // Calculate stock levels from movements for all product-warehouse combinations
-  const stockAggregation = await StockMovement.aggregate([
-    {
-      $group: {
-        _id: {
-          product: "$product",
-          warehouse: "$warehouse"
-        },
-        availableQty: {
-          $sum: {
-            $cond: [
-              { $eq: ["$type", "IN"] },
-              "$quantity",
-              { $multiply: ["$quantity", -1] }
-            ]
-          }
-        }
-      }
-    },
-    {
-      $lookup: {
-        from: "products",
-        localField: "_id.product",
-        foreignField: "_id",
-        as: "productInfo"
-      }
-    },
-    {
-      $lookup: {
-        from: "warehouses",
-        localField: "_id.warehouse",
-        foreignField: "_id",
-        as: "warehouseInfo"
-      }
-    },
-    {
-      $lookup: {
-        from: "categories",
-        localField: "productInfo.category",
-        foreignField: "_id",
-        as: "categoryInfo"
-      }
-    },
-    {
-      $lookup: {
-        from: "stockrules",
-        let: { product: "$_id.product", warehouse: "$_id.warehouse" },
-        pipeline: [
-          {
-            $match: {
-              $expr: {
-                $and: [
-                  { $eq: ["$product", "$$product"] },
-                  { $eq: ["$warehouse", "$$warehouse"] }
-                ]
-              }
-            }
-          }
-        ],
-        as: "stockRule"
-      }
-    },
-    {
-      $project: {
-        productId: "$_id.product",
-        warehouseId: "$_id.warehouse",
-        productName: { $arrayElemAt: ["$productInfo.name", 0] },
-        sku: { $arrayElemAt: ["$productInfo.sku", 0] },
-        cost: { $arrayElemAt: ["$productInfo.cost", 0] },
-        price: { $arrayElemAt: ["$productInfo.price", 0] },
-        category: { $arrayElemAt: ["$categoryInfo.name", 0] },
-        warehouseName: { $arrayElemAt: ["$warehouseInfo.name", 0] },
-        availableQty: "$availableQty",
-        reservedQty: { $literal: 0 }, // TODO: Implement reserved quantity
-        minStock: { $arrayElemAt: ["$stockRule.minStock", 0] },
-        reorderLevel: { $arrayElemAt: ["$stockRule.reorderLevel", 0] },
-        totalValue: {
-          $multiply: [
-            "$availableQty",
-            { $arrayElemAt: ["$productInfo.cost", 0] }
-          ]
-        },
-        status: {
-          $cond: [
-            { $lte: ["$availableQty", { $arrayElemAt: ["$stockRule.minStock", 0] }] },
-            "LOW",
-            "OK"
-          ]
-        }
-      }
-    }
-  ]);
-
-  // Add products with no stock movements
-  const stockMap = new Map();
-  stockAggregation.forEach(item => {
-    stockMap.set(item.productId.toString(), item);
-  });
-
-  const allLevels = [];
-  
-  // Ensure all products appear in at least one warehouse
-  products.forEach(product => {
-    const productId = product._id.toString();
-    let hasStock = false;
-    
-    warehouses.forEach(warehouse => {
-      const key = `${productId}-${warehouse._id}`;
-      const existingStock = stockAggregation.find(s => 
-        s.productId.toString() === productId && 
-        s.warehouseId.toString() === warehouse._id.toString()
-      );
-      
-      if (existingStock) {
-        allLevels.push(existingStock);
-        hasStock = true;
-      }
-    });
-    
-    // If product has no stock in any warehouse, add it with 0 quantity in first warehouse
-    if (!hasStock && warehouses.length > 0) {
-      allLevels.push({
-        productId: product._id,
-        warehouseId: warehouses[0]._id,
-        productName: product.name,
-        sku: product.sku,
-        cost: product.cost,
-        price: product.price,
-        category: product.category?.name || 'Uncategorized',
-        warehouseName: warehouses[0].name,
-        availableQty: 0,
-        reservedQty: 0,
-        minStock: 0,
-        reorderLevel: 0,
-        totalValue: 0,
-        status: 'OK'
-      });
-    }
-  });
-
-  return allLevels;
+  return result;
 };
 // const getlowstockreport = async () => {
 //   const lowStock = await StockMovement.aggregate([
@@ -356,66 +229,27 @@ const getstocklevelsreport = async () => {
 //   return lowStock;
 // };
 const getlowstockreport = async () => {
-  const lowStock = await StockLevel.aggregate([
-    {
-      $lookup: {
-        from: "stockrules",
-        let: { product: "$product", warehouse: "$warehouse" },
-        pipeline: [
-          {
-            $match: {
-              $expr: {
-                $and: [
-                  { $eq: ["$product", "$$product"] },
-                  { $eq: ["$warehouse", "$$warehouse"] }
-                ]
-              }
-            }
-          }
-        ],
-        as: "rule"
-      }
-    },
-    { $unwind: "$rule" },
-    {
-      $match: {
-        $expr: {
-          $lte: ["$quantity", "$rule.minStock"]
-        }
-      }
-    },
-    {
-      $lookup: {
-        from: "products",
-        localField: "product",
-        foreignField: "_id",
-        as: "productInfo"
-      }
-    },
-    {
-      $lookup: {
-        from: "warehouses",
-        localField: "warehouse",
-        foreignField: "_id",
-        as: "warehouseInfo"
-      }
-    },
-    {
-      $project: {
-        productId: "$product",
-        warehouseId: "$warehouse",
-        productName: { $arrayElemAt: ["$productInfo.name", 0] },
-        sku: { $arrayElemAt: ["$productInfo.sku", 0] },
-        warehouseName: { $arrayElemAt: ["$warehouseInfo.name", 0] },
-        availableQty: "$quantity",
-        minStock: "$rule.minStock",
-        reorderLevel: "$rule.reorderLevel",
-        status: "LOW"
-      }
-    }
-  ]);
+  // Get stock levels where quantity is less than or equal to minStock
+  const lowStock = await StockLevel.find({
+    $expr: { $lte: ["$quantity", "$minStock"] }
+  })
+    .populate('product', 'name sku')
+    .populate('warehouse', 'name')
+    .lean();
 
-  return lowStock;
+  const result = lowStock.map(level => ({
+    productId: level.product?._id,
+    warehouseId: level.warehouse?._id,
+    productName: level.product?.name || 'N/A',
+    sku: level.product?.sku || 'N/A',
+    warehouseName: level.warehouse?.name || 'N/A',
+    availableQty: level.quantity || 0,
+    minStock: level.minStock || 0,
+    reorderLevel: level.reorderLevel || 0,
+    status: 'LOW'
+  }));
+
+  return result;
 };
 
 const getstocksummary = async () => {

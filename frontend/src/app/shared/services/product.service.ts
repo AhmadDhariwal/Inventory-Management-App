@@ -59,4 +59,8 @@ export class ProductService {
     return this.http.put<any>(`${this.inventoryUrl}/stocklevels/${stockLevelId}`, data);
   }
 
+  updateStockLevelWithRules(stockLevelId: string, data: { quantity?: number, reservedQuantity?: number, reorderLevel?: number, minStock?: number }): Observable<any> {
+    return this.http.put<any>(`${this.inventoryUrl}/stocklevels/${stockLevelId}`, data);
+  }
+
 }

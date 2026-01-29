@@ -1,37 +1,46 @@
-const stockRuleService = require("./stockrule.service");
 const Inventory = require("../models/model");
 const Product = require("../models/product");
 const Warehouse = require("../models/warehouse");
+const StockLevel = require("../models/stocklevel");
 
 class AlertService {
   // Check all products for low stock alerts
   async checkLowStockAlerts() {
     try {
-      const rules = await stockRuleService.getRules();
-      
-      if (!rules.enableLowStockAlert) {
-        return { alerts: [], message: "Low stock alerts are disabled" };
-      }
-
       const alerts = [];
       
-      // Get all inventory items
-      const inventoryItems = await Inventory.find()
+      // Get all stock levels with reorder and min stock info
+      const stockLevels = await StockLevel.find()
         .populate('product', 'name sku')
         .populate('warehouse', 'name');
 
-      for (const item of inventoryItems) {
-        const stockCheck = await stockRuleService.checkStockLevel(item.quantity);
+      for (const stockLevel of stockLevels) {
+        if (!stockLevel.product || !stockLevel.warehouse) continue;
         
-        if (stockCheck.shouldAlert) {
+        const currentStock = stockLevel.quantity || 0;
+        const minStock = stockLevel.minStock || 0;
+        const reorderLevel = stockLevel.reorderLevel || 0;
+        
+        let alertType = null;
+        let priority = 'LOW';
+        
+        if (currentStock <= minStock) {
+          alertType = 'CRITICAL';
+          priority = 'HIGH';
+        } else if (currentStock <= reorderLevel) {
+          alertType = 'LOW_STOCK';
+          priority = 'MEDIUM';
+        }
+        
+        if (alertType) {
           alerts.push({
-            type: stockCheck.isCritical ? 'CRITICAL' : 'LOW_STOCK',
-            product: item.product,
-            warehouse: item.warehouse,
-            currentStock: item.quantity,
-            threshold: stockCheck.isCritical ? rules.criticalStockThreshold : rules.lowStockThreshold,
-            message: `${item.product.name} is ${stockCheck.isCritical ? 'critically low' : 'low'} in ${item.warehouse.name}`,
-            priority: stockCheck.isCritical ? 'HIGH' : 'MEDIUM',
+            type: alertType,
+            product: stockLevel.product,
+            warehouse: stockLevel.warehouse,
+            currentStock,
+            threshold: alertType === 'CRITICAL' ? minStock : reorderLevel,
+            message: `${stockLevel.product.name} is ${alertType === 'CRITICAL' ? 'critically low' : 'low'} in ${stockLevel.warehouse.name}`,
+            priority,
             createdAt: new Date()
           });
         }
@@ -82,7 +91,6 @@ class AlertService {
   // Generate notification triggers
   async generateNotificationTriggers() {
     try {
-      const rules = await stockRuleService.getRules();
       const alertData = await this.checkLowStockAlerts();
       
       const notifications = [];
@@ -100,8 +108,8 @@ class AlertService {
             threshold: alert.threshold,
             stockLevel: alert.type
           },
-          recipients: ['admin', 'inventory_manager'], // Configure based on rules
-          channels: ['email', 'dashboard'], // Configure based on notification settings
+          recipients: ['admin', 'inventory_manager'],
+          channels: ['email', 'dashboard'],
           createdAt: new Date()
         });
       }
@@ -115,27 +123,37 @@ class AlertService {
   // Check specific product stock level
   async checkProductStockLevel(productId, warehouseId) {
     try {
-      const inventory = await Inventory.findOne({
+      const stockLevel = await StockLevel.findOne({
         product: productId,
         warehouse: warehouseId
       }).populate('product', 'name sku').populate('warehouse', 'name');
 
-      if (!inventory) {
+      if (!stockLevel) {
         return {
           status: 'NOT_FOUND',
           message: 'Product not found in warehouse'
         };
       }
 
-      const stockCheck = await stockRuleService.checkStockLevel(inventory.quantity);
+      const currentStock = stockLevel.quantity || 0;
+      const minStock = stockLevel.minStock || 0;
+      const reorderLevel = stockLevel.reorderLevel || 0;
+      
+      let status = 'OK';
+      if (currentStock <= minStock) {
+        status = 'CRITICAL';
+      } else if (currentStock <= reorderLevel) {
+        status = 'LOW';
+      }
       
       return {
-        status: stockCheck.isCritical ? 'CRITICAL' : stockCheck.isLow ? 'LOW' : 'OK',
-        product: inventory.product,
-        warehouse: inventory.warehouse,
-        currentStock: inventory.quantity,
-        stockCheck,
-        message: this.getStockStatusMessage(stockCheck, inventory.product.name)
+        status,
+        product: stockLevel.product,
+        warehouse: stockLevel.warehouse,
+        currentStock,
+        minStock,
+        reorderLevel,
+        message: this.getStockStatusMessage(status, stockLevel.product.name)
       };
     } catch (error) {
       throw new Error(`Failed to check product stock level: ${error.message}`);
@@ -143,10 +161,10 @@ class AlertService {
   }
 
   // Helper: Get stock status message
-  getStockStatusMessage(stockCheck, productName) {
-    if (stockCheck.isCritical) {
+  getStockStatusMessage(status, productName) {
+    if (status === 'CRITICAL') {
       return `${productName} stock is critically low and requires immediate attention`;
-    } else if (stockCheck.isLow) {
+    } else if (status === 'LOW') {
       return `${productName} stock is below threshold and should be restocked soon`;
     } else {
       return `${productName} stock level is adequate`;

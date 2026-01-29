@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { StockRuleService } from '../../shared/services/stock-rule.service';
-import { StockRule } from '../../shared/models/inventory/stock-rule.model';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-inventory-settings',
@@ -15,10 +14,11 @@ export class InventorySettingsComponent implements OnInit {
   stockForm: FormGroup;
   isLoading = false;
   isSaving = false;
+  showMigrationMessage = true;
 
   constructor(
     private fb: FormBuilder,
-    private stockRuleService: StockRuleService
+    private router: Router
   ) {
     this.stockForm = this.fb.group({
       allowNegativeStock: [false],
@@ -36,45 +36,24 @@ export class InventorySettingsComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.loadStockRules();
+    // Stock rules are now managed at individual stock level
+    // Show migration message
   }
 
-  loadStockRules() {
-    this.isLoading = true;
-    this.stockRuleService.getRules().subscribe({
-      next: (rules: StockRule) => {
-        this.stockForm.patchValue(rules);
-        this.isLoading = false;
-      },
-      error: (error) => {
-        console.error('Error loading stock rules:', error);
-        this.isLoading = false;
-      }
-    });
+  navigateToStockLevels() {
+    this.router.navigate(['/stock/levels']);
+  }
+
+  navigateToProducts() {
+    this.router.navigate(['/products']);
+  }
+
+  dismissMigrationMessage() {
+    this.showMigrationMessage = false;
   }
 
   onSaveStockRules() {
-    if (this.stockForm.valid) {
-      // Validate thresholds
-      const formValue = this.stockForm.value;
-      if (formValue.criticalStockThreshold > formValue.lowStockThreshold) {
-        alert('Critical threshold cannot be higher than low stock threshold');
-        return;
-      }
-
-      this.isSaving = true;
-      this.stockRuleService.updateRules(formValue).subscribe({
-        next: (rules: StockRule) => {
-          console.log('Stock rules updated:', rules);
-          alert('Stock rules updated successfully!');
-          this.isSaving = false;
-        },
-        error: (error) => {
-          console.error('Error updating stock rules:', error);
-          alert('Error updating stock rules. Please try again.');
-          this.isSaving = false;
-        }
-      });
-    }
+    // This functionality has been moved to individual stock levels
+    alert('Stock rules are now managed at individual product stock levels. Please go to Products or Stock Levels to configure reorder levels and minimum stock.');
   }
 }

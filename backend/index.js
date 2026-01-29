@@ -12,7 +12,6 @@ const reportroutes = require("./src/routes/report.routes");
 const dashboardroutes = require("./src/routes/dashboard.routes");
 const productroutes = require("./src/routes/product.routes");
 const warehouseroutes = require("./src/routes/warehouse.routes");
-const stockruleroutes = require("./src/routes/stockrule.routes");
 const categoryroutes = require("./src/routes/category.routes");
 const businesssettingsroutes = require("./src/routes/businesssettings.routes");
 const cors = require('cors');
@@ -26,7 +25,7 @@ const app = express();
 const port = 3000;
 
 const allowedOrigins = ['http://localhost:4200',
-  'http://localhost:56692'
+  'http://localhost:62904'
 ];
 
 app.use(cors({
@@ -57,7 +56,6 @@ app.use("/api/dashboard", dashboardroutes);
 app.use("/api/products", productroutes);
 app.use("/api/categories", categoryroutes);
 app.use("/api/warehouses", warehouseroutes);
-app.use("/api/stockrules", stockruleroutes);
 app.use("/api/business-settings", businesssettingsroutes);
 
 

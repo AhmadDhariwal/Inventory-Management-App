@@ -1,5 +1,76 @@
 @import '../shared-settings.scss';
 
+// Migration notice styles
+.migration-notice {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+  color: white;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+
+  .notice-content {
+    h3 {
+      margin: 0 0 12px 0;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    p {
+      margin: 0 0 20px 0;
+      opacity: 0.9;
+      line-height: 1.5;
+    }
+
+    .notice-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+
+      .btn {
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &.btn-primary {
+          background: white;
+          color: #3b82f6;
+          
+          &:hover {
+            background: #f8fafc;
+            transform: translateY(-1px);
+          }
+        }
+
+        &.btn-secondary {
+          background: rgba(255, 255, 255, 0.2);
+          color: white;
+          border: 1px solid rgba(255, 255, 255, 0.3);
+          
+          &:hover {
+            background: rgba(255, 255, 255, 0.3);
+          }
+        }
+
+        &.btn-link {
+          background: transparent;
+          color: rgba(255, 255, 255, 0.8);
+          text-decoration: underline;
+          
+          &:hover {
+            color: white;
+          }
+        }
+      }
+    }
+  }
+}
+
 // Additional styles for inventory settings
 .loading-container {
   display: flex;

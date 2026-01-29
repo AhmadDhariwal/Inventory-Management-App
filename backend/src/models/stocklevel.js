@@ -21,6 +21,18 @@ const stocklevelschema = new mongoose.Schema({
     type: Number,
     default: 0,
     min: 0
+  },
+  reorderLevel: {
+    type: Number,
+    default: 0,
+    min: 0,
+    description: "Reorder level for this product in this warehouse"
+  },
+  minStock: {
+    type: Number,
+    default: 0,
+    min: 0,
+    description: "Minimum stock level for this product in this warehouse"
   }
 }, { 
   timestamps: true,
