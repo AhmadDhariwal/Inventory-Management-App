@@ -37,10 +37,10 @@ const stocklevelschema = new mongoose.Schema({
 }, { 
   timestamps: true,
   // Ensure unique combination of product and warehouse
-  indexes: [
-    { product: 1, warehouse: 1 },
-    { unique: true, fields: ['product', 'warehouse'] }
-  ]
+  // indexes: [
+  //   { product: 1, warehouse: 1 },
+  //   { unique: true, fields: ['product', 'warehouse'] }
+  // ]
 });
 
 // Create compound index for unique product-warehouse combination
