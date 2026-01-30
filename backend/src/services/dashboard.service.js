@@ -73,11 +73,11 @@
 // };
 
 
-const Product = require('../models/product.model');
-const Supplier = require('../models/supplier.model');
-const Purchase = require('../models/purchase.model');
-const StockMovement = require('../models/stockMovement.model');
-const StockLevel = require('../models/stockLevel.model');
+const Product = require('../models/product');
+const Supplier = require('../models/supplier');
+const PurchaseOrder = require('../models/purchaseorder');
+const StockMovement = require('../models/stockmovement');
+const StockLevel = require('../models/stocklevel');
 
 exports.getDashboardSummary = async () => {
 
@@ -93,8 +93,8 @@ exports.getDashboardSummary = async () => {
   ] = await Promise.all([
     Product.countDocuments(),
     Supplier.countDocuments(),
-    Purchase.aggregate([
-      { $group: { _id: null, total: { $sum: "$totalAmount" } } }
+    PurchaseOrder.aggregate([
+      { $group: { _id: null, total: { $sum: "$totalamount" } } }
     ]),
     StockLevel.aggregate([
       { $group: { _id: null, qty: { $sum: "$quantity" } } }
@@ -117,7 +117,7 @@ exports.getDashboardSummary = async () => {
     { $unwind: '$product' },
     {
       $match: {
-        $expr: { $lte: ['$quantity', '$product.minStockLevel'] }
+        $expr: { $lte: ['$quantity', '$minStock'] }
       }
     },
     {
@@ -125,7 +125,7 @@ exports.getDashboardSummary = async () => {
         productName: '$product.name',
         sku: '$product.sku',
         availableQty: '$quantity',
-        minStock: '$product.minStockLevel'
+        minStock: '$minStock'
       }
     }
   ]);
@@ -167,7 +167,7 @@ exports.getDashboardSummary = async () => {
     }
   ]);
 
-  const pendingPurchases = await Purchase.countDocuments({ status: 'PENDING' });
+  const pendingPurchases = await PurchaseOrder.countDocuments({ status: 'PENDING' });
 
   /* =======================
      4️⃣ CHART DATA (BASIC)
