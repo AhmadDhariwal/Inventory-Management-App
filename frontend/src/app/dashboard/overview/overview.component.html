@@ -1,72 +1,195 @@
-<section class="dashboard">
-
-  <div class="dashboard__header">
-    <h1 class="dashboard__title">Inventory Overview</h1>
-    <p class="dashboard__subtitle">
-      Real-time snapshot of global inventory performance
-    </p>
-  </div>
-
-  <div class="dashboard__kpis">
-    <app-kpi-card
-      label="Total Products"
-      [value]="stats.totalproducts">
-    </app-kpi-card>
-
-    <app-kpi-card
-      label="Total Suppliers"
-      [value]="stats.totalsuppliers">
-    </app-kpi-card>
-
-    <app-kpi-card
-      label="Total Stock"
-      [value]="stats.totalStock">
-    </app-kpi-card>
-
-    <app-kpi-card
-      label="Total Purchases"
-      [value]="stats.totalpurchases">
-    </app-kpi-card>
-    <app-kpi-card
-      label="Low Stock Items"
-      [value]="stats.lowStockItems || 0">
-    </app-kpi-card>
-  </div>
-   <section class="dashboard__charts">
-  <app-stock-trend
-    [monthlyStockData]="stockTrendData"
-    [months]="stockMonths">
-  </app-stock-trend>
-</section>
-
-<section class="dashboard__low-stock" *ngIf="lowStockItems.length > 0">
-  <div class="section-header">
-    <h2>Low Stock Alert</h2>
-    <span class="alert-count">{{ lowStockItems.length }} items need attention</span>
-  </div>
-  <div class="low-stock-grid">
-    <div *ngFor="let item of lowStockItems.slice(0, 6)" class="low-stock-item">
-      <div class="item-info">
-        <h4>{{ item.productName }}</h4>
-        <p>{{ item.warehouseName }}</p>
-      </div>
-      <div class="stock-info">
-        <span class="current-stock">{{ item.availableQty }}</span>
-        <span class="min-stock">Min: {{ item.minStock }}</span>
+<div class="dashboard-container">
+  <header class="dashboard-header">
+    <div class="header-content">
+      <h1 class="dashboard-title">
+        <i class="fas fa-chart-line"></i>
+        Inventory Dashboard
+      </h1>
+      <p class="dashboard-subtitle">Real-time overview of your inventory management system</p>
+      <div class="last-updated">
+        <i class="fas fa-sync-alt"></i>
+        Auto-refreshing every 30 seconds
       </div>
     </div>
+  </header>
+  
+  <div *ngIf="loading" class="loading-state">
+    <div class="loading-spinner"></div>
+    <p>Loading dashboard data...</p>
   </div>
-</section>
-
-<div class="dashboard__widgets">
-  <app-widget-card
-    *ngFor="let widget of widgets"
-    [title]="widget.title"
-    [value]="widget.value"
-    [icon]="widget.icon"
-    [color]="widget.color"
-    [trend]="widget.trend">
-  </app-widget-card>
+  
+  <div *ngIf="error" class="error-state">
+    <i class="fas fa-exclamation-triangle"></i>
+    <p>{{ error }}</p>
+    <button class="retry-btn" (click)="loadDashboard()">
+      <i class="fas fa-redo"></i>
+      Retry
+    </button>
+  </div>
+  
+  <div *ngIf="!loading && !error" class="dashboard-content">
+    <!-- KPI Section -->
+    <section class="kpi-section">
+      <h2 class="section-title">Key Performance Indicators</h2>
+      <div class="kpi-grid">
+        <div class="kpi-card kpi-primary">
+          <div class="kpi-icon">
+            <i class="fas fa-box"></i>
+          </div>
+          <div class="kpi-content">
+            <h3>Total Products</h3>
+            <p class="kpi-value">{{ stats.totalproducts | number }}</p>
+            <span class="kpi-label">Active inventory items</span>
+          </div>
+        </div>
+        
+        <div class="kpi-card kpi-success">
+          <div class="kpi-icon">
+            <i class="fas fa-users"></i>
+          </div>
+          <div class="kpi-content">
+            <h3>Total Suppliers</h3>
+            <p class="kpi-value">{{ stats.totalsuppliers | number }}</p>
+            <span class="kpi-label">Active suppliers</span>
+          </div>
+        </div>
+        
+        <div class="kpi-card kpi-info">
+          <div class="kpi-icon">
+            <i class="fas fa-warehouse"></i>
+          </div>
+          <div class="kpi-content">
+            <h3>Total Stock</h3>
+            <p class="kpi-value">{{ stats.totalStock | number }}</p>
+            <span class="kpi-label">Units in inventory</span>
+          </div>
+        </div>
+        
+        <div class="kpi-card kpi-warning">
+          <div class="kpi-icon">
+            <i class="fas fa-dollar-sign"></i>
+          </div>
+          <div class="kpi-content">
+            <h3>Purchase Value</h3>
+            <p class="kpi-value">{{ stats.totalpurchases | currency:'USD':'symbol':'1.0-0' }}</p>
+            <span class="kpi-label">Total purchase amount</span>
+          </div>
+        </div>
+        
+        <div class="kpi-card kpi-danger" [class.kpi-alert]="stats.lowStockItems > 0">
+          <div class="kpi-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+          </div>
+          <div class="kpi-content">
+            <h3>Low Stock Alerts</h3>
+            <p class="kpi-value">{{ stats.lowStockItems | number }}</p>
+            <span class="kpi-label">Items need attention</span>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Today's Activity Section -->
+    <section class="activity-section">
+      <h2 class="section-title">Today's Activity</h2>
+      <div class="activity-grid">
+        <div class="activity-card activity-positive">
+          <div class="activity-icon">
+            <i class="fas fa-arrow-up"></i>
+          </div>
+          <div class="activity-content">
+            <h3>Stock In</h3>
+            <p class="activity-value">+{{ stats.stockInToday | number }}</p>
+            <span class="activity-label">Units received today</span>
+          </div>
+        </div>
+        
+        <div class="activity-card activity-negative">
+          <div class="activity-icon">
+            <i class="fas fa-arrow-down"></i>
+          </div>
+          <div class="activity-content">
+            <h3>Stock Out</h3>
+            <p class="activity-value">-{{ stats.stockOutToday | number }}</p>
+            <span class="activity-label">Units dispatched today</span>
+          </div>
+        </div>
+        
+        <div class="activity-card activity-neutral">
+          <div class="activity-icon">
+            <i class="fas fa-exchange-alt"></i>
+          </div>
+          <div class="activity-content">
+            <h3>Net Movement</h3>
+            <p class="activity-value" 
+               [class.positive]="(stats.stockInToday - stats.stockOutToday) > 0"
+               [class.negative]="(stats.stockInToday - stats.stockOutToday) < 0">
+              {{ (stats.stockInToday - stats.stockOutToday) | number:'+1.0-0' }}
+            </p>
+            <span class="activity-label">Today's net change</span>
+          </div>
+        </div>
+        
+        <div class="activity-card activity-warning">
+          <div class="activity-icon">
+            <i class="fas fa-shopping-cart"></i>
+          </div>
+          <div class="activity-content">
+            <h3>Pending Orders</h3>
+            <p class="activity-value">{{ stats.pendingPurchases | number }}</p>
+            <span class="activity-label">Awaiting receipt</span>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Low Stock Alerts Section -->
+    <section class="alerts-section" *ngIf="lowStockItems.length > 0">
+      <div class="section-header">
+        <h2 class="section-title">
+          <i class="fas fa-exclamation-triangle"></i>
+          Low Stock Alerts
+        </h2>
+        <span class="alert-count">{{ lowStockItems.length }} items need attention</span>
+      </div>
+      
+      <div class="alerts-grid">
+        <div class="alert-card" 
+             *ngFor="let item of lowStockItems.slice(0, 6); trackBy: trackByProductId"
+             (click)="navigateToProduct(item)"
+             role="button"
+             tabindex="0">
+          <div class="alert-header">
+            <h4 class="alert-product">{{ item.productName }}</h4>
+            <span class="alert-sku">{{ item.sku }}</span>
+          </div>
+          <div class="alert-location">
+            <i class="fas fa-map-marker-alt"></i>
+            {{ item.warehouseName }}
+          </div>
+          <div class="alert-metrics">
+            <div class="metric">
+              <span class="metric-label">Current</span>
+              <span class="metric-value critical">{{ item.availableQty | number }}</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Min Required</span>
+              <span class="metric-value">{{ item.minStock | number }}</span>
+            </div>
+          </div>
+          <div class="alert-action">
+            <i class="fas fa-arrow-right"></i>
+          </div>
+        </div>
+      </div>
+      
+      <div class="alerts-footer" *ngIf="lowStockItems.length > 6">
+        <p>{{ lowStockItems.length - 6 }} more items need attention</p>
+        <button class="view-all-btn" (click)="router.navigate(['/stock/levels'])">
+          View All Alerts
+          <i class="fas fa-external-link-alt"></i>
+        </button>
+      </div>
+    </section>
+  </div>
 </div>
-
-</section>

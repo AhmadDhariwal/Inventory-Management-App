@@ -1,0 +1,20 @@
+<div class="widget-card alert">
+  <div class="widget-header">
+    <div class="widget-icon">
+      <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
+    </div>
+    <div class="widget-info">
+      <h3 class="widget-title">Low Stock Alert</h3>
+      <p class="widget-value">{{ count | number:'1.0-0' }}</p>
+    </div>
+  </div>
+  <div class="widget-footer">
+    <span class="widget-label">Items need attention</span>
+  </div>
+  <div class="widget-details" *ngIf="items.length > 0">
+    <div class="low-stock-item" *ngFor="let item of items.slice(0, 3)">
+      <span class="item-name">{{ item.productName }}</span>
+      <span class="item-stock">{{ item.availableQty | number:'1.0-0' }}/{{ item.minStock | number:'1.0-0' }}</span>
+    </div>
+  </div>
+</div>

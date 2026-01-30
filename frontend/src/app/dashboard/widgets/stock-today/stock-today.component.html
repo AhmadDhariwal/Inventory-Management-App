@@ -1,0 +1,23 @@
+<div class="widget-card">
+  <div class="widget-header">
+    <div class="widget-icon">
+      <i class="fas fa-exchange-alt" aria-hidden="true"></i>
+    </div>
+    <div class="widget-info">
+      <h3 class="widget-title">Today's Stock Movement</h3>
+      <div class="stock-movement">
+        <div class="stock-in">
+          <span class="movement-label">In:</span>
+          <span class="movement-value positive">+{{ stockIn | number:'1.0-0' }}</span>
+        </div>
+        <div class="stock-out">
+          <span class="movement-label">Out:</span>
+          <span class="movement-value negative">-{{ stockOut | number:'1.0-0' }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="widget-footer">
+    <span class="widget-label">Net: {{ (stockIn - stockOut) | number:'+1.0-0' }}</span>
+  </div>
+</div>

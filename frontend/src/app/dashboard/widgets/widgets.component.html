@@ -1,1 +1,25 @@
-<p>widgets works!</p>
+<div class="widgets-grid" *ngIf="data">
+
+  <app-total-products
+    [count]="data.kpis?.totalProducts || 0">
+  </app-total-products>
+
+  <app-total-stock
+    [quantity]="data.kpis?.totalStockQty || 0">
+  </app-total-stock>
+
+  <app-low-stock
+    [count]="data.alerts?.lowStockCount || 0"
+    [items]="data.alerts?.lowStockItems || []">
+  </app-low-stock>
+
+  <app-pending-purchases
+    [count]="data.widgets?.pendingPurchases || 0">
+  </app-pending-purchases>
+
+  <app-stock-today
+    [stockIn]="data.widgets?.stockInToday || 0"
+    [stockOut]="data.widgets?.stockOutToday || 0">
+  </app-stock-today>
+
+</div>
