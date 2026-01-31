@@ -118,7 +118,7 @@
 .quick-stat {
   text-align: center;
   background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(15px);
+  //backdrop-filter: blur(15px);
   padding: 1.25rem 2.5rem;
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.25);
@@ -218,7 +218,7 @@
   -webkit-backdrop-filter: blur(20px);
   border-radius: 24px;
   padding: 2.5rem;
-  box-shadow: 
+  box-shadow:
     0 20px 40px rgba(0,0,0,0.1),
     0 8px 20px rgba(0,0,0,0.06),
     inset 0 1px 0 rgba(255,255,255,0.5);
@@ -260,7 +260,7 @@
 
 .kpi-card:hover {
   transform: translateY(-12px) scale(1.03);
-  box-shadow: 
+  box-shadow:
     0 30px 60px rgba(0,0,0,0.15),
     0 12px 30px rgba(0,0,0,0.1),
     0 0 0 1px rgba(255,255,255,0.6),
@@ -334,8 +334,8 @@
 
 .trend-up { color: #00b894; }
 .trend-down { color: #e17055; }
-.trend-alert { 
-  color: #d63031; 
+.trend-alert {
+  color: #d63031;
   animation: alertBlink 2s ease-in-out infinite;
 }
 
@@ -354,7 +354,7 @@
 .kpi-card.revenue {
   background: linear-gradient(135deg, rgba(46, 204, 113, 0.08), rgba(255, 255, 255, 0.95));
   border-left: 5px solid #2ecc71;
-  
+
   .kpi-icon {
     background: linear-gradient(135deg, #2ecc71, #27ae60);
     box-shadow: 0 10px 25px rgba(46, 204, 113, 0.3);
@@ -364,7 +364,7 @@
 .kpi-card.orders {
   background: linear-gradient(135deg, rgba(52, 152, 219, 0.08), rgba(255, 255, 255, 0.95));
   border-left: 5px solid #3498db;
-  
+
   .kpi-icon {
     background: linear-gradient(135deg, #3498db, #2980b9);
     box-shadow: 0 10px 25px rgba(52, 152, 219, 0.3);
@@ -374,7 +374,7 @@
 .kpi-card.inventory {
   background: linear-gradient(135deg, rgba(155, 89, 182, 0.08), rgba(255, 255, 255, 0.95));
   border-left: 5px solid #9b59b6;
-  
+
   .kpi-icon {
     background: linear-gradient(135deg, #9b59b6, #8e44ad);
     box-shadow: 0 10px 25px rgba(155, 89, 182, 0.3);
@@ -384,7 +384,7 @@
 .kpi-card.customers {
   background: linear-gradient(135deg, rgba(230, 126, 34, 0.08), rgba(255, 255, 255, 0.95));
   border-left: 5px solid #e67e22;
-  
+
   .kpi-icon {
     background: linear-gradient(135deg, #e67e22, #d35400);
     box-shadow: 0 10px 25px rgba(230, 126, 34, 0.3);
@@ -394,7 +394,7 @@
 .kpi-card.alerts {
   background: linear-gradient(135deg, rgba(231, 76, 60, 0.08), rgba(255, 255, 255, 0.95));
   border-left: 5px solid #e74c3c;
-  
+
   .kpi-icon {
     background: linear-gradient(135deg, #e74c3c, #c0392b);
     box-shadow: 0 10px 25px rgba(231, 76, 60, 0.3);
@@ -420,10 +420,10 @@
 
 .activity-card {
   background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
+  //backdrop-filter: blur(20px);
   border-radius: 20px;
   padding: 2.5rem;
-  box-shadow: 
+  box-shadow:
     0 15px 35px rgba(0,0,0,0.08),
     0 5px 15px rgba(0,0,0,0.04),
     inset 0 1px 0 rgba(255,255,255,0.5);
@@ -445,7 +445,7 @@
 
 .activity-card:hover {
   transform: translateY(-8px) scale(1.02);
-  box-shadow: 
+  box-shadow:
     0 25px 50px rgba(0,0,0,0.12),
     0 10px 25px rgba(0,0,0,0.08),
     0 0 30px rgba(102, 126, 234, 0.2);
@@ -612,31 +612,31 @@
   .dashboard-header {
     padding: 2.5rem 0;
   }
-  
+
   .header-content {
     padding: 0 1rem;
   }
-  
+
   .dashboard-content {
     padding: 0 1rem 2rem;
   }
-  
+
   .kpi-grid, .activity-grid {
     grid-template-columns: 1fr;
     gap: 1.5rem;
   }
-  
+
   .header-stats {
     gap: 1.5rem;
     flex-direction: column;
     align-items: center;
   }
-  
+
   .quick-stat {
     padding: 1rem 2rem;
     min-width: 200px;
   }
-  
+
   .floating-particles {
     display: none;
   }
@@ -646,11 +646,11 @@
   .kpi-card, .activity-card {
     padding: 2rem 1.5rem;
   }
-  
+
   .kpi-value {
     font-size: 2.5rem;
   }
-  
+
   .kpi-icon {
     width: 60px;
     height: 60px;
@@ -695,19 +695,19 @@ html {
     background: white !important;
     color: black !important;
   }
-  
+
   .dashboard-title,
   .section-title {
     color: black !important;
   }
-  
+
   .kpi-card,
   .activity-card {
     box-shadow: none !important;
     border: 1px solid #ddd !important;
     break-inside: avoid;
   }
-  
+
   .floating-particles {
     display: none !important;
   }
