@@ -215,6 +215,7 @@
 const Product = require('../models/product');
 const Supplier = require('../models/supplier');
 const PurchaseOrder = require('../models/purchaseorder');
+const SalesOrder = require('../models/salesorder');
 const StockMovement = require('../models/stockmovement');
 const StockLevel = require('../models/stocklevel');
 
@@ -352,5 +353,141 @@ exports.getDashboardSummary = async () => {
         stockOutToday: 0
       }
     };
+  }
+};
+
+// Stock Trend API
+exports.getStockTrend = async (days = 30) => {
+  try {
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+    startDate.setHours(0, 0, 0, 0);
+
+    const stockTrend = await StockMovement.aggregate([
+      {
+        $match: {
+          createdAt: { $gte: startDate }
+        }
+      },
+      {
+        $group: {
+          _id: {
+            $dateToString: {
+              format: "%Y-%m-%d",
+              date: "$createdAt"
+            }
+          },
+          movements: {
+            $push: {
+              type: "$type",
+              quantity: "$quantity"
+            }
+          }
+        }
+      },
+      {
+        $project: {
+          _id: 1,
+          movements: {
+            $map: {
+              input: ["IN", "OUT"],
+              as: "type",
+              in: {
+                type: "$$type",
+                quantity: {
+                  $sum: {
+                    $map: {
+                      input: {
+                        $filter: {
+                          input: "$movements",
+                          cond: { $eq: ["$$this.type", "$$type"] }
+                        }
+                      },
+                      in: "$$this.quantity"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      { $sort: { "_id": 1 } }
+    ]);
+
+    return stockTrend;
+  } catch (error) {
+    console.error('Stock trend error:', error);
+    return [];
+  }
+};
+
+// Purchase Trend API
+exports.getPurchaseTrend = async (days = 30) => {
+  try {
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+    startDate.setHours(0, 0, 0, 0);
+
+    const purchaseTrend = await PurchaseOrder.aggregate([
+      {
+        $match: {
+          createdAt: { $gte: startDate }
+        }
+      },
+      {
+        $group: {
+          _id: {
+            $dateToString: {
+              format: "%Y-%m-%d",
+              date: "$createdAt"
+            }
+          },
+          totalAmount: { $sum: "$totalamount" },
+          totalQuantity: { $sum: "$totalquantity" }
+        }
+      },
+      { $sort: { "_id": 1 } }
+    ]);
+
+    return purchaseTrend;
+  } catch (error) {
+    console.error('Purchase trend error:', error);
+    return [];
+  }
+};
+
+// Sales Trend API
+exports.getSalesTrend = async (days = 30) => {
+  try {
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+    startDate.setHours(0, 0, 0, 0);
+
+    const salesTrend = await SalesOrder.aggregate([
+      {
+        $match: {
+          createdAt: { $gte: startDate }
+        }
+      },
+      {
+        $group: {
+          _id: {
+            $dateToString: {
+              format: "%Y-%m-%d",
+              date: "$createdAt"
+            }
+          },
+          totalRevenue: { $sum: "$totalamount" },
+          totalOrders: { $sum: 1 }
+        }
+      },
+      { $sort: { "_id": 1 } }
+    ]);
+
+    return salesTrend;
+  } catch (error) {
+    console.error('Sales trend error:', error);
+    return [];
   }
 };

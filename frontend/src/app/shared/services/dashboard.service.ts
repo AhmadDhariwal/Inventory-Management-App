@@ -10,7 +10,19 @@ export class DashboardService {
   private api = 'http://localhost:3000/api/dashboard';
   constructor(private http: HttpClient) { }
 
-  getdashboardstats() : Observable<any>{
+  getdashboardstats(): Observable<any> {
     return this.http.get(this.api);
+  }
+
+  getStockTrend(days: number = 30): Observable<any> {
+    return this.http.get(`${this.api}/stock-trend?days=${days}`);
+  }
+
+  getPurchaseTrend(days: number = 30): Observable<any> {
+    return this.http.get(`${this.api}/purchase-trend?days=${days}`);
+  }
+
+  getSalesTrend(days: number = 30): Observable<any> {
+    return this.http.get(`${this.api}/sales-trend?days=${days}`);
   }
 }

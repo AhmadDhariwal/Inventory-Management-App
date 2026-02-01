@@ -22,3 +22,33 @@ exports.getdashboardstats = async (req, res) => {
   }
 };
 
+exports.getStockTrend = async (req, res) => {
+  try {
+    const days = parseInt(req.query.days) || 30;
+    const data = await dashboardService.getStockTrend(days);
+    res.status(200).json(data);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.getPurchaseTrend = async (req, res) => {
+  try {
+    const days = parseInt(req.query.days) || 30;
+    const data = await dashboardService.getPurchaseTrend(days);
+    res.status(200).json(data);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.getSalesTrend = async (req, res) => {
+  try {
+    const days = parseInt(req.query.days) || 30;
+    const data = await dashboardService.getSalesTrend(days);
+    res.status(200).json(data);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+

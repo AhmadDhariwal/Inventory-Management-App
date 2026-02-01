@@ -1,8 +1,9 @@
 // Enhanced Dashboard Styles with Modern Design
 .dashboard-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 25%, #667eea 50%, #764ba2 75%, #f093fb 100%);
+ // background: linear-gradient(135deg, #1e3c72 0%, #2a5298 25%, #667eea 50%, #764ba2 75%, #f093fb 100%);
   background-size: 400% 400%;
+  background: teal;
   animation: gradientShift 20s ease infinite;
   padding: 0;
   margin: 0;
@@ -598,6 +599,28 @@
     transform: translateY(-100px) scale(1);
     opacity: 0;
   }
+}
+
+// Charts Section
+.charts-section {
+  margin-bottom: 4rem;
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 2rem;
+}
+
+.single-chart {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+// Widget Section
+.widget-section {
+  margin-bottom: 4rem;
 }
 
 // Enhanced Responsive Design

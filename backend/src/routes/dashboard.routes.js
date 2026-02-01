@@ -11,5 +11,8 @@ const router = express.Router();
 const controller = require('../controllers/dashboard.controller');
 
 router.get('/', controller.getdashboardstats);
+router.get('/stock-trend', controller.getStockTrend);
+router.get('/purchase-trend', controller.getPurchaseTrend);
+router.get('/sales-trend', controller.getSalesTrend);
 
 module.exports = router;

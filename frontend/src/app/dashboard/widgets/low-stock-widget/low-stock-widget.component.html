@@ -1,0 +1,78 @@
+<div class="low-stock-widget">
+  <!-- Collapsed View -->
+  <div class="widget-header" (click)="toggleExpanded()" [class.expanded]="isExpanded">
+    <div class="header-content">
+      <div class="icon-section">
+        <i class="fas fa-exclamation-triangle" [class.pulse]="totalCount > 0"></i>
+      </div>
+      <div class="info-section">
+        <h3 class="widget-title">Low Stock Alerts</h3>
+        <p class="widget-count">
+          <span class="count-number">{{ totalCount }}</span>
+          <span class="count-label">items need attention</span>
+        </p>
+      </div>
+      <div class="action-section">
+        <i class="fas fa-chevron-down expand-icon" [class.rotated]="isExpanded"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Expanded View -->
+  <div class="widget-content" [class.expanded]="isExpanded" *ngIf="isExpanded">
+    <div class="table-container" *ngIf="lowStockItems.length > 0">
+      <table class="stock-table">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Warehouse</th>
+            <th>Current Qty</th>
+            <th>Min Stock</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of lowStockItems; trackBy: trackByItem" 
+              class="table-row" 
+              (click)="onItemClick(item)"
+              [class.clickable]="item.productId">
+            <td class="product-cell">
+              <div class="product-info">
+                <span class="product-name">{{ item.productName }}</span>
+                <span class="product-sku">{{ item.sku }}</span>
+              </div>
+            </td>
+            <td class="warehouse-cell">
+              <i class="fas fa-warehouse"></i>
+              {{ item.warehouseName }}
+            </td>
+            <td class="quantity-cell">
+              <span class="current-qty" [class]="getStockLevel(item)">
+                {{ item.availableQty | number }}
+              </span>
+            </td>
+            <td class="min-stock-cell">
+              {{ item.minStock | number }}
+            </td>
+            <td class="status-cell">
+              <span class="status-badge" [class]="getStockLevel(item)">
+                {{ getStockLevel(item) | titlecase }}
+              </span>
+            </td>
+            <td class="action-cell">
+              <button class="action-btn" (click)="onItemClick(item); $event.stopPropagation()">
+                <i class="fas fa-arrow-right"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <div class="empty-state" *ngIf="lowStockItems.length === 0">
+      <i class="fas fa-check-circle"></i>
+      <p>All items are well stocked!</p>
+    </div>
+  </div>
+</div>
