@@ -429,6 +429,37 @@
   font-variant-numeric: tabular-nums;
 }
 
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+
+  &.status-pending {
+    background: #fef3c7;
+    color: #92400e;
+  }
+
+  &.status-approved {
+    background: #d1fae5;
+    color: #065f46;
+  }
+
+  &.status-received {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+
+  &.status-cancelled {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+}
+
 .actions-cell {
   width: 1%;
   white-space: nowrap;
@@ -514,6 +545,24 @@
     &:hover:not(:disabled) {
       background: #fed7d7;
       color: #c53030;
+    }
+  }
+
+  &.btn-success {
+    color: #38a169;
+    
+    &:hover:not(:disabled) {
+      background: #c6f6d5;
+      color: #2f855a;
+    }
+  }
+
+  &.btn-primary {
+    color: #3182ce;
+    
+    &:hover:not(:disabled) {
+      background: #bee3f8;
+      color: #2c5282;
     }
   }
 }

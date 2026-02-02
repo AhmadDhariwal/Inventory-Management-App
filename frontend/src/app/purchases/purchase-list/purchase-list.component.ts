@@ -285,6 +285,42 @@ export class PurchaseListComponent implements OnInit {
     this.deletePurchaseOrderId = '';
     this.deletePurchaseOrderName = '';
   }
+
+  approvePurchaseOrder(po: PurchaseOrder): void {
+    this.purchaseService.approvePurchaseOrder(po._id).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.loadPurchaseOrders();
+        }
+      },
+      error: (error) => {
+        console.error('Error approving purchase order:', error);
+      }
+    });
+  }
+
+  receivePurchaseOrder(po: PurchaseOrder): void {
+    this.purchaseService.receivePurchaseOrder(po._id).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.loadPurchaseOrders();
+        }
+      },
+      error: (error) => {
+        console.error('Error receiving purchase order:', error);
+      }
+    });
+  }
+
+  getStatusClass(status: string): string {
+    switch (status) {
+      case 'PENDING': return 'status-pending';
+      case 'APPROVED': return 'status-approved';
+      case 'RECEIVED': return 'status-received';
+      case 'CANCELLED': return 'status-cancelled';
+      default: return 'status-pending';
+    }
+  }
 }
 
 

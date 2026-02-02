@@ -110,8 +110,32 @@ const getpurchaseorderbyid = async (id) => {
     .populate("createdBy", "name");
 };
 
+// Approve purchase order
+const approvepurchaseorder = async (id, userId) => {
+  const purchaseorder = await Purchaseorder.findById(id);
+  if (!purchaseorder) throw new Error("Purchase order not found");
+  
+  if (purchaseorder.status !== "PENDING") {
+    throw new Error("Only pending purchase orders can be approved");
+  }
+
+  purchaseorder.status = "APPROVED";
+  purchaseorder.approvedAt = new Date();
+  purchaseorder.approvedBy = userId;
+  await purchaseorder.save();
+
+  return purchaseorder;
+};
+
 // Receive purchase order manually
 const receivepurchaseorder = async (id, userId) => {
+  const purchaseorder = await Purchaseorder.findById(id);
+  if (!purchaseorder) throw new Error("Purchase order not found");
+  
+  if (purchaseorder.status !== "APPROVED") {
+    throw new Error("Only approved purchase orders can be received");
+  }
+
   return await processPurchaseOrderReceipt(id, userId);
 };
 
@@ -141,6 +165,7 @@ module.exports = {
   createpurchaseorder,
   getallpurchaseorders,
   getpurchaseorderbyid,
+  approvepurchaseorder,
   receivepurchaseorder,
   processPurchaseOrderReceipt,
   deletepurchaseorder

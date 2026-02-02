@@ -1,1 +1,194 @@
-<p>supplier-form works!</p>
+<div class="form-container">
+  <!-- Header -->
+  <div class="form-header">
+    <div class="header-content">
+      <h1 class="form-title">
+        <i class="fas fa-user-plus" *ngIf="!isEditMode"></i>
+        <i class="fas fa-user-edit" *ngIf="isEditMode"></i>
+        {{ isEditMode ? 'Edit Supplier' : 'Add New Supplier' }}
+      </h1>
+      <p class="form-subtitle">
+        {{ isEditMode ? 'Update supplier information' : 'Enter supplier details to add them to your system' }}
+      </p>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="loading-spinner"></div>
+    <p>Loading supplier data...</p>
+  </div>
+
+  <!-- Form -->
+  <div *ngIf="!loading" class="form-content">
+    <form [formGroup]="supplierForm" (ngSubmit)="onSubmit()" class="supplier-form">
+      
+      <!-- Basic Information Section -->
+      <div class="form-section">
+        <h2 class="section-title">Basic Information</h2>
+        
+        <div class="form-grid">
+          <!-- Supplier Name -->
+          <div class="form-group">
+            <label for="name" class="form-label">
+              Supplier Name *
+            </label>
+            <input
+              id="name"
+              type="text"
+              formControlName="name"
+              class="form-input"
+              [class.error]="isFieldInvalid('name')"
+              placeholder="Enter supplier name"
+            />
+            <div class="form-error" *ngIf="getFieldError('name')">
+              {{ getFieldError('name') }}
+            </div>
+          </div>
+
+          <!-- Contact Person -->
+          <div class="form-group">
+            <label for="contactperson" class="form-label">
+              Contact Person
+            </label>
+            <input
+              id="contactperson"
+              type="text"
+              formControlName="contactperson"
+              class="form-input"
+              [class.error]="isFieldInvalid('contactperson')"
+              placeholder="Enter contact person name"
+            />
+            <div class="form-error" *ngIf="getFieldError('contactperson')">
+              {{ getFieldError('contactperson') }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact Information Section -->
+      <div class="form-section">
+        <h2 class="section-title">Contact Information</h2>
+        
+        <div class="form-grid">
+          <!-- Email -->
+          <div class="form-group">
+            <label for="email" class="form-label">
+              Email Address
+            </label>
+            <input
+              id="email"
+              type="email"
+              formControlName="email"
+              class="form-input"
+              [class.error]="isFieldInvalid('email')"
+              placeholder="supplier@example.com"
+            />
+            <div class="form-error" *ngIf="getFieldError('email')">
+              {{ getFieldError('email') }}
+            </div>
+          </div>
+
+          <!-- Phone -->
+          <div class="form-group">
+            <label for="phone" class="form-label">
+              Phone Number
+            </label>
+            <input
+              id="phone"
+              type="tel"
+              formControlName="phone"
+              class="form-input"
+              [class.error]="isFieldInvalid('phone')"
+              placeholder="+1 (555) 123-4567"
+            />
+            <div class="form-error" *ngIf="getFieldError('phone')">
+              {{ getFieldError('phone') }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Address -->
+        <div class="form-group">
+          <label for="address" class="form-label">
+            Address
+          </label>
+          <textarea
+            id="address"
+            formControlName="address"
+            class="form-textarea"
+            [class.error]="isFieldInvalid('address')"
+            placeholder="Enter supplier address"
+            rows="3"
+          ></textarea>
+          <div class="form-error" *ngIf="getFieldError('address')">
+            {{ getFieldError('address') }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Business Terms Section -->
+      <div class="form-section">
+        <h2 class="section-title">Business Terms</h2>
+        
+        <div class="form-grid">
+          <!-- Payment Terms -->
+          <div class="form-group">
+            <label for="paymentterms" class="form-label">
+              Payment Terms *
+            </label>
+            <select
+              id="paymentterms"
+              formControlName="paymentterms"
+              class="form-select"
+              [class.error]="isFieldInvalid('paymentterms')"
+            >
+              <option *ngFor="let option of paymentTermsOptions" [value]="option.value">
+                {{ option.label }}
+              </option>
+            </select>
+            <div class="form-error" *ngIf="getFieldError('paymentterms')">
+              {{ getFieldError('paymentterms') }}
+            </div>
+          </div>
+
+          <!-- Status -->
+          <div class="form-group" *ngIf="isEditMode">
+            <label class="form-label">Status</label>
+            <div class="checkbox-wrapper">
+              <label class="checkbox-label">
+                <input
+                  type="checkbox"
+                  formControlName="isactive"
+                  class="form-checkbox"
+                />
+                <span class="checkbox-text">Active Supplier</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button
+          type="button"
+          class="btn btn-outline"
+          (click)="onCancel()"
+          [disabled]="submitting"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="supplierForm.invalid || submitting"
+        >
+          <i class="fas fa-spinner fa-spin" *ngIf="submitting"></i>
+          <i class="fas fa-save" *ngIf="!submitting"></i>
+          {{ submitting ? 'Saving...' : (isEditMode ? 'Update Supplier' : 'Create Supplier') }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

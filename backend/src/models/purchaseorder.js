@@ -41,8 +41,18 @@ const purchaseorderschema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["PENDING", "RECEIVED", "CANCELLED"],
+      enum: ["PENDING", "APPROVED", "RECEIVED", "CANCELLED"],
       default: "PENDING"
+    },
+    approvedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "user"
+    },
+    approvedAt: {
+      type: Date
+    },
+    receivedAt: {
+      type: Date
     },
   },
   { timestamps: true }

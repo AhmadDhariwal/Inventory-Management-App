@@ -14,8 +14,11 @@ export interface PurchaseOrder {
   warehouse: Warehouse;
   items: PurchaseOrderItem[];
   totalamount: number;
-  status?: 'PENDING' | 'RECEIVED' | 'CANCELLED';
+  status?: 'PENDING' | 'APPROVED' | 'RECEIVED' | 'CANCELLED';
   createdBy: { _id: string; name: string };
+  approvedBy?: { _id: string; name: string };
+  approvedAt?: string;
+  receivedAt?: string;
   createdAt?: string;
   updatedAt?: string;
 }

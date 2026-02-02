@@ -14,7 +14,8 @@
   </app-low-stock>
 
   <app-pending-purchases
-    [count]="data.widgets?.pendingPurchases || 0">
+    [count]="data.widgets?.pendingPurchases || 0"
+    [approvedCount]="data.widgets?.approvedPurchases || 0">
   </app-pending-purchases>
 
   <app-stock-today

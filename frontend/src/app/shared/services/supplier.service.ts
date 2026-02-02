@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { Supplier } from '../models/inventory/supplier.model';
 
 @Injectable({
@@ -12,21 +13,36 @@ export class SupplierService {
   constructor(private http: HttpClient) {}
 
   getSuppliers(): Observable<Supplier[]> {
-    return this.http.get<Supplier[]>(this.baseUrl);
+    return this.http.get<{success: boolean, data: Supplier[]}>(`${this.baseUrl}`)
+      .pipe(map(response => response.data));
   }
 
-  createSupplier(supplier: Supplier): Observable<Supplier> {
-    return this.http.post<Supplier>(this.baseUrl, supplier);
-  }
-   getSuppliersbyid(id: string): Observable<Supplier[]> {
-    return this.http.get<Supplier[]>(`${this.baseUrl}/${id}`);
+  getSupplierById(id: string): Observable<Supplier> {
+    return this.http.get<{success: boolean, data: Supplier}>(`${this.baseUrl}/${id}`)
+      .pipe(map(response => response.data));
   }
 
-  updateSupplier(id: string, supplier: Supplier): Observable<Supplier> {
-    return this.http.put<Supplier>(`${this.baseUrl}/${id}`, supplier);
+  createSupplier(supplier: Partial<Supplier>): Observable<Supplier> {
+    return this.http.post<{success: boolean, data: Supplier}>(`${this.baseUrl}`, supplier)
+      .pipe(map(response => response.data));
   }
 
-  deleteSupplier(id: string): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/${id}`);
+  updateSupplier(id: string, supplier: Partial<Supplier>): Observable<Supplier> {
+    return this.http.put<{success: boolean, data: Supplier}>(`${this.baseUrl}/${id}`, supplier)
+      .pipe(map(response => response.data));
+  }
+
+  deleteSupplier(id: string): Observable<{success: boolean, message: string}> {
+    return this.http.delete<{success: boolean, message: string}>(`${this.baseUrl}/${id}`);
+  }
+
+  disableSupplier(id: string): Observable<Supplier> {
+    return this.http.patch<{success: boolean, data: Supplier}>(`${this.baseUrl}/${id}/disable`, {})
+      .pipe(map(response => response.data));
+  }
+
+  toggleSupplierStatus(id: string): Observable<Supplier> {
+    return this.http.patch<{success: boolean, data: Supplier}>(`${this.baseUrl}/${id}/toggle-status`, {})
+      .pipe(map(response => response.data));
   }
 }

@@ -2,7 +2,7 @@
   <div class="floating-particles">
     <div class="particle" *ngFor="let i of [1,2,3,4,5,6,7,8]"></div>
   </div>
-  
+
   <header class="dashboard-header">
     <div class="header-content">
       <h1 class="dashboard-title">
@@ -30,12 +30,12 @@
       </div>
     </div>
   </header>
-  
+
   <div *ngIf="loading" class="loading-state">
     <div class="loading-spinner"></div>
     <p>Loading dashboard data...</p>
   </div>
-  
+
   <div *ngIf="error" class="error-state">
     <i class="fas fa-exclamation-triangle"></i>
     <p>{{ error }}</p>
@@ -44,7 +44,7 @@
       Retry
     </button>
   </div>
-  
+
   <div *ngIf="!loading && !error" class="dashboard-content">
     <!-- KPI Section -->
     <section class="kpi-section">
@@ -64,7 +64,7 @@
             </div>
           </div>
         </div>
-        
+
         <div class="kpi-card kpi-success" [style.animation-delay]="'0.2s'">
           <div class="kpi-icon">
             <i class="fas fa-users"></i>
@@ -79,7 +79,7 @@
             </div>
           </div>
         </div>
-        
+
         <div class="kpi-card kpi-info" [style.animation-delay]="'0.3s'">
           <div class="kpi-icon">
             <i class="fas fa-warehouse"></i>
@@ -94,7 +94,7 @@
             </div>
           </div>
         </div>
-        
+
         <div class="kpi-card kpi-warning" [style.animation-delay]="'0.4s'">
           <div class="kpi-icon">
             <i class="fas fa-dollar-sign"></i>
@@ -109,7 +109,7 @@
             </div>
           </div>
         </div>
-        
+
         <div class="kpi-card kpi-danger" [class.kpi-alert]="stats.lowStockItems > 0" [style.animation-delay]="'0.5s'">
           <div class="kpi-icon">
             <i class="fas fa-exclamation-triangle"></i>
@@ -126,7 +126,7 @@
         </div>
       </div>
     </section>
-    
+
     <!-- Today's Activity Section -->
     <section class="activity-section">
       <h2 class="section-title">Today's Activity</h2>
@@ -141,7 +141,7 @@
             <span class="activity-label">Units received today</span>
           </div>
         </div>
-        
+
         <div class="activity-card activity-negative">
           <div class="activity-icon">
             <i class="fas fa-arrow-down"></i>
@@ -152,14 +152,14 @@
             <span class="activity-label">Units dispatched today</span>
           </div>
         </div>
-        
+
         <div class="activity-card activity-neutral">
           <div class="activity-icon">
             <i class="fas fa-exchange-alt"></i>
           </div>
           <div class="activity-content">
             <h3>Net Movement</h3>
-            <p class="activity-value" 
+            <p class="activity-value"
                [class.positive]="(stats.stockInToday - stats.stockOutToday) > 0"
                [class.negative]="(stats.stockInToday - stats.stockOutToday) < 0">
               {{ (stats.stockInToday - stats.stockOutToday) | number:'+1.0-0' }}
@@ -167,7 +167,7 @@
             <span class="activity-label">Today's net change</span>
           </div>
         </div>
-        
+
         <div class="activity-card activity-warning">
           <div class="activity-icon">
             <i class="fas fa-shopping-cart"></i>
@@ -180,7 +180,7 @@
         </div>
       </div>
     </section>
-    
+
     <!-- Stock Trend Section -->
     <section class="charts-section">
       <h2 class="section-title">Stock Movement Analysis</h2>
@@ -188,7 +188,7 @@
         <app-stock-trend [trend]="stockTrendData"></app-stock-trend>
       </div>
     </section>
-    
+
     <!-- Purchase Trend Section -->
     <section class="charts-section">
       <h2 class="section-title">Purchase Analytics</h2>
@@ -196,7 +196,7 @@
         <app-purchase-trend [trend]="purchaseTrendData"></app-purchase-trend>
       </div>
     </section>
-    
+
     <!-- Sales Trend Section -->
     <section class="charts-section">
       <h2 class="section-title">Sales Performance</h2>
@@ -204,28 +204,28 @@
         <app-sales-trend [trend]="salesTrendData"></app-sales-trend>
       </div>
     </section>
-    
+
     <!-- Low Stock Widget Section -->
     <section class="widget-section">
-      <app-low-stock-widget 
-        [lowStockItems]="lowStockItems" 
+      <app-low-stock-widget
+        [lowStockItems]="lowStockItems"
         [totalCount]="stats.lowStockItems"
         (itemClick)="navigateToProduct($event)">
       </app-low-stock-widget>
     </section>
-    
+
     <!-- Low Stock Alerts Section -->
     <section class="alerts-section" *ngIf="lowStockItems.length > 0">
-      <div class="section-header">
+   <!--   <div class="section-header">
         <h2 class="section-title">
           <i class="fas fa-exclamation-triangle"></i>
           Low Stock Alerts
         </h2>
         <span class="alert-count">{{ lowStockItems.length }} items need attention</span>
       </div>
-      
+
       <div class="alerts-grid">
-        <div class="alert-card" 
+        <div class="alert-card"
              *ngFor="let item of lowStockItems.slice(0, 6); trackBy: trackByProductId"
              (click)="navigateToProduct(item)"
              role="button"
@@ -252,8 +252,8 @@
             <i class="fas fa-arrow-right"></i>
           </div>
         </div>
-      </div>
-      
+      </div> -->
+
       <div class="alerts-footer" *ngIf="lowStockItems.length > 6">
         <p>{{ lowStockItems.length - 6 }} more items need attention</p>
         <button class="view-all-btn" (click)="router.navigate(['/stock/levels'])">

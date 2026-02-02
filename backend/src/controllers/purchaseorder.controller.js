@@ -38,6 +38,44 @@ const getpurchaseorderbyid = async (req, res) => {
   }
 };
 
+const approvepurchaseorder = async (req, res) => {
+  try {
+    const purchaseorder = await purchaseorderservice.approvepurchaseorder(
+      req.params.id,
+      req.user.id
+    );
+    res.status(200).json({
+      success: true,
+      message: "Purchase order approved successfully",
+      data: purchaseorder
+    });
+  } catch (error) {
+    res.status(400).json({ 
+      success: false,
+      error: error.message 
+    });
+  }
+};
+
+const receivepurchaseorder = async (req, res) => {
+  try {
+    const result = await purchaseorderservice.receivepurchaseorder(
+      req.params.id,
+      req.user.id
+    );
+    res.status(200).json({
+      success: true,
+      message: "Purchase order received successfully",
+      data: result
+    });
+  } catch (error) {
+    res.status(400).json({ 
+      success: false,
+      error: error.message 
+    });
+  }
+};
+
 const deletepurchaseorder = async (req, res) => {
   try {
     const result = await purchaseorderservice.deletepurchaseorder(
@@ -59,5 +97,7 @@ const deletepurchaseorder = async (req, res) => {
 module.exports = { createpurchaseorder,
   getallpurchaseorders,
   getpurchaseorderbyid,
+  approvepurchaseorder,
+  receivepurchaseorder,
   deletepurchaseorder
  };

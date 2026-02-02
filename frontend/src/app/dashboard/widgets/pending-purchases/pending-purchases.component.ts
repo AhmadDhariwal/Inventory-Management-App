@@ -10,4 +10,5 @@ import { CommonModule } from '@angular/common';
 })
 export class PendingPurchasesComponent {
   @Input() count: number = 0;
+  @Input() approvedCount: number = 0;
 }

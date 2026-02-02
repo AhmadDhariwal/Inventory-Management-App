@@ -28,6 +28,14 @@ export class PurchaseService {
     return this.http.delete<{success: boolean, message: string}>(`${this.baseUrl}/${id}`);
   }
 
+  approvePurchaseOrder(id: string): Observable<{success: boolean, message: string, data: PurchaseOrder}> {
+    return this.http.patch<{success: boolean, message: string, data: PurchaseOrder}>(`${this.baseUrl}/${id}/approve`, {});
+  }
+
+  receivePurchaseOrder(id: string): Observable<{success: boolean, message: string, data: any}> {
+    return this.http.patch<{success: boolean, message: string, data: any}>(`${this.baseUrl}/${id}/receive`, {});
+  }
+
   // Purchase Reports
   getPurchaseReport(): Observable<PurchaseOrder[]> {
     return this.http.get<PurchaseOrder[]>(`${this.reportsUrl}/purchases`);

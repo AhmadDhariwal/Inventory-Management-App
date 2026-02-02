@@ -225,8 +225,13 @@ exports.getDashboardSummary = async () => {
     const totalProducts = await Product.countDocuments();
     const totalSuppliers = await Supplier.countDocuments();
     
-    // Get total purchase amount
+    // Get total purchase amount (only approved/received orders)
     const purchaseAmount = await PurchaseOrder.aggregate([
+      { 
+        $match: { 
+          status: { $in: ["APPROVED", "RECEIVED"] } 
+        } 
+      },
       { $group: { _id: null, total: { $sum: "$totalamount" } } }
     ]);
     
@@ -311,9 +316,13 @@ exports.getDashboardSummary = async () => {
       }
     ]);
 
-    // Get pending purchases
+    // Get pending and approved purchases
     const pendingPurchases = await PurchaseOrder.countDocuments({ 
-      status: { $in: ['PENDING', 'pending'] }
+      status: 'PENDING'
+    });
+    
+    const approvedPurchases = await PurchaseOrder.countDocuments({ 
+      status: 'APPROVED'
     });
 
     return {
@@ -329,6 +338,7 @@ exports.getDashboardSummary = async () => {
       },
       widgets: {
         pendingPurchases: pendingPurchases || 0,
+        approvedPurchases: approvedPurchases || 0,
         stockInToday: stockInToday[0]?.qty || 0,
         stockOutToday: stockOutToday[0]?.qty || 0
       }
@@ -349,6 +359,7 @@ exports.getDashboardSummary = async () => {
       },
       widgets: {
         pendingPurchases: 0,
+        approvedPurchases: 0,
         stockInToday: 0,
         stockOutToday: 0
       }
