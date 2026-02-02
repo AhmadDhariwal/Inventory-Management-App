@@ -264,9 +264,9 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let purchase of paginatedPurchases" class="table-row">
+            <tr *ngFor="let purchase of paginatedPurchases; let i = index" class="table-row">
               <td class="reference-col">
-                <div class="reference-id">{{ purchase._id }}</div>
+                <div class="reference-id">{{ generateOrderNumber(i) }}</div>
               </td>
               <td class="date-col">
                 <div class="date-main">{{ purchase.createdAt | date:'MMM dd, yyyy' }}</div>

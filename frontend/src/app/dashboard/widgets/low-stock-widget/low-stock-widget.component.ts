@@ -25,7 +25,7 @@ export class LowStockWidgetComponent {
   onItemClick(item: any): void {
     this.itemClick.emit(item);
     if (item.productId) {
-      this.router.navigate(['/products', item.productId]);
+      this.router.navigate(['/products/details', item.productId]);
     }
   }
 

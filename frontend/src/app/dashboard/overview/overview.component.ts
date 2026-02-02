@@ -65,6 +65,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
           lowStockItems: data.alerts?.lowStockCount || 0,
           stockInToday: data.widgets?.stockInToday || 0,
           stockOutToday: data.widgets?.stockOutToday || 0,
+          approvedpurchases: data.widgets?.approvedPurchases || 0,
           pendingPurchases: data.widgets?.pendingPurchases || 0
         };
         this.lowStockItems = data.alerts?.lowStockItems || [];
@@ -86,16 +87,16 @@ export class OverviewComponent implements OnInit, OnDestroy {
       next: data => {
         if (data && data.length > 0) {
           this.stockTrendData = data;
-          console.log('✅ Stock trend loaded from API:', data.length, 'days');
+          console.log(' Stock trend loaded from API:', data.length, 'days');
         } else {
           this.stockTrendData = this.generateMockStockData();
-          console.log('⚠️ Using mock stock trend data');
+          console.log(' Using mock stock trend data');
         }
       },
       error: err => {
-        console.error('❌ Stock trend API error:', err);
+        console.error(' Stock trend API error:', err);
         this.stockTrendData = this.generateMockStockData();
-        console.log('⚠️ Fallback to mock stock trend data');
+        console.log(' Fallback to mock stock trend data');
       }
     });
 
@@ -104,16 +105,16 @@ export class OverviewComponent implements OnInit, OnDestroy {
       next: data => {
         if (data && data.length > 0) {
           this.purchaseTrendData = data;
-          console.log('✅ Purchase trend loaded from API:', data.length, 'days');
+          console.log(' Purchase trend loaded from API:', data.length, 'days');
         } else {
           this.purchaseTrendData = this.generateMockPurchaseData();
-          console.log('⚠️ Using mock purchase trend data');
+          console.log('Using mock purchase trend data');
         }
       },
       error: err => {
-        console.error('❌ Purchase trend API error:', err);
+        console.error(' Purchase trend API error:', err);
         this.purchaseTrendData = this.generateMockPurchaseData();
-        console.log('⚠️ Fallback to mock purchase trend data');
+        console.log(' Fallback to mock purchase trend data');
       }
     });
 
@@ -122,16 +123,16 @@ export class OverviewComponent implements OnInit, OnDestroy {
       next: data => {
         if (data && data.length > 0) {
           this.salesTrendData = data;
-          console.log('✅ Sales trend loaded from API:', data.length, 'days');
+          console.log(' Sales trend loaded from API:', data.length, 'days');
         } else {
           this.salesTrendData = this.generateMockSalesData();
-          console.log('⚠️ Using mock sales trend data');
+          console.log(' Using mock sales trend data');
         }
       },
       error: err => {
-        console.error('❌ Sales trend API error:', err);
+        console.error(' Sales trend API error:', err);
         this.salesTrendData = this.generateMockSalesData();
-        console.log('⚠️ Fallback to mock sales trend data');
+        console.log('Fallback to mock sales trend data');
       }
     });
   }

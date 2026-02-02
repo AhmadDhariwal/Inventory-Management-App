@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ProductService } from '../../shared/services/product.service';
 import { Product } from '../../shared/models/inventory/product.model';
 import { CommonModule } from '@angular/common';
@@ -8,7 +8,7 @@ import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-product-details',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './product-details.component.html',
   styleUrl: './product-details.component.scss'
 })
@@ -97,7 +97,7 @@ export class ProductDetailsComponent implements OnInit {
         reorderLevel: Number(stock.reorderLevel) || 0,
         minStock: Number(stock.minStock) || 0
       };
-      
+
       this.productService.updateStockLevelWithRules(stock._id, updateData).subscribe({
         next: (result) => {
           console.log('Stock level updated successfully');

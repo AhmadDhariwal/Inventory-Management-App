@@ -157,10 +157,11 @@ export class PurchaseReportComponent implements OnInit {
     // Search filter
     if (this.searchText.trim()) {
       const searchLower = this.searchText.toLowerCase();
-      filtered = filtered.filter(p =>
-        p._id.toLowerCase().includes(searchLower) ||
-        (p.supplier && p.supplier.name && p.supplier.name.toLowerCase().includes(searchLower))
-      );
+      filtered = filtered.filter((p, index) => {
+        const orderNumber = `PO-${(index + 1).toString().padStart(4, '0')}`;
+        return orderNumber.toLowerCase().includes(searchLower) ||
+               (p.supplier && p.supplier.name && p.supplier.name.toLowerCase().includes(searchLower));
+      });
     }
 
     this.filteredPurchases = filtered;
@@ -218,8 +219,14 @@ export class PurchaseReportComponent implements OnInit {
     return items.length > 2 ? `${preview} +${items.length - 2} more` : preview;
   }
 
+  generateOrderNumber(index: number): string {
+    const orderIndex = (this.currentPage - 1) * this.itemsPerPage + index + 1;
+    return `PO-${orderIndex.toString().padStart(4, '0')}`;
+  }
+
   viewPurchaseDetails(purchase: PurchaseOrder): void {
-    console.log('View purchase details:', purchase);
+    // Navigate to purchase details page
+    window.open(`/purchases/details/${purchase._id}`, '_blank');
   }
 
   exportReport(format: 'csv' | 'excel'): void {

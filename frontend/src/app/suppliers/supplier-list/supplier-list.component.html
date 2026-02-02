@@ -81,28 +81,32 @@
                 <button
                   class="btn btn-sm btn-info"
                   (click)="viewSupplier(supplier)"
-                  title="View Details">
+                  title="View supplier details">
                   <i class="fas fa-eye"></i>
+                  <span class="btn-text">View</span>
                 </button>
                 <button
                   class="btn btn-sm btn-outline"
                   (click)="editSupplier(supplier)"
-                  title="Edit Supplier">
+                  title="Edit supplier information">
                   <i class="fas fa-edit"></i>
+                  <span class="btn-text">Edit</span>
                 </button>
                 <button
                   class="btn btn-sm"
                   [class.btn-warning]="supplier.isactive"
                   [class.btn-success]="!supplier.isactive"
                   (click)="toggleSupplierStatus(supplier)"
-                  [title]="supplier.isactive ? 'Deactivate Supplier' : 'Activate Supplier'">
+                  [title]="supplier.isactive ? 'Deactivate this supplier' : 'Activate this supplier'">
                   <i class="fas" [class.fa-pause]="supplier.isactive" [class.fa-play]="!supplier.isactive"></i>
+                  <span class="btn-text">{{ supplier.isactive ? 'Deactivate' : 'Activate' }}</span>
                 </button>
                 <button
                   class="btn btn-sm btn-danger"
                   (click)="confirmDelete(supplier)"
-                  title="Delete Supplier">
+                  title="Permanently delete this supplier">
                   <i class="fas fa-trash"></i>
+                  <span class="btn-text">Delete</span>
                 </button>
               </div>
             </td>
@@ -129,7 +133,7 @@
     <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h3>Confirm Delete</h3>
-        <button class="modal-close" (click)="cancelDelete()">
+        <button title="Cancel delete" class="modal-close" (click)="cancelDelete()">
           <i class="fas fa-times"></i>
         </button>
       </div>

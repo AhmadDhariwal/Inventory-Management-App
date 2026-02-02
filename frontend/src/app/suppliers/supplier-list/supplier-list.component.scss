@@ -194,6 +194,7 @@
   display: flex;
   gap: 0.5rem;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .btn {
@@ -209,6 +210,12 @@
   border: none;
   cursor: pointer;
   transition: all 0.2s;
+  white-space: nowrap;
+
+  .btn-text {
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
 
   &.btn-primary {
     background-color: #3b82f6;
@@ -269,6 +276,11 @@
   &.btn-sm {
     padding: 0.375rem 0.75rem;
     font-size: 0.75rem;
+    min-width: auto;
+
+    .btn-text {
+      font-size: 0.6875rem;
+    }
 
     i {
       font-size: 0.75rem;
@@ -434,10 +446,16 @@
   .action-buttons {
     flex-direction: column;
     gap: 0.25rem;
+    align-items: stretch;
 
     .btn {
       width: 100%;
-      justify-content: center;
+      justify-content: flex-start;
+      padding: 0.5rem 0.75rem;
+      
+      .btn-text {
+        margin-left: 0.25rem;
+      }
     }
   }
 

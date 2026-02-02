@@ -10,5 +10,6 @@ router.get("/:id", verifytoken, suppliercontroller.getsupplierById);
 router.put("/:id", verifytoken, suppliercontroller.updatesupplier);
 router.delete("/:id", verifytoken, suppliercontroller.deletesupplier);
 router.patch("/:id/disable", verifytoken, suppliercontroller.disablesupplier);
+router.patch("/:id/toggle-status", verifytoken, suppliercontroller.togglesupplierstatus);
 
 module.exports = router;

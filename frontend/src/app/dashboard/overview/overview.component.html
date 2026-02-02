@@ -162,9 +162,21 @@
             <p class="activity-value"
                [class.positive]="(stats.stockInToday - stats.stockOutToday) > 0"
                [class.negative]="(stats.stockInToday - stats.stockOutToday) < 0">
-              {{ (stats.stockInToday - stats.stockOutToday) | number:'+1.0-0' }}
+              {{ (stats.stockInToday - stats.stockOutToday) >= 0 ? '+' : '-' }}
+              {{ (stats.stockInToday - stats.stockOutToday) | number:'1.0-0' }}
             </p>
             <span class="activity-label">Today's net change</span>
+          </div>
+        </div>
+
+         <div class="activity-card activity-warning">
+          <div class="activity-icon">
+            <i class="fas fa-shopping-cart"></i>
+          </div>
+          <div class="activity-content">
+            <h3>Approved Purchases</h3>
+            <p class="activity-value">{{ stats.approvedpurchases | number }}</p>
+            <span class="activity-label">Approved Purchases</span>
           </div>
         </div>
 
@@ -216,7 +228,7 @@
 
     <!-- Low Stock Alerts Section -->
     <section class="alerts-section" *ngIf="lowStockItems.length > 0">
-   <!--   <div class="section-header">
+     <!-- <div class="section-header">
         <h2 class="section-title">
           <i class="fas fa-exclamation-triangle"></i>
           Low Stock Alerts
@@ -255,7 +267,7 @@
       </div> -->
 
       <div class="alerts-footer" *ngIf="lowStockItems.length > 6">
-        <p>{{ lowStockItems.length - 6 }} more items need attention</p>
+        <p>The Length of Low Stock Alerts is Exceeded and Now the Total Low Stock Count is {{ lowStockItems.length }} which is Highly Alarming  </p>
         <button class="view-all-btn" (click)="router.navigate(['/stock/levels'])">
           View All Alerts
           <i class="fas fa-external-link-alt"></i>

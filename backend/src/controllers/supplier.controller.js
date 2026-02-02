@@ -18,7 +18,7 @@ exports.createsupplier = async (req, res) => {
 
 exports.getsuppliers = async (req, res) => {
   try {
-    const suppliers = await Supplier.find({ isactive: true }).sort({ createdAt: -1 });
+    const suppliers = await Supplier.find().sort({ createdAt: -1 });
     res.json({
       success: true,
       data: suppliers
@@ -115,6 +115,32 @@ exports.disablesupplier = async (req, res) => {
     res.json({ 
       success: true,
       message: "Supplier disabled successfully", 
+      data: supplier 
+    });
+  } catch (error) {
+    res.status(400).json({ 
+      success: false,
+      error: error.message 
+    });
+  }
+};
+
+exports.togglesupplierstatus = async (req, res) => {
+  try {
+    const supplier = await Supplier.findById(req.params.id);
+    if (!supplier) {
+      return res.status(404).json({ 
+        success: false,
+        message: "Supplier not found" 
+      });
+    }
+    
+    supplier.isactive = !supplier.isactive;
+    await supplier.save();
+    
+    res.json({ 
+      success: true,
+      message: `Supplier ${supplier.isactive ? 'activated' : 'deactivated'} successfully`, 
       data: supplier 
     });
   } catch (error) {

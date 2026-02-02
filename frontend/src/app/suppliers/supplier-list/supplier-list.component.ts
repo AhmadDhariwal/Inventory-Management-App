@@ -8,7 +8,7 @@ import { Supplier } from '../../shared/models/inventory/supplier.model';
 @Component({
   selector: 'app-supplier-list',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule,FormsModule],
   templateUrl: './supplier-list.component.html',
   styleUrl: './supplier-list.component.scss'
 })
