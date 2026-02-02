@@ -4,7 +4,18 @@
     <p class="page-description">Configure your organization's basic information and preferences</p>
   </header>
 
-  <div class="settings-sections">
+  <!-- Success/Error Messages -->
+  <div class="alert alert-success" *ngIf="successMessage">
+    <i class="fas fa-check-circle"></i>
+    {{ successMessage }}
+  </div>
+  
+  <div class="alert alert-error" *ngIf="errorMessage">
+    <i class="fas fa-exclamation-circle"></i>
+    {{ errorMessage }}
+  </div>
+
+  <div class="settings-sections" *ngIf="!isLoading">
     <!-- Company Information -->
     <section class="settings-card">
       <div class="card-header">
@@ -30,7 +41,7 @@
           <div class="form-group">
             <label for="industry" class="form-label">Industry</label>
             <select id="industry" formControlName="industry" class="form-select">
-              <option value="">Select Industry</option>
+              <option value="other">Select Industry</option>
               <option value="retail">Retail</option>
               <option value="manufacturing">Manufacturing</option>
               <option value="wholesale">Wholesale</option>
@@ -69,12 +80,16 @@
               type="email"
               class="form-input"
               placeholder="contact@company.com" />
+            <div class="form-error" *ngIf="companyForm.get('email')?.invalid && companyForm.get('email')?.touched">
+              Please enter a valid email address
+            </div>
           </div>
         </div>
 
         <div class="form-actions">
-          <button type="submit" class="btn btn-primary" [disabled]="companyForm.invalid">
-            Save Company Information
+          <button type="submit" class="btn btn-primary" [disabled]="companyForm.invalid || isSaving">
+            <span *ngIf="isSaving">Saving...</span>
+            <span *ngIf="!isSaving">Save Company Information</span>
           </button>
         </div>
       </form>
@@ -92,7 +107,6 @@
           <div class="form-group">
             <label for="currency" class="form-label">Currency *</label>
             <select id="currency" formControlName="currency" class="form-select">
-              <option value="">Select Currency</option>
               <option value="USD">USD - US Dollar</option>
               <option value="EUR">EUR - Euro</option>
               <option value="GBP">GBP - British Pound</option>
@@ -109,7 +123,6 @@
           <div class="form-group">
             <label for="timezone" class="form-label">Timezone *</label>
             <select id="timezone" formControlName="timezone" class="form-select">
-              <option value="">Select Timezone</option>
               <option value="UTC">UTC - Coordinated Universal Time</option>
               <option value="America/New_York">EST - Eastern Time</option>
               <option value="America/Chicago">CST - Central Time</option>
@@ -149,8 +162,9 @@
         </div>
 
         <div class="form-actions">
-          <button type="submit" class="btn btn-primary" [disabled]="regionalForm.invalid">
-            Save Regional Settings
+          <button type="submit" class="btn btn-primary" [disabled]="regionalForm.invalid || isSaving">
+            <span *ngIf="isSaving">Saving...</span>
+            <span *ngIf="!isSaving">Save Regional Settings</span>
           </button>
         </div>
       </form>
@@ -184,32 +198,40 @@
               <option value="custom">Custom</option>
             </select>
           </div>
+        </div>
 
-          <div class="form-group">
-            <label class="form-label">Business Features</label>
-            <div class="checkbox-group">
-              <label class="checkbox-item">
-                <input type="checkbox" formControlName="enableMultiLocation" class="form-checkbox">
-                <span class="checkbox-label">Multi-location support</span>
-              </label>
-              <label class="checkbox-item">
-                <input type="checkbox" formControlName="enableTaxCalculation" class="form-checkbox">
-                <span class="checkbox-label">Automatic tax calculation</span>
-              </label>
-              <label class="checkbox-item">
-                <input type="checkbox" formControlName="enableDiscounts" class="form-checkbox">
-                <span class="checkbox-label">Discount management</span>
-              </label>
-            </div>
+        <div class="form-section">
+          <h3 class="section-title">Business Features</h3>
+          <div class="checkbox-group">
+            <label class="checkbox-item">
+              <input type="checkbox" formControlName="enableMultiLocation" class="form-checkbox">
+              <span class="checkbox-label">Multi-location Support</span>
+              <small class="checkbox-help">Enable inventory management across multiple locations</small>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" formControlName="enableTaxCalculation" class="form-checkbox">
+              <span class="checkbox-label">Automatic Tax Calculation</span>
+              <small class="checkbox-help">Automatically calculate taxes on transactions</small>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" formControlName="enableDiscounts" class="form-checkbox">
+              <span class="checkbox-label">Discount Management</span>
+              <small class="checkbox-help">Enable discount features for sales and purchases</small>
+            </label>
           </div>
         </div>
 
         <div class="form-actions">
-          <button type="submit" class="btn btn-primary" [disabled]="preferencesForm.invalid">
-            Save Preferences
+          <button type="submit" class="btn btn-primary" [disabled]="preferencesForm.invalid || isSaving">
+            <span *ngIf="isSaving">Saving...</span>
+            <span *ngIf="!isSaving">Save Preferences</span>
           </button>
         </div>
       </form>
     </section>
+  </div>
+
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="loading">Loading business settings...</div>
   </div>
 </div>

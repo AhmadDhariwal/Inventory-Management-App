@@ -23,6 +23,17 @@
         </div>
       </div>
       
+      <!-- Success/Error Messages -->
+      <div class="alert alert-success" *ngIf="updateSuccess">
+        <i class="fas fa-check-circle"></i>
+        Profile updated successfully!
+      </div>
+      
+      <div class="alert alert-error" *ngIf="updateError">
+        <i class="fas fa-exclamation-circle"></i>
+        {{ updateError }}
+      </div>
+      
       <form [formGroup]="profileForm" (ngSubmit)="updateProfile()" class="form">
         <div class="form-grid">
           <div class="form-group">
@@ -114,9 +125,70 @@
               <h3 class="security-title">Password</h3>
               <p class="security-description">Last changed {{ getPasswordLastChanged() }}</p>
             </div>
-            <button type="button" class="btn btn-secondary" (click)="changePassword()">
+            <button type="button" class="btn btn-secondary" (click)="togglePasswordForm()">
               Change Password
             </button>
+          </div>
+
+          <!-- Password Change Form -->
+          <div class="password-form" *ngIf="showPasswordForm">
+            <div class="alert alert-success" *ngIf="passwordSuccess">
+              <i class="fas fa-check-circle"></i>
+              Password changed successfully!
+            </div>
+            
+            <div class="alert alert-error" *ngIf="passwordError">
+              <i class="fas fa-exclamation-circle"></i>
+              {{ passwordError }}
+            </div>
+            
+            <form [formGroup]="passwordForm" (ngSubmit)="changePassword()" class="form">
+              <div class="form-group">
+                <label for="currentPassword" class="form-label">Current Password *</label>
+                <input
+                  id="currentPassword"
+                  formControlName="currentPassword"
+                  type="password"
+                  class="form-input"
+                  placeholder="Enter current password" />
+              </div>
+              
+              <div class="form-group">
+                <label for="newPassword" class="form-label">New Password *</label>
+                <input
+                  id="newPassword"
+                  formControlName="newPassword"
+                  type="password"
+                  class="form-input"
+                  placeholder="Enter new password" />
+                <div class="form-error" *ngIf="passwordForm.get('newPassword')?.invalid && passwordForm.get('newPassword')?.touched">
+                  Password must be at least 6 characters
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label for="confirmPassword" class="form-label">Confirm Password *</label>
+                <input
+                  id="confirmPassword"
+                  formControlName="confirmPassword"
+                  type="password"
+                  class="form-input"
+                  placeholder="Confirm new password" />
+                <div class="form-error" *ngIf="passwordForm.hasError('passwordMismatch') && passwordForm.get('confirmPassword')?.touched">
+                  Passwords do not match
+                </div>
+              </div>
+              
+              <div class="form-actions">
+                <button type="button" class="btn btn-secondary" (click)="togglePasswordForm()">
+                  Cancel
+                </button>
+                <button type="submit" class="btn btn-primary" [disabled]="passwordForm.invalid || isPasswordLoading">
+                  <span *ngIf="isPasswordLoading">Changing...</span>
+                  <span *ngIf="!isPasswordLoading">Change Password</span>
+                </button>
+              </div>
+            </form>
           </div>
 
           <div class="security-item">
@@ -140,11 +212,32 @@
           <div class="security-item">
             <div class="security-info">
               <h3 class="security-title">Active Sessions</h3>
-              <p class="security-description">{{ activeSessions }} active session(s) on your account</p>
+              <p class="security-description">{{ activeSessions.length }} active session(s) on your account</p>
             </div>
-            <button type="button" class="btn btn-secondary" (click)="viewSessions()">
-              Manage Sessions
-            </button>
+            <div class="sessions-list" *ngIf="!sessionsLoading">
+              <div class="session-item" *ngFor="let session of activeSessions">
+                <div class="session-info">
+                  <strong>{{ session.device }}</strong>
+                  <small>{{ session.location }} • {{ session.lastActive | date:'short' }}</small>
+                  <span class="current-badge" *ngIf="session.current">Current</span>
+                </div>
+                <button 
+                  type="button" 
+                  class="btn btn-sm btn-danger" 
+                  *ngIf="!session.current"
+                  (click)="terminateSession(session.id)">
+                  Terminate
+                </button>
+              </div>
+              <button 
+                type="button" 
+                class="btn btn-danger" 
+                *ngIf="activeSessions.length > 1"
+                (click)="terminateAllSessions()">
+                Terminate All Other Sessions
+              </button>
+            </div>
+            <div *ngIf="sessionsLoading" class="loading">Loading sessions...</div>
           </div>
         </div>
       </div>

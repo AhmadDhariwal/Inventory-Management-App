@@ -4,7 +4,18 @@
     <p class="page-description">Configure security policies and access controls for your organization</p>
   </header>
 
-  <div class="settings-sections">
+  <!-- Success/Error Messages -->
+  <div class="alert alert-success" *ngIf="successMessage">
+    <i class="fas fa-check-circle"></i>
+    {{ successMessage }}
+  </div>
+  
+  <div class="alert alert-error" *ngIf="errorMessage">
+    <i class="fas fa-exclamation-circle"></i>
+    {{ errorMessage }}
+  </div>
+
+  <div class="settings-sections" *ngIf="!isLoading">
     <!-- Security Policies -->
     <section class="settings-card">
       <div class="card-header">
@@ -82,8 +93,9 @@
         </div>
         
         <div class="form-actions">
-          <button type="submit" class="btn btn-primary" [disabled]="securityForm.invalid">
-            Save Security Settings
+          <button type="submit" class="btn btn-primary" [disabled]="securityForm.invalid || isSaving">
+            <span *ngIf="isSaving">Saving...</span>
+            <span *ngIf="!isSaving">Save Security Settings</span>
           </button>
         </div>
       </form>
@@ -105,8 +117,8 @@
               formControlName="allowedIPs"
               class="form-textarea"
               rows="3"
-              placeholder="192.168.1.0/24&#10;10.0.0.0/8&#10;172.16.0.0/12"></textarea>
-            <small class="form-help">Enter IP addresses or ranges (one per line). Leave empty to allow all IPs.</small>
+              placeholder="192.168.1.1, 10.0.0.0/8, 172.16.0.0/12"></textarea>
+            <small class="form-help">Enter IP addresses or ranges separated by commas. Leave empty to allow all IPs.</small>
           </div>
         </div>
 
@@ -132,47 +144,16 @@
         </div>
         
         <div class="form-actions">
-          <button type="submit" class="btn btn-primary" [disabled]="accessForm.invalid">
-            Save Access Settings
+          <button type="submit" class="btn btn-primary" [disabled]="accessForm.invalid || isSaving">
+            <span *ngIf="isSaving">Saving...</span>
+            <span *ngIf="!isSaving">Save Access Settings</span>
           </button>
         </div>
       </form>
     </section>
-
-    <!-- Security Status -->
-    <section class="settings-card">
-      <div class="card-header">
-        <h2 class="card-title">Security Status</h2>
-        <p class="card-description">Current security status and recommendations</p>
-      </div>
-      
-      <div class="form">
-        <div class="status-items">
-          <div class="status-item status-good">
-            <div class="status-icon">✅</div>
-            <div class="status-info">
-              <h3 class="status-title">SSL Certificate</h3>
-              <p class="status-description">Valid SSL certificate installed and active</p>
-            </div>
-          </div>
-
-          <div class="status-item status-warning">
-            <div class="status-icon">⚠️</div>
-            <div class="status-info">
-              <h3 class="status-title">Password Policy</h3>
-              <p class="status-description">Consider enabling stronger password requirements</p>
-            </div>
-          </div>
-
-          <div class="status-item status-good">
-            <div class="status-icon">✅</div>
-            <div class="status-info">
-              <h3 class="status-title">System Updates</h3>
-              <p class="status-description">All security updates are current</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+  </div>
+  
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="loading">Loading security settings...</div>
   </div>
 </div>

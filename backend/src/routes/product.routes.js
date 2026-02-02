@@ -1,9 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const product = require("../models/product");
-const Category = require("../models/category"); // Import Category model
+const Category = require("../models/category");
+const { verifytoken, restrictto } = require("../middleware/auth.middleware");
 
-router.get("/", async (req, res) => {
+// GET all products - Both admin and user can view
+router.get("/", verifytoken, async (req, res) => {
   try {
     const products = await product.find().populate('category', 'name').sort({ createdAt: -1 });
     res.json(products);
@@ -12,7 +14,8 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.get("/:id", async (req, res) => {
+// GET single product - Both admin and user can view
+router.get("/:id", verifytoken, async (req, res) => {
   try {
     const productData = await product.findById(req.params.id).populate('category', 'name');
     if (!productData) {
@@ -24,7 +27,8 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-router.post("/", async (req, res) => {
+// CREATE product - Admin only
+router.post("/", verifytoken, restrictto(['admin']), async (req, res) => {
   try {
     const newProduct = new product(req.body);
     await newProduct.save();
@@ -35,7 +39,8 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.put("/:id", async (req, res) => {
+// UPDATE product - Admin only
+router.put("/:id", verifytoken, restrictto(['admin']), async (req, res) => {
   try {
     const updatedProduct = await product.findByIdAndUpdate(
       req.params.id, 
@@ -52,7 +57,8 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-router.delete("/:id", async (req, res) => {
+// DELETE product - Admin only
+router.delete("/:id", verifytoken, restrictto(['admin']), async (req, res) => {
   try {
     const deletedProduct = await product.findByIdAndDelete(req.params.id);
     if (!deletedProduct) {

@@ -4,45 +4,75 @@
     <p class="page-description">Configure stock management rules and automation settings</p>
   </header>
 
-  <!-- Migration Notice -->
-  <div class="migration-notice" *ngIf="showMigrationMessage">
-    <div class="notice-content">
-      <h3>📦 Stock Rules Have Been Updated!</h3>
-      <p>Stock rules (reorder levels and minimum stock) are now managed at individual product stock levels for better flexibility.</p>
-      <div class="notice-actions">
-        <button class="btn btn-primary" (click)="navigateToProducts()">Manage in Products</button>
-        <button class="btn btn-secondary" (click)="navigateToStockLevels()">View Stock Levels</button>
-        <button class="btn btn-link" (click)="dismissMigrationMessage()">Dismiss</button>
-      </div>
-    </div>
+  <!-- Success/Error Messages -->
+  <div class="alert alert-success" *ngIf="successMessage">
+    <i class="fas fa-check-circle"></i>
+    {{ successMessage }}
+  </div>
+  
+  <div class="alert alert-error" *ngIf="errorMessage">
+    <i class="fas fa-exclamation-circle"></i>
+    {{ errorMessage }}
   </div>
 
   <div class="settings-sections" *ngIf="!isLoading">
     <!-- Stock Management Rules -->
     <section class="settings-card">
       <div class="card-header">
-        <h2 class="card-title">Global Stock Settings</h2>
-        <p class="card-description">Note: Reorder levels and minimum stock are now configured per product in the Products section</p>
+        <h2 class="card-title">Inventory Management Settings</h2>
+        <p class="card-description">Configure global inventory behavior and automation rules</p>
       </div>
 
       <form [formGroup]="stockForm" (ngSubmit)="onSaveStockRules()" class="form">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="lowStockThreshold" class="form-label">Default Low Stock Threshold *</label>
+            <input
+              id="lowStockThreshold"
+              formControlName="lowStockThreshold"
+              type="number"
+              class="form-input"
+              min="0"
+              placeholder="10" />
+            <small class="form-help">Default threshold for low stock alerts</small>
+            <div class="form-error" *ngIf="stockForm.get('lowStockThreshold')?.invalid && stockForm.get('lowStockThreshold')?.touched">
+              Low stock threshold must be 0 or greater
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="criticalStockThreshold" class="form-label">Default Critical Stock Threshold *</label>
+            <input
+              id="criticalStockThreshold"
+              formControlName="criticalStockThreshold"
+              type="number"
+              class="form-input"
+              min="0"
+              placeholder="5" />
+            <small class="form-help">Default threshold for critical stock alerts</small>
+            <div class="form-error" *ngIf="stockForm.get('criticalStockThreshold')?.invalid && stockForm.get('criticalStockThreshold')?.touched">
+              Critical stock threshold must be 0 or greater
+            </div>
+          </div>
+        </div>
+
         <div class="form-section">
           <h3 class="section-title">Stock Control Rules</h3>
           <div class="checkbox-group">
             <label class="checkbox-item">
-              <input type="checkbox" formControlName="allowNegativeStock" class="form-checkbox" >
+              <input type="checkbox" formControlName="allowNegativeStock" class="form-checkbox">
               <span class="checkbox-label">Allow Negative Stock</span>
-              <small class="checkbox-help">Now managed per product stock level</small>
+              <small class="checkbox-help">Allow stock quantities to go below zero</small>
             </label>
             <label class="checkbox-item">
-              <input type="checkbox" formControlName="enableLowStockAlert" class="form-checkbox" >
+              <input type="checkbox" formControlName="enableLowStockAlert" class="form-checkbox">
               <span class="checkbox-label">Enable Low Stock Alerts</span>
-              <small class="checkbox-help">Now managed per product stock level</small>
+              <small class="checkbox-help">Send notifications when stock is low</small>
             </label>
             <label class="checkbox-item">
-              <input type="checkbox" formControlName="requireApprovalForRemoval" class="form-checkbox" >
+              <input type="checkbox" formControlName="requireApprovalForRemoval" class="form-checkbox">
               <span class="checkbox-label">Require Approval for Stock Removal</span>
-              <small class="checkbox-help">Feature available in future updates</small>
+              <small class="checkbox-help">Require manager approval for stock adjustments</small>
             </label>
           </div>
         </div>
@@ -51,19 +81,19 @@
           <h3 class="section-title">Automation Rules</h3>
           <div class="checkbox-group">
             <label class="checkbox-item">
-              <input type="checkbox" formControlName="autoUpdateStock" class="form-checkbox" >
+              <input type="checkbox" formControlName="autoUpdateStock" class="form-checkbox">
               <span class="checkbox-label">Auto Update Stock</span>
-              <small class="checkbox-help">Stock is automatically updated on transactions</small>
+              <small class="checkbox-help">Automatically update stock on transactions</small>
             </label>
             <label class="checkbox-item">
-              <input type="checkbox" formControlName="autoReceivePurchase" class="form-checkbox" >
+              <input type="checkbox" formControlName="autoReceivePurchase" class="form-checkbox">
               <span class="checkbox-label">Auto Receive Purchase Orders</span>
-              <small class="checkbox-help">Feature available in future updates</small>
+              <small class="checkbox-help">Automatically receive approved purchase orders</small>
             </label>
             <label class="checkbox-item">
-              <input type="checkbox" formControlName="autoDeductSales" class="form-checkbox" >
+              <input type="checkbox" formControlName="autoDeductSales" class="form-checkbox">
               <span class="checkbox-label">Auto Deduct Sales</span>
-              <small class="checkbox-help">Stock is automatically deducted on sales</small>
+              <small class="checkbox-help">Automatically deduct stock on sales orders</small>
             </label>
           </div>
         </div>
@@ -72,34 +102,37 @@
           <h3 class="section-title">Tracking Features</h3>
           <div class="checkbox-group">
             <label class="checkbox-item">
-              <input type="checkbox" formControlName="enableBarcodeScanning" class="form-checkbox" >
+              <input type="checkbox" formControlName="enableBarcodeScanning" class="form-checkbox">
               <span class="checkbox-label">Enable Barcode Scanning</span>
-              <small class="checkbox-help">Feature available in future updates</small>
+              <small class="checkbox-help">Enable barcode scanning for inventory operations</small>
             </label>
             <label class="checkbox-item">
-              <input type="checkbox" formControlName="trackSerialNumbers" class="form-checkbox" >
+              <input type="checkbox" formControlName="trackSerialNumbers" class="form-checkbox">
               <span class="checkbox-label">Track Serial Numbers</span>
-              <small class="checkbox-help">Feature available in future updates</small>
+              <small class="checkbox-help">Track individual item serial numbers</small>
             </label>
             <label class="checkbox-item">
               <input type="checkbox" formControlName="trackBatchNumbers" class="form-checkbox">
               <span class="checkbox-label">Track Batch Numbers</span>
-              <small class="checkbox-help">Feature available in future updates</small>
+              <small class="checkbox-help">Track product batches and expiration dates</small>
             </label>
           </div>
         </div>
 
         <div class="form-actions">
-          <button type="button" class="btn btn-primary" (click)="navigateToProducts()">
-            Configure Stock Rules in Products
+          <button type="submit" class="btn btn-primary" [disabled]="stockForm.invalid || isSaving">
+            <span *ngIf="isSaving">Saving...</span>
+            <span *ngIf="!isSaving">Save Inventory Settings</span>
+          </button>
+          <button type="button" class="btn btn-secondary" (click)="navigateToProducts()">
+            Manage Products
           </button>
         </div>
       </form>
     </section>
   </div>
 
-  <!-- Loading State -->
   <div *ngIf="isLoading" class="loading-container">
-    <p>Loading inventory settings...</p>
+    <div class="loading">Loading inventory settings...</div>
   </div>
 </div>

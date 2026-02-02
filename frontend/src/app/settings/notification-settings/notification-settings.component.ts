@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { UserService, NotificationSettings } from '../../shared/services/user.service';
 
 @Component({
   selector: 'app-notification-settings',
@@ -11,8 +12,15 @@ import { CommonModule } from '@angular/common';
 })
 export class NotificationSettingsComponent implements OnInit {
   notificationForm: FormGroup;
+  isLoading = false;
+  isSaving = false;
+  successMessage = '';
+  errorMessage = '';
 
-  constructor(private fb: FormBuilder) {
+  constructor(
+    private fb: FormBuilder,
+    private userService: UserService
+  ) {
     this.notificationForm = this.fb.group({
       emailNotifications: [true],
       smsNotifications: [false],
@@ -30,10 +38,40 @@ export class NotificationSettingsComponent implements OnInit {
   }
 
   loadSettings() {
-    // Load existing settings
+    this.isLoading = true;
+    this.userService.getNotificationSettings().subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.notificationForm.patchValue(response.data);
+        }
+      },
+      error: (error) => {
+        console.error('Error loading notification settings:', error);
+        this.errorMessage = 'Failed to load notification settings';
+      },
+      complete: () => {
+        this.isLoading = false;
+      }
+    });
   }
 
   onSave() {
-    console.log('Notification settings:', this.notificationForm.value);
+    this.isSaving = true;
+    this.errorMessage = '';
+    
+    this.userService.updateNotificationSettings(this.notificationForm.value).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.successMessage = 'Notification settings updated successfully';
+          setTimeout(() => this.successMessage = '', 3000);
+        }
+      },
+      error: (error) => {
+        this.errorMessage = error.error?.error || 'Failed to update notification settings';
+      },
+      complete: () => {
+        this.isSaving = false;
+      }
+    });
   }
 }

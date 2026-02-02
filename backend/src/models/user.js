@@ -1,6 +1,4 @@
-const express = require('express');
 const mongoose = require('mongoose');
-
 
 const userschema = new mongoose.Schema( {
 
@@ -27,10 +25,17 @@ const userschema = new mongoose.Schema( {
         default: 'user',
         enum: ['user', 'admin'],
         required: true,
+    },
+    phone: {
+        type: String,
+        default: ''
+    },
+    department: {
+        type: String,
+        default: ''
     }
 
 },{timestamps : true});
-
 
 const User = mongoose.model('user', userschema);
 

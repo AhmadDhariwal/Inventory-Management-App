@@ -14,6 +14,7 @@ const productroutes = require("./src/routes/product.routes");
 const warehouseroutes = require("./src/routes/warehouse.routes");
 const categoryroutes = require("./src/routes/category.routes");
 const businesssettingsroutes = require("./src/routes/businesssettings.routes");
+const settingsroutes = require("./src/routes/settings.routes");
 const cors = require('cors');
 const userroute = require('./src/routes/user');
 const { verifytoken,restrictto } = require('./src/middleware/auth.middleware');
@@ -57,6 +58,7 @@ app.use("/api/products", productroutes);
 app.use("/api/categories", categoryroutes);
 app.use("/api/warehouses", warehouseroutes);
 app.use("/api/business-settings", businesssettingsroutes);
+app.use("/api/settings", settingsroutes);
 
 
 // app.get('/', (req, res) => {

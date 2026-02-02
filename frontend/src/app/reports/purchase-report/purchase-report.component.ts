@@ -59,6 +59,7 @@ export class PurchaseReportComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadPurchaseData();
+    this.loadSuppliers();
   }
 
   loadPurchaseData(): void {
@@ -66,7 +67,6 @@ export class PurchaseReportComponent implements OnInit {
     this.purchaseService.getPurchaseReport().subscribe({
       next: (response) => {
         this.purchases = response || [];
-        this.extractSuppliers();
         this.calculateSummary();
         this.applyFilters();
       },
@@ -80,7 +80,23 @@ export class PurchaseReportComponent implements OnInit {
     });
   }
 
+  loadSuppliers(): void {
+    this.purchaseService.getAllSuppliers().subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.suppliers = response.data;
+        }
+      },
+      error: (error) => {
+        console.error('Error loading suppliers:', error);
+        this.suppliers = [];
+      }
+    });
+  }
+
   private extractSuppliers(): void {
+    // This method is no longer needed as we load suppliers separately
+    // Keeping it for backward compatibility but it won't be used
     const supplierMap = new Map();
     this.purchases.forEach(purchase => {
       if (purchase.supplier) {
@@ -90,7 +106,10 @@ export class PurchaseReportComponent implements OnInit {
         });
       }
     });
-    this.suppliers = Array.from(supplierMap.values());
+    // Don't override suppliers loaded from API
+    if (this.suppliers.length === 0) {
+      this.suppliers = Array.from(supplierMap.values());
+    }
   }
 
   private calculateSummary(): void {
@@ -254,6 +273,7 @@ export class PurchaseReportComponent implements OnInit {
 
   refreshData(): void {
     this.loadPurchaseData();
+    this.loadSuppliers();
   }
 
   Math = Math;

@@ -41,6 +41,10 @@ export class PurchaseService {
     return this.http.get<PurchaseOrder[]>(`${this.reportsUrl}/purchases`);
   }
 
+  getAllSuppliers(): Observable<{success: boolean, data: Array<{_id: string, name: string}>}> {
+    return this.http.get<{success: boolean, data: Array<{_id: string, name: string}>}>(`${this.reportsUrl}/purchases/suppliers`);
+  }
+
   exportPurchaseReportCSV(): Observable<Blob> {
     return this.http.get(`${this.reportsUrl}/purchases/export/csv`, {
       responseType: 'blob'

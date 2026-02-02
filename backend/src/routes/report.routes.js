@@ -7,6 +7,7 @@ router.get("/stockmovements", reportcontroller.getstockmovementreport);
 router.get("/stockmovements/export/csv", reportcontroller.exportStockMovementsCSV);
 router.get("/stockmovements/export/excel", reportcontroller.exportStockMovementsExcel);
 router.get("/purchases", reportcontroller.getpurchasereport);
+router.get("/purchases/suppliers", reportcontroller.getallsuppliers);
 router.get("/purchases/export/csv", reportcontroller.exportPurchaseOrdersCSV);
 router.get("/purchases/export/excel", reportcontroller.exportPurchaseOrdersExcel);
 router.get("/stocklevels", reportcontroller.getstocklevelsreport);

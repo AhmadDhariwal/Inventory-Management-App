@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../shared/services/auth.service';
+import { UserService, UserProfile, PasswordChangeRequest } from '../../shared/services/user.service';
 
 @Component({
   selector: 'app-account-settings',
@@ -12,38 +13,96 @@ import { AuthService } from '../../shared/services/auth.service';
 })
 export class AccountSettingsComponent implements OnInit {
   profileForm!: FormGroup;
+  passwordForm!: FormGroup;
   isEditMode = false;
   isLoading = false;
+  isPasswordLoading = false;
   twoFactorEnabled = false;
-  activeSessions = 1;
-  user: any = {};
+  activeSessions: any[] = [];
+  user: UserProfile | null = null;
+  updateSuccess = false;
+  updateError = '';
+  passwordSuccess = false;
+  passwordError = '';
+  showPasswordForm = false;
+  sessionsLoading = false;
 
   constructor(
     private authService: AuthService,
+    private userService: UserService,
     private fb: FormBuilder
   ) {}
 
   ngOnInit(): void {
     this.loadUserData();
-    this.initializeForm();
+    this.initializeForms();
+    this.loadActiveSessions();
   }
 
   loadUserData(): void {
-    const userData = localStorage.getItem('user');
-    if (userData) {
-      this.user = JSON.parse(userData);
-    }
+    this.isLoading = true;
+    this.userService.getUserProfile().subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.user = response.data;
+          this.initializeForms();
+        }
+      },
+      error: (error) => {
+        console.error('Error loading user profile:', error);
+        const userData = localStorage.getItem('user');
+        if (userData) {
+          this.user = JSON.parse(userData);
+          this.initializeForms();
+        }
+      },
+      complete: () => {
+        this.isLoading = false;
+      }
+    });
   }
 
-  initializeForm(): void {
+  initializeForms(): void {
+    if (!this.user) return;
+    
     const nameParts = this.user.name ? this.user.name.split(' ') : ['', ''];
     
     this.profileForm = this.fb.group({
       firstName: [nameParts[0] || '', [Validators.required, Validators.minLength(2)]],
       lastName: [nameParts[1] || '', [Validators.required, Validators.minLength(2)]],
-      email: [this.user.email || '', [Validators.required, Validators.email]],
+      email: [{value: this.user.email || '', disabled: true}, [Validators.required, Validators.email]],
       phone: [this.user.phone || ''],
       department: [this.user.department || '']
+    });
+
+    this.passwordForm = this.fb.group({
+      currentPassword: ['', [Validators.required]],
+      newPassword: ['', [Validators.required, Validators.minLength(6)]],
+      confirmPassword: ['', [Validators.required]]
+    }, { validators: this.passwordMatchValidator });
+  }
+
+  passwordMatchValidator(form: FormGroup) {
+    const newPassword = form.get('newPassword');
+    const confirmPassword = form.get('confirmPassword');
+    return newPassword && confirmPassword && newPassword.value === confirmPassword.value 
+      ? null : { passwordMismatch: true };
+  }
+
+  loadActiveSessions(): void {
+    this.sessionsLoading = true;
+    this.userService.getActiveSessions().subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.activeSessions = response.data;
+        }
+      },
+      error: (error) => {
+        console.error('Error loading sessions:', error);
+      },
+      complete: () => {
+        this.sessionsLoading = false;
+      }
     });
   }
 
@@ -52,61 +111,124 @@ export class AccountSettingsComponent implements OnInit {
       this.cancelEdit();
     } else {
       this.isEditMode = true;
+      this.updateSuccess = false;
+      this.updateError = '';
     }
   }
 
   cancelEdit(): void {
     this.isEditMode = false;
-    this.initializeForm(); // Reset form to original values
+    this.updateSuccess = false;
+    this.updateError = '';
+    this.initializeForms();
   }
 
   updateProfile(): void {
     if (this.profileForm.valid) {
       this.isLoading = true;
+      this.updateError = '';
       
       const formData = this.profileForm.value;
-      const updatedUser = {
-        ...this.user,
+      const updatedData = {
         name: `${formData.firstName} ${formData.lastName}`.trim(),
-        phone: formData.phone,
-        department: formData.department
+        phone: formData.phone || '',
+        department: formData.department || ''
       };
 
-      // Simulate API call
-      setTimeout(() => {
-        localStorage.setItem('user', JSON.stringify(updatedUser));
-        this.user = updatedUser;
-        this.isLoading = false;
-        this.isEditMode = false;
-        
-        // Show success message (you can replace with a proper notification service)
-        alert('Profile updated successfully!');
-      }, 1000);
+      this.userService.updateUserProfile(updatedData).subscribe({
+        next: (response) => {
+          if (response.success) {
+            this.user = response.data;
+            this.updateSuccess = true;
+            this.isEditMode = false;
+            localStorage.setItem('user', JSON.stringify(this.user));
+            setTimeout(() => this.updateSuccess = false, 3000);
+          }
+        },
+        error: (error) => {
+          this.updateError = error.error?.error || 'Failed to update profile';
+        },
+        complete: () => {
+          this.isLoading = false;
+        }
+      });
+    }
+  }
+
+  togglePasswordForm(): void {
+    this.showPasswordForm = !this.showPasswordForm;
+    this.passwordSuccess = false;
+    this.passwordError = '';
+    if (this.showPasswordForm) {
+      this.passwordForm.reset();
+    }
+  }
+
+  changePassword(): void {
+    if (this.passwordForm.valid) {
+      this.isPasswordLoading = true;
+      this.passwordError = '';
+      
+      const passwordData: PasswordChangeRequest = this.passwordForm.value;
+      
+      this.userService.changePassword(passwordData).subscribe({
+        next: (response) => {
+          if (response.success) {
+            this.passwordSuccess = true;
+            this.showPasswordForm = false;
+            this.passwordForm.reset();
+            setTimeout(() => this.passwordSuccess = false, 3000);
+          }
+        },
+        error: (error) => {
+          this.passwordError = error.error?.error || 'Failed to change password';
+        },
+        complete: () => {
+          this.isPasswordLoading = false;
+        }
+      });
+    }
+  }
+
+  terminateSession(sessionId: string): void {
+    this.userService.terminateSession(sessionId).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.loadActiveSessions();
+        }
+      },
+      error: (error) => {
+        console.error('Error terminating session:', error);
+      }
+    });
+  }
+
+  terminateAllSessions(): void {
+    if (confirm('This will sign you out from all devices. Continue?')) {
+      this.userService.terminateAllSessions().subscribe({
+        next: (response) => {
+          if (response.success) {
+            this.authService.logout();
+          }
+        },
+        error: (error) => {
+          console.error('Error terminating sessions:', error);
+        }
+      });
     }
   }
 
   getPasswordLastChanged(): string {
-    // This would typically come from the backend
     return '30 days ago';
-  }
-
-  changePassword(): void {
-    // Implement password change functionality
-    alert('Password change functionality would be implemented here');
   }
 
   toggleTwoFactor(): void {
     this.twoFactorEnabled = !this.twoFactorEnabled;
-    alert(`Two-factor authentication ${this.twoFactorEnabled ? 'enabled' : 'disabled'}`);
-  }
-
-  viewSessions(): void {
-    // Implement session management
-    alert('Session management would be implemented here');
   }
 
   exportData(): void {
-    // Implement data export
+    if (!this.user) return;
+    
     const dataStr = JSON.stringify(this.user, null, 2);
     const dataBlob = new Blob([dataStr], { type: 'application/json' });
     const url = URL.createObjectURL(dataBlob);

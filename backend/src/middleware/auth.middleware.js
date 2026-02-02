@@ -20,7 +20,7 @@ async function verifytoken(req,res,next){
         }
     try{
         const decoded = jwt.verify(token,"Hello");
-        req.user = { id: decoded.userid }; // Fix: Create req.user object
+        req.user = { userid: decoded.userid, role: decoded.role };
         req.userid = decoded.userid;
         req.role = decoded.role;
         next();
@@ -64,7 +64,7 @@ async function user (req, res, next) {
 
     const decoded = jwt.verify(token, "Hello");
 
-    req.user = { id: decoded.userid };
+    req.user = { userid: decoded.userid, role: decoded.role };
     req.userid = decoded.userid;
 
    

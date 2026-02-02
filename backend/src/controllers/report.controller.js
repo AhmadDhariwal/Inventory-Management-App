@@ -1,4 +1,6 @@
 const reportservice = require("../services/report.service");
+const stockLevelService = require("../services/stocklevel.service");
+const Supplier = require("../models/supplier");
 
 const getstockreport = async (req, res) => {
   try {
@@ -71,9 +73,31 @@ const getpurchasereport = async (req, res) => {
   }
 };
 
+const getallsuppliers = async (req, res) => {
+  try {
+    const suppliers = await Supplier.find({ isactive: true })
+      .select('_id name')
+      .sort({ name: 1 });
+    res.status(200).json({
+      success: true,
+      data: suppliers
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 const getstocklevelsreport = async (req, res) => {
   try {
-    const report = await reportservice.getstocklevelsreport();
+    let report = await reportservice.getstocklevelsreport();
+    
+    // If no stock levels found, initialize them
+    if (!report || report.length === 0) {
+      console.log('No stock levels found, initializing...');
+      await stockLevelService.initializeStockLevels();
+      report = await reportservice.getstocklevelsreport();
+    }
+    
     res.status(200).json(report);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -134,7 +158,6 @@ const getproductreport = async (req, res) => {
   }
 };
 
-
 module.exports = {
   getstockreport,
   getstockmovementreport,
@@ -145,6 +168,7 @@ module.exports = {
   exportPurchaseOrdersCSV,
   exportPurchaseOrdersExcel,
   getpurchasereport,
+  getallsuppliers,
   getstocklevelsreport,
   getlowstockreport,
   getstocksummary,

@@ -246,7 +246,7 @@ const getlowstockreport = async () => {
     availableQty: level.quantity || 0,
     minStock: level.minStock || 0,
     reorderLevel: level.reorderLevel || 0,
-    status: 'LOW'
+    status: level.quantity <= (level.minStock || 0) * 0.5 ? 'CRITICAL' : 'LOW'
   }));
 
   return result;
