@@ -20,12 +20,15 @@ const checkRole = (allowedRoles) => {
   };
 };
 
-// Predefined role checks
 const adminOnly = checkRole(['admin']);
-const adminOrUser = checkRole(['admin', 'user']);
+const managerOnly = checkRole(['manager']);
+const adminOrManager = checkRole(['admin', 'manager']);
+const allRoles = checkRole(['admin', 'manager', 'user']);
 
 module.exports = {
   checkRole,
   adminOnly,
-  adminOrUser
+  managerOnly,
+  adminOrManager,
+  allRoles
 };

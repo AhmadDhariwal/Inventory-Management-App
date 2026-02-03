@@ -24,6 +24,10 @@ export const routes: Routes = [
 
   // Main application routes (with layout and auth guard)
   {
+    path:'homepage',
+    loadComponent :() => import('./components/homepage/homepage.component').then((m) => m.HomepageComponent)
+  },
+  {
     path: '',
     component: MainLayoutComponent,
     canActivate: [AuthGuard],
