@@ -5,7 +5,7 @@ const { verifytoken, restrictto } = require("../middleware/auth.middleware");
 
 // Business settings management routes
 router.get("/", verifytoken, businessSettingsController.getBusinessSettings);
-router.put("/", verifytoken, restrictto(["admin"]), businessSettingsController.updateBusinessSettings);
+router.put("/", verifytoken, restrictto(["admin","manager"]), businessSettingsController.updateBusinessSettings);
 
 // Specific settings routes
 router.get("/company", verifytoken, businessSettingsController.getCompanyInfo);

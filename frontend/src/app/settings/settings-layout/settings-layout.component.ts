@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Router, RouterLink, RouterOutlet, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../shared/services/auth.service';
 
 @Component({
   selector: 'app-settings-layout',
@@ -10,5 +11,20 @@ import { CommonModule } from '@angular/common';
   styleUrl: './settings-layout.component.scss'
 })
 export class SettingsLayoutComponent {
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) {}
+
+  hasRole(role: string): boolean {
+    return this.authService.hasRole(role);
+  }
+
+  hasAnyRole(roles: string[]): boolean {
+    return this.authService.hasAnyRole(roles);
+  }
+
+  getUserRole(): string {
+    return this.authService.getUserRole() || 'user';
+  }
 }

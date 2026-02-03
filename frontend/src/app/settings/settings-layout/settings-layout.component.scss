@@ -41,6 +41,44 @@
       line-height: 1.4;
       font-weight: 400;
     }
+    
+    .user-role-badge {
+      margin-top: 12px;
+      padding: 8px 12px;
+      background: #f3f4f6;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      
+      .role-label {
+        font-size: 12px;
+        color: #6b7280;
+        font-weight: 500;
+      }
+      
+      .role-value {
+        font-size: 12px;
+        font-weight: 600;
+        padding: 2px 8px;
+        border-radius: 4px;
+        
+        &.role-admin {
+          background: #fef2f2;
+          color: #dc2626;
+        }
+        
+        &.role-manager {
+          background: #fef3c7;
+          color: #d97706;
+        }
+        
+        &.role-user {
+          background: #f0f9ff;
+          color: #0369a1;
+        }
+      }
+    }
   }
 }
 

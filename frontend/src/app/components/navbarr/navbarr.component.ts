@@ -5,7 +5,7 @@ import { RouterLink, RouterOutlet } from '@angular/router';
 import { Router,ActivatedRoute } from '@angular/router';
 import { CommonModule, NgIf } from '@angular/common';
 import { UsersComponent } from '../users/users.component';
-import { LoginComponent } from '../login/login.component';
+// import { LoginComponent } from '../login/login.component';
 import { AuthGuard } from '../../guards/auth.guard';
 
 @Component({
@@ -25,8 +25,8 @@ export class NavbarComponent {
           private route : ActivatedRoute
         ) {}
 
-        isAuthenticated(): boolean {
-          return this.itemService.isAuthenticated();
+        isAuthenticated() {
+      //    return this.itemService.isAuthenticated();
         }
 
         isadmin() : boolean {
@@ -35,7 +35,7 @@ export class NavbarComponent {
 
     onLogout(): void {
 
-    this.itemService.logout();
+   // this.itemService.logout();
     console.log("Logout successful");
    this.router.navigate(['/login']);
 

@@ -1,1 +1,228 @@
-<p>roles works!</p>
+<div class="roles-container">
+  <div class="page-header">
+    <h1>User Roles & Permissions</h1>
+    <p>Manage user roles and access permissions</p>
+  </div>
+
+  <!-- Success/Error Messages -->
+  <div class="alert alert-success" *ngIf="success">
+    <i class="fas fa-check-circle"></i>
+    {{ success }}
+  </div>
+
+  <div class="alert alert-error" *ngIf="error">
+    <i class="fas fa-exclamation-circle"></i>
+    {{ error }}
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-section">
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input
+        type="text"
+        placeholder="Search users..."
+        [(ngModel)]="searchTerm"
+        (input)="onSearch()"
+      >
+    </div>
+
+    <div class="filter-group">
+      <select title="filter for role" [(ngModel)]="selectedRole" (change)="onRoleFilter()">
+        <option value="">All Roles</option>
+        <option value="admin">Admin</option>
+        <option value="manager">Manager</option>
+        <option value="user">User</option>
+      </select>
+    </div>
+
+    <button class="btn-secondary" (click)="clearFilters()">
+      <i class="fas fa-times"></i>
+      Clear Filters
+    </button>
+  </div>
+
+  <!-- Users Table -->
+  <div class="table-container">
+    <div class="loading-overlay" *ngIf="loading">
+      <div class="spinner"></div>
+    </div>
+
+    <table class="users-table">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Role</th>
+          <th>Department</th>
+          <th>Status</th>
+          <th>Created</th>
+          <th>Last Login</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of filteredUsers; trackBy: trackByUser">
+          <td>
+            <div class="user-info">
+              <div class="user-avatar">
+                <i class="fas fa-user"></i>
+              </div>
+              <div class="user-details">
+                <div class="user-name">{{ user.name }}</div>
+                <div class="user-email">{{ user.email }}</div>
+                <div class="user-username">{{ '@' + user.username }}</div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <span class="role-badge" [ngClass]="getRoleBadgeClass(user.role)">
+              {{ user.role | titlecase }}
+            </span>
+          </td>
+          <td>
+            <span class="department">{{ user.department || 'Not specified' }}</span>
+          </td>
+          <td>
+            <span class="status-badge" [ngClass]="getStatusBadgeClass(user.isActive)">
+              {{ user.isActive ? 'Active' : 'Inactive' }}
+            </span>
+          </td>
+          <td>
+            <span class="date">{{ formatDate(user.createdAt) }}</span>
+          </td>
+          <td>
+            <span class="date">{{ user.lastLogin ? formatDate(user.lastLogin) : 'Never' }}</span>
+          </td>
+          <td>
+            <div class="action-buttons" *ngIf="canModifyUser(user)">
+              <button 
+                class="btn-icon btn-primary" 
+                (click)="openRoleModal(user)"
+                title="Change User Role"
+              >
+                <i class="fas fa-user-edit"></i>
+              </button>
+              
+              <button 
+                class="btn-icon" 
+                [ngClass]="user.isActive ? 'btn-warning' : 'btn-success'"
+                title="User Status Toggle"
+                (click)="toggleUserStatus(user)"
+                [title]="user.isActive ? 'Deactivate User' : 'Activate User'"
+              >
+                <i class="fas" [ngClass]="user.isActive ? 'fa-user-times' : 'fa-user-check'"></i>
+              </button>
+              
+              <button 
+                class="btn-icon btn-danger" 
+                (click)="openDeleteModal(user)"
+                title="Delete User Permanently"
+              >
+                <i class="fas fa-user-minus"></i>
+              </button>
+            </div>
+            <span *ngIf="!canModifyUser(user)" class="text-muted">Current User</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="empty-state" *ngIf="!loading && filteredUsers.length === 0">
+      <i class="fas fa-users"></i>
+      <h3>No users found</h3>
+      <p>Try adjusting your search criteria</p>
+    </div>
+  </div>
+</div>
+
+<!-- Role Change Modal -->
+<div class="modal-overlay" *ngIf="showRoleModal" (click)="closeRoleModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Change User Role</h3>
+      <button title="Close Role Model" class="modal-close" (click)="closeRoleModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div class="modal-body" *ngIf="selectedUser">
+      <div class="user-summary">
+        <div class="user-avatar">
+          <i class="fas fa-user"></i>
+        </div>
+        <div>
+          <div class="user-name">{{ selectedUser.name }}</div>
+          <div class="user-email">{{ selectedUser.email }}</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Select New Role:</label>
+        <div class="role-options">
+          <label class="radio-option">
+            <input type="radio" [(ngModel)]="newRole" value="user">
+            <span class="radio-custom"></span>
+            <div class="role-info">
+              <div class="role-name">User</div>
+              <div class="role-desc">Basic access to inventory features</div>
+            </div>
+          </label>
+
+          <label class="radio-option">
+            <input type="radio" [(ngModel)]="newRole" value="manager">
+            <span class="radio-custom"></span>
+            <div class="role-info">
+              <div class="role-name">Manager</div>
+              <div class="role-desc">Access to business and inventory settings</div>
+            </div>
+          </label>
+
+          <label class="radio-option">
+            <input type="radio" [(ngModel)]="newRole" value="admin">
+            <span class="radio-custom"></span>
+            <div class="role-info">
+              <div class="role-name">Admin</div>
+              <div class="role-desc">Full access to all features and settings</div>
+            </div>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="closeRoleModal()">Cancel</button>
+      <button class="btn-primary" (click)="updateUserRole()" [disabled]="loading">
+        <i class="fas fa-save"></i>
+        Update Role
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal-overlay" *ngIf="showDeleteModal" (click)="closeDeleteModal()">
+  <div class="modal modal-danger" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Delete User</h3>
+      <button title="Close Delete Model" class="modal-close" (click)="closeDeleteModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div class="modal-body" *ngIf="userToDelete">
+      <div class="warning-icon">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+      <p>Are you sure you want to delete <strong>{{ userToDelete.name }}</strong>?</p>
+      <p class="warning-text">This action cannot be undone and will permanently remove the user and all associated data.</p>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="closeDeleteModal()">Cancel</button>
+      <button class="btn-danger" (click)="deleteUser()" [disabled]="loading">
+        <i class="fas fa-trash"></i>
+        Delete User
+      </button>
+    </div>
+  </div>
+</div>

@@ -40,6 +40,19 @@ async function handleusersignup(req,res){
       }
     }
 
+    async function allusers(req,res){
+        try {
+            const allusers = await userschema.find().select('-password');
+            res.status(200).json({
+                message: "All users fetched successfully",
+                items: allusers,
+            });
+        } catch (err) {
+            console.error("allusers error:", err);
+            res.status(500).json({ error: "Server error" });
+        }
+    }
+
 async function handleuserlogin(req,res){
 
     try {
@@ -191,4 +204,5 @@ module.exports = {
     changePassword,
     getActiveSessions,
     terminateSession,
+    allusers
 };

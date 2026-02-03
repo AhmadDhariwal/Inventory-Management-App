@@ -197,15 +197,15 @@
                 <span class="warehouse-name">{{ po.warehouse.name || 'N/A' }}</span>
               </td>
               <td class="numeric" [attr.data-label]="'Total Amount'">
-                <span class="amount">{{ po.totalamount | currency:'USD':'symbol':'1.2-2' }}</span>
+                <span class="amount">{{ po?.totalamount | currency:'USD':'symbol':'1.2-2' }}</span>
               </td>
               <td [attr.data-label]="'Created By'">
                 <div class="user-info">
-                  <span class="user-name">{{ po.createdBy.name || 'Unknown' }}</span>
+                  <span class="user-name">{{ po.createdBy?.name || 'Unknown' }}</span>
                 </div>
               </td>
               <td [attr.data-label]="'Date Created'">
-                <time [attr.datetime]="po.createdAt" class="date-time">
+                <time [attr.datetime]="po?.createdAt" class="date-time">
                   {{ po.createdAt | date:'MMM d, y' }}
                 </time>
               </td>

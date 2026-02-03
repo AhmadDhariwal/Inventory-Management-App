@@ -13,6 +13,8 @@ export interface RegisterRequest {
   name: string;
   email: string;
   username: string;
+  phone: string;
+  department: string;
   password: string;
   role?: string;
 }
@@ -25,7 +27,7 @@ export interface AuthResponse {
 }
 
 export interface User {
-  id: string;
+  _id: string;
   name: string;
   email: string;
   username: string;
@@ -40,7 +42,7 @@ export class AuthService {
   private tokenKey = 'auth_token';
   private userKey = 'user_data';
   private roleKey = 'user_role';
-  
+
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(this.hasValidToken());
   private currentUserSubject = new BehaviorSubject<User | null>(this.getCurrentUser());
 
@@ -76,7 +78,7 @@ export class AuthService {
       localStorage.setItem(this.tokenKey, response.token);
       localStorage.setItem(this.roleKey, response.role);
       localStorage.setItem(this.userKey, JSON.stringify(response.item));
-      
+
       this.isAuthenticatedSubject.next(true);
       this.currentUserSubject.next(response.item);
     }
@@ -86,10 +88,10 @@ export class AuthService {
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.roleKey);
     localStorage.removeItem(this.userKey);
-    
+
     this.isAuthenticatedSubject.next(false);
     this.currentUserSubject.next(null);
-    
+
     this.router.navigate(['/auth/login']);
   }
 
@@ -109,16 +111,16 @@ export class AuthService {
   hasValidToken(): boolean {
     const token = this.getToken();
     if (!token) return false;
-    
+
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
       const currentTime = Math.floor(Date.now() / 1000);
-      
+
       if (payload.exp && payload.exp < currentTime) {
         this.logout();
         return false;
       }
-      
+
       return true;
     } catch (error) {
       this.logout();
@@ -148,13 +150,13 @@ export class AuthService {
 
   private handleError = (error: HttpErrorResponse): Observable<never> => {
     let errorMessage = 'An unknown error occurred';
-    
+
     if (error.error instanceof ErrorEvent) {
       errorMessage = error.error.message;
     } else {
       errorMessage = error.error?.error || error.error?.message || error.message;
     }
-    
+
     return throwError(() => ({ error: errorMessage }));
   }
 }

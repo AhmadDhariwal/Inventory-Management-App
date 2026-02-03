@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { RouterModule, ActivatedRoute } from '@angular/router';
 import { ProductService } from '../../shared/services/product.service';
 import { Router } from '@angular/router';
 import { Product } from '../../shared/models/inventory/product.model';
@@ -36,13 +36,22 @@ export class ProductListComponent implements OnInit {
 
   constructor(
     private productService: ProductService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
     this.loadProducts();
     this.loadCategories();
     this.loadStockLevels();
+
+    // Handle search query from URL parameters
+    this.route.queryParams.subscribe(params => {
+      if (params['search']) {
+        this.searchTerm = params['search'];
+        this.applyFiltersAndSort();
+      }
+    });
   }
 
   loadProducts(): void {

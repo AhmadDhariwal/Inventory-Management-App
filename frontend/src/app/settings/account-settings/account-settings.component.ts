@@ -72,7 +72,8 @@ export class AccountSettingsComponent implements OnInit {
       lastName: [nameParts[1] || '', [Validators.required, Validators.minLength(2)]],
       email: [{value: this.user.email || '', disabled: true}, [Validators.required, Validators.email]],
       phone: [this.user.phone || ''],
-      department: [this.user.department || '']
+      department: [this.user.department || ''],
+      role: [{value: this.user.role || 'user', disabled: true}]
     });
 
     this.passwordForm = this.fb.group({

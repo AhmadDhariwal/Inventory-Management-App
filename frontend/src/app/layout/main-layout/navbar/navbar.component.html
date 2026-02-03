@@ -1,17 +1,100 @@
 <header class="navbar">
-  <button type="button" class="navbar__menu-btn" (click)="toggleSidebar.emit()" aria-label="Toggle menu">
-    <span></span>
-    <span></span>
-    <span></span>
-  </button>
-  
-  <div class="navbar__title">{{ pageTitle }}</div>
+  <div class="navbar__left">
+    <button type="button" class="navbar__menu-btn" (click)="toggleSidebar.emit()" aria-label="Toggle menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <div class="navbar__title">{{ pageTitle }}</div>
+  </div>
+
+  <!-- Enhanced Search Bar -->
+  <div class="navbar__search">
+    <div class="search-wrapper">
+      <i class="fas fa-search search-icon"></i>
+      <input
+        type="text"
+        placeholder="Search products, SKU, categories..."
+        [(ngModel)]="searchQuery"
+        (keyup.enter)="onSearch()"
+        (input)="onSearchInput()"
+        class="search-input"
+        #searchInput
+      />
+      <button
+        type="button"
+        *ngIf="searchQuery"
+        class="search-clear"
+        (click)="clearSearch()"
+        title="Clear search"
+      >
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="search-suggestions" *ngIf="showSuggestions && searchSuggestions.length > 0">
+      <div
+        class="suggestion-item"
+        *ngFor="let suggestion of searchSuggestions; trackBy: trackBySuggestion"
+        (click)="selectSuggestion(suggestion)"
+      >
+        <i class="fas fa-box suggestion-icon"></i>
+        <span class="suggestion-text">{{ suggestion.name }}</span>
+        <span class="suggestion-sku">{{ suggestion.sku }}</span>
+      </div>
+    </div>
+  </div>
 
   <div class="navbar__actions">
-    <span class="navbar__user">Admin</span>
-  </div>
+    <!-- Dark Mode Toggle -->
+    <button
+      type="button"
+      class="navbar__action-btn theme-toggle"
+      title="Dark mode toggle"
+      (click)="toggleDarkMode()"
+      [title]="isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'"
+    >
+      <div class="theme-icon-wrapper">
+        <i class="fas fa-sun sun-icon" [class.active]="!isDarkMode"></i>
+        <i class="fas fa-moon moon-icon" [class.active]="isDarkMode"></i>
+      </div>
+    </button>
 
-  <div>
-     <button title="Logout button" (click)="onlogout()" class="logout-btn">Logout </button>
+    <!-- Notifications -->
+    <button type="button" class="navbar__action-btn notifications" title="Notifications">
+      <i class="fas fa-bell"></i>
+      <span class="notification-badge" *ngIf="notificationCount > 0">{{ notificationCount }}</span>
+    </button>
+
+    <!-- User Menu -->
+    <div class="navbar__user-menu" (click)="toggleUserMenu()">
+      <div class="user-info">
+        <span class="user-name">{{ getCurrentUser()?.name || 'User' }}</span>
+        <span class="user-role" [ngClass]="'role-' + getUserRole()">{{ getUserRole() | titlecase }}</span>
+      </div>
+      <div class="user-avatar">
+        <i class="fas fa-user"></i>
+      </div>
+      <i class="fas fa-chevron-down dropdown-arrow" [class.rotated]="showUserMenu"></i>
+
+      <!-- Dropdown Menu -->
+      <div class="user-dropdown" [class.show]="showUserMenu">
+        <a routerLink="/app/settings/account" class="dropdown-item" (click)="closeUserMenu()">
+          <i class="fas fa-user-cog"></i>
+          <span>Account Settings</span>
+        </a>
+        <a routerLink="/app/settings/preferences" class="dropdown-item" (click)="closeUserMenu()">
+          <i class="fas fa-cog"></i>
+          <span>Preferences</span>
+        </a>
+        <div class="dropdown-divider"></div>
+        <button type="button" class="dropdown-item logout" (click)="onlogout()">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Logout</span>
+        </button>
+      </div>
+    </div>
   </div>
 </header>
+
+<!-- Click outside to close dropdowns -->
+<div class="navbar-overlay" *ngIf="showUserMenu || showSuggestions" (click)="closeAllDropdowns()"></div>

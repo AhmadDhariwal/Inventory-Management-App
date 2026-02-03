@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { UserService, BusinessSettings } from '../../shared/services/user.service';
+import { BusinessSettingsService } from '../../shared/services/business-settings.service';
 
 @Component({
   selector: 'app-business-settings',
@@ -21,7 +21,7 @@ export class BusinessSettingsComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private userService: UserService
+    private businessSettingsService: BusinessSettingsService
   ) {}
 
   ngOnInit(): void {
@@ -56,34 +56,30 @@ export class BusinessSettingsComponent implements OnInit {
 
   loadSettings(): void {
     this.isLoading = true;
-    this.userService.getBusinessSettings().subscribe({
-      next: (response) => {
-        if (response.success) {
-          const settings = response.data;
-          
-          this.companyForm.patchValue({
-            companyName: settings.companyName,
-            industry: settings.industry,
-            address: settings.address,
-            phone: settings.phone,
-            email: settings.email
-          });
-          
-          this.regionalForm.patchValue({
-            currency: settings.currency,
-            timezone: settings.timezone,
-            dateFormat: settings.dateFormat,
-            language: settings.language
-          });
-          
-          this.preferencesForm.patchValue({
-            fiscalYearStart: settings.fiscalYearStart,
-            workingDays: settings.workingDays,
-            enableMultiLocation: settings.enableMultiLocation,
-            enableTaxCalculation: settings.enableTaxCalculation,
-            enableDiscounts: settings.enableDiscounts
-          });
-        }
+    this.businessSettingsService.getSettings().subscribe({
+      next: (settings) => {
+        this.companyForm.patchValue({
+          companyName: settings.companyName,
+          industry: settings.industry,
+          address: settings.address,
+          phone: settings.phone,
+          email: settings.email
+        });
+        
+        this.regionalForm.patchValue({
+          currency: settings.currency,
+          timezone: settings.timezone,
+          dateFormat: settings.dateFormat,
+          language: settings.language
+        });
+        
+        this.preferencesForm.patchValue({
+          fiscalYearStart: settings.fiscalYearStart,
+          workingDays: settings.workingDays,
+          enableMultiLocation: settings.enableMultiLocation,
+          enableTaxCalculation: settings.enableTaxCalculation,
+          enableDiscounts: settings.enableDiscounts
+        });
       },
       error: (error) => {
         console.error('Error loading business settings:', error);
@@ -123,12 +119,10 @@ export class BusinessSettingsComponent implements OnInit {
     this.isSaving = true;
     this.errorMessage = '';
     
-    this.userService.updateBusinessSettings(data).subscribe({
-      next: (response) => {
-        if (response.success) {
-          this.successMessage = `${type} updated successfully`;
-          setTimeout(() => this.successMessage = '', 3000);
-        }
+    this.businessSettingsService.updateSettings(data).subscribe({
+      next: (settings) => {
+        this.successMessage = `${type} updated successfully`;
+        setTimeout(() => this.successMessage = '', 3000);
       },
       error: (error) => {
         this.errorMessage = error.error?.error || `Failed to update ${type.toLowerCase()}`;

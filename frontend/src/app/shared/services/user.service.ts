@@ -12,6 +12,24 @@ export interface UserProfile {
   department?: string;
   createdAt: string;
   updatedAt: string;
+  isActive?: boolean;
+}
+
+export interface UserListItem {
+  _id: string;
+  name: string;
+  email: string;
+  username: string;
+  role: string;
+  department?: string;
+  isActive: boolean;
+  createdAt: string;
+  lastLogin?: string;
+}
+
+export interface RoleUpdateRequest {
+  userId: string;
+  newRole: 'admin' | 'manager' | 'user';
 }
 
 export interface PasswordChangeRequest {
@@ -142,5 +160,22 @@ export class UserService {
 
   updateBusinessSettings(settings: Partial<BusinessSettings>): Observable<{success: boolean, message: string, data: BusinessSettings}> {
     return this.http.put<{success: boolean, message: string, data: BusinessSettings}>(`${this.settingsUrl}/business`, settings);
+  }
+
+  // User Management (Admin only)
+  getAllUsers(): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/all`);
+  }
+
+  updateUserRole(roleData: RoleUpdateRequest): Observable<{success: boolean, message: string, data: UserProfile}> {
+    return this.http.put<{success: boolean, message: string, data: UserProfile}>(`${this.baseUrl}/role`, roleData);
+  }
+
+  toggleUserStatus(userId: string): Observable<{success: boolean, message: string, data: UserProfile}> {
+    return this.http.put<{success: boolean, message: string, data: UserProfile}>(`${this.baseUrl}/${userId}/toggle-status`, {});
+  }
+
+  deleteUser(userId: string): Observable<{success: boolean, message: string}> {
+    return this.http.delete<{success: boolean, message: string}>(`${this.baseUrl}/${userId}`);
   }
 }

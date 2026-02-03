@@ -3,6 +3,10 @@
     <div class="sidebar-header">
       <h2 class="sidebar-title">Settings</h2>
       <p class="sidebar-subtitle">Manage your preferences</p>
+      <div class="user-role-badge">
+        <span class="role-label">Role:</span>
+        <span class="role-value" [ngClass]="'role-' + getUserRole()">{{ getUserRole() | titlecase }}</span>
+      </div>
     </div>
     
     <nav class="settings-nav">
@@ -11,12 +15,12 @@
         <a routerLink="account" routerLinkActive="active" class="nav-item">
           <span>Account Settings</span>
         </a>
-        <a routerLink="business" routerLinkActive="active" class="nav-item">
+        <a *ngIf="hasAnyRole(['admin', 'manager'])" routerLink="business" routerLinkActive="active" class="nav-item">
           <span>Business Settings</span>
         </a>
       </div>
       
-      <div class="nav-section">
+      <div class="nav-section" *ngIf="hasAnyRole(['admin', 'manager'])">
         <h3 class="nav-section-title">Operations</h3>
         <a routerLink="inventory" routerLinkActive="active" class="nav-item">
           <span>Inventory Settings</span>
@@ -25,11 +29,18 @@
       
       <div class="nav-section">
         <h3 class="nav-section-title">Security & Privacy</h3>
-        <a routerLink="security" routerLinkActive="active" class="nav-item">
+        <a *ngIf="hasRole('admin')" routerLink="security" routerLinkActive="active" class="nav-item">
           <span>Security Settings</span>
         </a>
         <a routerLink="notifications" routerLinkActive="active" class="nav-item">
           <span>Notifications</span>
+        </a>
+      </div>
+      
+      <div class="nav-section" *ngIf="hasRole('admin')">
+        <h3 class="nav-section-title">Administration</h3>
+        <a routerLink="roles" routerLinkActive="active" class="nav-item">
+          <span>User Roles</span>
         </a>
       </div>
     </nav>

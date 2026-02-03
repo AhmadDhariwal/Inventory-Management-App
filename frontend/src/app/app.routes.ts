@@ -24,7 +24,7 @@ export const routes: Routes = [
 
   // Main application routes (with layout and auth guard)
   {
-    path:'homepage',
+    path:'',
     loadComponent :() => import('./components/homepage/homepage.component').then((m) => m.HomepageComponent)
   },
   {
@@ -76,7 +76,7 @@ export const routes: Routes = [
         loadChildren: () =>
           import('./settings/settings.module').then(m => m.SettingsModule),
         canActivate: [AuthGuard],
-        data: { roles: ['admin'] } // Only admin can access settings
+        data: { roles: ['admin','manager'] } // Only admin can access settings
       }
     ]
   },

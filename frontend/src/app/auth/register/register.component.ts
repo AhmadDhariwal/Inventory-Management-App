@@ -41,6 +41,8 @@ export class RegisterComponent implements OnInit {
       lastName: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
       username: ['', [Validators.required, Validators.minLength(3), Validators.pattern(/^[a-zA-Z0-9_]+$/)]],
+      phone: ['', [Validators.required, Validators.pattern(/^[+]?[0-9\s\-\(\)]{10,}$/)]],
+      department: ['', [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(8), this.passwordValidator]],
       confirmPassword: ['', [Validators.required]],
       acceptTerms: [false, [Validators.requiredTrue]]
@@ -56,27 +58,27 @@ export class RegisterComponent implements OnInit {
   private passwordValidator(control: any) {
     const password = control.value;
     if (!password) return null;
-    
+
     const hasUpperCase = /[A-Z]/.test(password);
     const hasLowerCase = /[a-z]/.test(password);
     const hasNumber = /\d/.test(password);
-    
+
     if (hasUpperCase && hasLowerCase && hasNumber) {
       return null;
     }
-    
+
     return { passwordStrength: true };
   }
 
   private passwordMatchValidator(form: FormGroup) {
     const password = form.get('password');
     const confirmPassword = form.get('confirmPassword');
-    
+
     if (password && confirmPassword && password.value !== confirmPassword.value) {
       confirmPassword.setErrors({ passwordMismatch: true });
       return { passwordMismatch: true };
     }
-    
+
     return null;
   }
 
@@ -127,12 +129,14 @@ export class RegisterComponent implements OnInit {
     }
 
     this.loading = true;
-    
+
     const formValue = this.registerForm.value;
     const userData: RegisterRequest = {
       name: `${formValue.firstName} ${formValue.lastName}`,
       email: formValue.email,
       username: formValue.username,
+      phone: formValue.phone,
+      department: formValue.department,
       password: formValue.password,
       role: 'user' // Default role
     };
@@ -141,7 +145,7 @@ export class RegisterComponent implements OnInit {
       next: (response) => {
         this.loading = false;
         // Redirect to dashboard after successful registration
-        this.router.navigate(['/dashboard']);
+        this.router.navigate(['/app/dashboard']);
       },
       error: (err) => {
         this.loading = false;

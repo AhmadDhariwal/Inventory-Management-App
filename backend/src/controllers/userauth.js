@@ -215,6 +215,10 @@ const handleuserlogin = asyncHandler(async (req, res) => {
   await userService.handleuserlogin(req, res);
 });
 
+const allusers =asyncHandler(async(req,res)=>{
+    await userService.allusers(req,res);
+});
+
 // Get logged-in user profile
 const getUserProfile = asyncHandler(async (req, res) => {
   await userService.getUserProfile(req, res);
@@ -247,4 +251,5 @@ module.exports = {
     changePassword,
     getActiveSessions,
     terminateSession,
+    allusers
 };
