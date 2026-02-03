@@ -3,10 +3,11 @@ const express = require('express');
 const router = express.Router();
 const {handleusersignup , handleuserlogin, updateUserProfile, getUserProfile, changePassword, getActiveSessions, terminateSession} = require('../controllers/userauth');
 const { restrictto, verifytoken } = require('../middleware/auth.middleware');
+const { adminOnly,adminOrManager, managerOnly,allRoles } = require('../middleware/rbac.middleware');
 
 router.post('/', handleusersignup);
 router.post('/login', handleuserlogin);
-router.get('/profile', verifytoken, getUserProfile);
+router.get('/profile', verifytoken,allRoles, getUserProfile);
 router.put('/profile', verifytoken, updateUserProfile);
 router.put('/change-password', verifytoken, changePassword);
 router.get('/sessions', verifytoken, getActiveSessions);

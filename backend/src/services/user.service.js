@@ -13,12 +13,13 @@ async function handleusersignup(req,res){
           return res.status(400).json({ error: "Data is required" });
         }
         //const generatedId =  shortid.generate();   // We can also use it for the generateid `ITEM_${Date.now()}`;
-     //   const hashedpassword = await bcrypt.hash(body.password, 8);
+       const hashedpassword = await bcrypt.hash(body.password, 8);
+       //console.log(hashedpassword);
         const createduser = await userschema.create({
             name: body.name,
             email : body.email,
             username : body.username,
-            password: body.password,
+            password: hashedpassword,
            role : body.role,
         })
       await createduser.save();
@@ -50,13 +51,18 @@ async function handleuserlogin(req,res){
     
         const logineduser = await userschema.findOne({
             username : body.username,
-            password: body.password,
+           // password: body.password,
            
         })
        // const passwordMatch = await bcrypt.compare(password, logineduser.password);
         if(!logineduser){
             return res.status(401).json({ error: "Invalid username or password" });
         }
+        const passwordMatch = await bcrypt.compare(body.password, logineduser.password);
+
+        if (!passwordMatch) {
+           return res.status(401).json({ error: "Invalid username or password" });
+       }
         const token = jwt.sign({ userid : logineduser._id , role : logineduser.role }, "Hello", {expiresIn : '24h'});
       
         res.status(200).json({
