@@ -13,7 +13,7 @@ export class ProductService {
 
   constructor(private http: HttpClient) {}
 
-  getProducts(params?: any): Observable<Product[]> {
+  getProducts(params?: any): Observable<any> {
     let httpParams = new HttpParams();
 
     if (params) {
@@ -24,7 +24,7 @@ export class ProductService {
       });
     }
 
-    return this.http.get<Product[]>(this.baseUrl, { params: httpParams });
+    return this.http.get<any>(this.baseUrl, { params: httpParams });
   }
 
   getProductById(id: string): Observable<Product> {

@@ -1,11 +1,17 @@
 import { DashboardModule } from './dashboard/dashboard.module';
 import { Routes } from '@angular/router';
 import { AuthGuard } from './guards/auth.guard';
+
 import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
 import { LoginComponent } from './auth/login/login.component';
 import { RegisterComponent } from './auth/register/register.component';
 
 export const routes: Routes = [
+
+   {
+    path:'',
+    loadComponent :() => import('./components/homepage/homepage.component').then((m) => m.HomepageComponent)
+  },
   // Auth routes (no layout)
   {
     path: 'auth',

@@ -7,8 +7,6 @@ const Inventory = require("../models/model");
 
 const createpurchaseorder = async (data, userId) => {
   const { supplier, items, warehouse, totalamount } = data;
-
-  console.log('Creating purchase order with userId:', userId);
   
   if (!userId) {
     throw new Error("User ID is required");
@@ -21,7 +19,6 @@ const createpurchaseorder = async (data, userId) => {
     throw new Error("Supplier not found or inactive");
   }
 
-  // Create Purchase Order with PENDING status (no auto-receive)
   const purchaseorder = await Purchaseorder.create({
     supplier,
     items,
@@ -31,13 +28,11 @@ const createpurchaseorder = async (data, userId) => {
     status: "PENDING"
   });
 
-  // Populate the createdBy field before returning
   await purchaseorder.populate('createdBy', 'name');
   
   return purchaseorder;
 };
 
-// Process purchase order receipt
 const processPurchaseOrderReceipt = async (purchaseOrderId, userId) => {
   const purchaseorder = await Purchaseorder.findById(purchaseOrderId);
   if (!purchaseorder) throw new Error("Purchase order not found");

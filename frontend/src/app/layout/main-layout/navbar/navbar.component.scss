@@ -198,6 +198,7 @@
     justify-content: center;
     width: 44px;
     height: 44px;
+    font-size: 18px;
 
     &:hover {
       background: var(--hover);
@@ -205,46 +206,85 @@
       transform: translateY(-1px);
     }
 
+    // Fallback for missing icons
+    &:empty::before {
+      content: '●';
+      font-size: 12px;
+    }
+
     &.theme-toggle {
+      &::before {
+        content: none;
+      }
+      
       .theme-icon-wrapper {
         position: relative;
         width: 20px;
         height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
         .sun-icon,
         .moon-icon {
           position: absolute;
-          top: 0;
-          left: 0;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%) rotate(180deg) scale(0.5);
           transition: all 0.4s ease;
           opacity: 0;
-          transform: rotate(180deg) scale(0.5);
+          font-size: 16px;
+          color: var(--text);
 
           &.active {
             opacity: 1;
-            transform: rotate(0deg) scale(1);
+            transform: translate(-50%, -50%) rotate(0deg) scale(1);
           }
+        }
+        
+        // Fallback text when FontAwesome doesn't load
+        .sun-icon:empty::before {
+          content: '☀';
+        }
+        
+        .moon-icon:empty::before {
+          content: '🌙';
         }
       }
     }
 
     &.notifications {
+      position: relative;
+      
+      &::before {
+        content: none;
+      }
+      
+      // Fallback for bell icon
+      i:empty::before {
+        content: '🔔';
+        font-style: normal;
+      }
+      
       .notification-badge {
         position: absolute;
-        top: 6px;
-        right: 6px;
+        top: 4px;
+        right: 4px;
         background: #ef4444;
         color: white;
         font-size: 10px;
-        font-weight: 600;
-        padding: 2px 5px;
-        border-radius: 10px;
-        min-width: 16px;
-        height: 16px;
+        font-weight: 700;
+        padding: 2px 6px;
+        border-radius: 12px;
+        min-width: 18px;
+        height: 18px;
         display: flex;
         align-items: center;
         justify-content: center;
         animation: pulse 2s infinite;
+        border: 2px solid var(--surface);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        z-index: 1;
       }
     }
   }
@@ -442,6 +482,24 @@
   .navbar {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 
+    &__action-btn {
+      &.theme-toggle {
+        .theme-icon-wrapper {
+          .sun-icon,
+          .moon-icon {
+            color: var(--text);
+          }
+        }
+      }
+
+      &.notifications {
+        .notification-badge {
+          border-color: var(--surface);
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+      }
+    }
+
     &__search {
       .search-suggestions {
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
@@ -451,6 +509,13 @@
     &__user-menu {
       .user-dropdown {
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+        
+        .dropdown-item {
+          &.logout:hover {
+            background: rgba(239, 68, 68, 0.1);
+            color: #f87171;
+          }
+        }
       }
     }
   }
