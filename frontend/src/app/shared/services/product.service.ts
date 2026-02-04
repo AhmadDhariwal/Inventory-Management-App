@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { Product } from '../models/inventory/product.model';
+import { ActivityLogsService } from './activity-logs.service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +13,10 @@ export class ProductService {
   private categoryUrl = 'http://localhost:3000/api/categories';
   private inventoryUrl = 'http://localhost:3000/api/inventory';
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private activityService: ActivityLogsService
+  ) {}
 
   getProducts(params?: any): Observable<any> {
     let httpParams = new HttpParams();
@@ -32,15 +37,31 @@ export class ProductService {
   }
 
   createProduct(product: Partial<Product>): Observable<Product> {
-    return this.http.post<Product>(this.baseUrl, product);
+    return this.http.post<Product>(this.baseUrl, product).pipe(
+      tap((result: any) => {
+        if (result && result.name) {
+          this.activityService.logCreate('Products', result.name, result._id).subscribe();
+        }
+      })
+    );
   }
 
   updateProduct(id: string, product: Partial<Product>): Observable<Product> {
-    return this.http.put<Product>(`${this.baseUrl}/${id}`, product);
+    return this.http.put<Product>(`${this.baseUrl}/${id}`, product).pipe(
+      tap((result: any) => {
+        if (result && result.name) {
+          this.activityService.logUpdate('Products', result.name, result._id).subscribe();
+        }
+      })
+    );
   }
 
   deleteProduct(id: string): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/${id}`);
+    return this.http.delete(`${this.baseUrl}/${id}`).pipe(
+      tap(() => {
+        this.activityService.logDelete('Products', 'Product', id).subscribe();
+      })
+    );
   }
 
   getCategories(): Observable<any[]> {

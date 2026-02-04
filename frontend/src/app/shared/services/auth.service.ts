@@ -3,6 +3,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, BehaviorSubject, throwError } from 'rxjs';
 import { tap, catchError, map } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import { ActivityLogsService } from './activity-logs.service';
 
 export interface LoginRequest {
   username: string;
@@ -49,7 +50,11 @@ export class AuthService {
   public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
   public currentUser$ = this.currentUserSubject.asObservable();
 
-  constructor(private http: HttpClient, private router: Router) {
+  constructor(
+    private http: HttpClient, 
+    private router: Router,
+    private activityService: ActivityLogsService
+  ) {
     this.checkTokenValidity();
   }
 
@@ -58,6 +63,8 @@ export class AuthService {
       .pipe(
         tap((response: AuthResponse) => {
           this.setAuthData(response);
+          // Log login activity
+          this.activityService.logLogin().subscribe();
         }),
         catchError(this.handleError)
       );
@@ -85,6 +92,11 @@ export class AuthService {
   }
 
   logout(): void {
+    // Log logout activity before clearing data
+    if (this.isAuthenticated()) {
+      this.activityService.logLogout().subscribe();
+    }
+    
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.roleKey);
     localStorage.removeItem(this.userKey);

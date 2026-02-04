@@ -20,6 +20,8 @@ async function handleusersignup(req,res){
             email : body.email,
             username : body.username,
             password: hashedpassword,
+            phone: body.phone,
+            department : body.department,
            role : body.role,
         })
       await createduser.save();

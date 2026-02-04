@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { ActivityLogsService } from './activity-logs.service';
 
 export interface UserProfile {
   _id: string;
@@ -100,18 +102,43 @@ export class UserService {
   private baseUrl = 'http://localhost:3000/user';
   private settingsUrl = 'http://localhost:3000/api/settings';
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private activityService: ActivityLogsService
+  ) {}
 
   getUserProfile(): Observable<{success: boolean, data: UserProfile}> {
     return this.http.get<{success: boolean, data: UserProfile}>(`${this.baseUrl}/profile`);
   }
 
   updateUserProfile(profileData: {name: string, phone?: string, department?: string}): Observable<{success: boolean, message: string, data: UserProfile}> {
-    return this.http.put<{success: boolean, message: string, data: UserProfile}>(`${this.baseUrl}/profile`, profileData);
+    return this.http.put<{success: boolean, message: string, data: UserProfile}>(`${this.baseUrl}/profile`, profileData).pipe(
+      tap((result) => {
+        if (result.success) {
+          this.activityService.createLog({
+            action: 'UPDATE',
+            module: 'User Management',
+            entityName: 'User Profile',
+            description: 'Updated user profile information'
+          }).subscribe();
+        }
+      })
+    );
   }
 
   changePassword(passwordData: PasswordChangeRequest): Observable<{success: boolean, message: string}> {
-    return this.http.put<{success: boolean, message: string}>(`${this.baseUrl}/change-password`, passwordData);
+    return this.http.put<{success: boolean, message: string}>(`${this.baseUrl}/change-password`, passwordData).pipe(
+      tap((result) => {
+        if (result.success) {
+          this.activityService.createLog({
+            action: 'UPDATE',
+            module: 'User Management',
+            entityName: 'Password',
+            description: 'Changed user password'
+          }).subscribe();
+        }
+      })
+    );
   }
 
   getActiveSessions(): Observable<{success: boolean, data: any[]}> {
@@ -132,7 +159,18 @@ export class UserService {
   }
 
   updateSecuritySettings(settings: Partial<SecuritySettings>): Observable<{success: boolean, message: string, data: SecuritySettings}> {
-    return this.http.put<{success: boolean, message: string, data: SecuritySettings}>(`${this.settingsUrl}/security`, settings);
+    return this.http.put<{success: boolean, message: string, data: SecuritySettings}>(`${this.settingsUrl}/security`, settings).pipe(
+      tap((result) => {
+        if (result.success) {
+          this.activityService.createLog({
+            action: 'UPDATE',
+            module: 'Settings',
+            entityName: 'Security Settings',
+            description: 'Updated security settings'
+          }).subscribe();
+        }
+      })
+    );
   }
 
   // Notification Settings
@@ -141,7 +179,18 @@ export class UserService {
   }
 
   updateNotificationSettings(settings: Partial<NotificationSettings>): Observable<{success: boolean, message: string, data: NotificationSettings}> {
-    return this.http.put<{success: boolean, message: string, data: NotificationSettings}>(`${this.settingsUrl}/notifications`, settings);
+    return this.http.put<{success: boolean, message: string, data: NotificationSettings}>(`${this.settingsUrl}/notifications`, settings).pipe(
+      tap((result) => {
+        if (result.success) {
+          this.activityService.createLog({
+            action: 'UPDATE',
+            module: 'Settings',
+            entityName: 'Notification Settings',
+            description: 'Updated notification settings'
+          }).subscribe();
+        }
+      })
+    );
   }
 
   // Inventory Settings
@@ -150,7 +199,18 @@ export class UserService {
   }
 
   updateInventorySettings(settings: Partial<InventorySettings>): Observable<{success: boolean, message: string, data: InventorySettings}> {
-    return this.http.put<{success: boolean, message: string, data: InventorySettings}>(`${this.settingsUrl}/inventory`, settings);
+    return this.http.put<{success: boolean, message: string, data: InventorySettings}>(`${this.settingsUrl}/inventory`, settings).pipe(
+      tap((result) => {
+        if (result.success) {
+          this.activityService.createLog({
+            action: 'UPDATE',
+            module: 'Settings',
+            entityName: 'Inventory Settings',
+            description: 'Updated inventory settings'
+          }).subscribe();
+        }
+      })
+    );
   }
 
   // Business Settings
@@ -159,7 +219,18 @@ export class UserService {
   }
 
   updateBusinessSettings(settings: Partial<BusinessSettings>): Observable<{success: boolean, message: string, data: BusinessSettings}> {
-    return this.http.put<{success: boolean, message: string, data: BusinessSettings}>(`${this.settingsUrl}/business`, settings);
+    return this.http.put<{success: boolean, message: string, data: BusinessSettings}>(`${this.settingsUrl}/business`, settings).pipe(
+      tap((result) => {
+        if (result.success) {
+          this.activityService.createLog({
+            action: 'UPDATE',
+            module: 'Settings',
+            entityName: 'Business Settings',
+            description: 'Updated business settings'
+          }).subscribe();
+        }
+      })
+    );
   }
 
   // User Management (Admin only)

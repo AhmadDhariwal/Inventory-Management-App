@@ -3,6 +3,9 @@
 
   <nav class="sidebar__nav">
     <a routerLink="/dashboard" routerLinkActive="active" (click)="close.emit()">Dashboard</a>
+    <a routerLink="/dashboard/activity-logs" routerLinkActive="active" (click)="close.emit()">
+      <i class="fas fa-history"></i> Activity Logs
+    </a>
     <a routerLink="/products" (click)="close.emit()">Products</a>
     <a routerLink="/suppliers" routerLinkActive="active" (click)="close.emit()">Suppliers</a>
     <a routerLink="/purchases" (click)="close.emit()">Purchases</a>

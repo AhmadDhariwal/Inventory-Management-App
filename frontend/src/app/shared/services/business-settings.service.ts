@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { BusinessSettings, BusinessSettingsResponse } from '../models/business-settings.model';
+import { ActivityLogsService } from './activity-logs.service';
 
 @Injectable({ 
   providedIn: 'root' 
@@ -12,7 +13,10 @@ export class BusinessSettingsService {
   private settingsSubject = new BehaviorSubject<BusinessSettings | null>(null);
   public settings$ = this.settingsSubject.asObservable();
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private activityService: ActivityLogsService
+  ) {}
 
   // Get all business settings
   getSettings(): Observable<BusinessSettings> {
@@ -26,7 +30,15 @@ export class BusinessSettingsService {
   updateSettings(data: Partial<BusinessSettings>): Observable<BusinessSettings> {
     return this.http.put<BusinessSettingsResponse>(this.baseUrl, data).pipe(
       map(response => response.data),
-      tap(settings => this.settingsSubject.next(settings))
+      tap(settings => {
+        this.settingsSubject.next(settings);
+        this.activityService.createLog({
+          action: 'UPDATE',
+          module: 'Business Settings',
+          entityName: 'Company Settings',
+          description: 'Updated business settings configuration'
+        }).subscribe();
+      })
     );
   }
 

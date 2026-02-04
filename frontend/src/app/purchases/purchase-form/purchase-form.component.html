@@ -6,7 +6,7 @@
   <div class="form-row">
     <div class="form-group">
       <label for="supplier">Supplier *</label>
-      <select id="supplier" formControlName="supplier" class="form-control" [attr.aria-label]="'Select supplier'" [attr.title]="'Choose a supplier for this purchase order'">
+      <select id="supplier" formControlName="supplier" class="form-control" title="Select supplier">
         <option value="">Select Supplier</option>
         <option *ngFor="let supplier of suppliers" [value]="supplier._id">
           {{ supplier.name }}
@@ -16,7 +16,7 @@
 
     <div class="form-group">
       <label for="warehouse">Warehouse *</label>
-      <select id="warehouse" formControlName="warehouse" class="form-control" [attr.aria-label]="'Select warehouse'" [attr.title]="'Choose a warehouse for this purchase order'">
+      <select id="warehouse" formControlName="warehouse" class="form-control" title="Select warehouse">
         <option value="">Select Warehouse</option>
         <option *ngFor="let warehouse of warehouses" [value]="warehouse._id">
           {{ warehouse.name }}
@@ -37,7 +37,7 @@
       <div *ngFor="let item of items.controls; let i = index" [formGroupName]="i" class="item-row">
         <div class="form-group">
           <label [for]="'product-' + i">Product *</label>
-          <select [id]="'product-' + i" formControlName="product" class="form-control" [attr.aria-label]="'Select product for item ' + (i + 1)" [attr.title]="'Choose product for item ' + (i + 1)">
+          <select [id]="'product-' + i" formControlName="product" class="form-control" title="Select product">
             <option value="">Select Product</option>
             <option *ngFor="let product of products" [value]="product._id">
               {{ product.name }} ({{ product.sku }})
@@ -65,7 +65,7 @@
   </div>
 
   <div class="form-footer">
-    <button type="submit" [disabled]="!purchaseForm.valid || loading" class="btn btn-primary">
+    <button type="submit" [disabled]="!purchaseForm.valid || loading" class="btn btn-primary" >
       {{ loading ? 'Creating...' : 'Create Purchase Order' }}
     </button>
   </div>

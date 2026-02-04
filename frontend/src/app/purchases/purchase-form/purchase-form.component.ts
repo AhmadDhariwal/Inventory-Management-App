@@ -7,11 +7,12 @@ import { SupplierService } from '../../shared/services/supplier.service';
 import { Supplier } from '../../shared/models/inventory/supplier.model';
 import { Product } from '../../shared/models/inventory/product.model';
 import { Warehouse } from '../../shared/models/inventory/warehouse.model';
+import { AuthRoutingModule } from "../../auth/auth-routing.module";
 
 @Component({
   selector: 'app-purchase-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, AuthRoutingModule],
   templateUrl: './purchase-form.component.html',
   styleUrl: './purchase-form.component.scss'
 })

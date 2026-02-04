@@ -59,6 +59,12 @@
       </div>
     </button>
 
+    <!-- Activity Logs Quick Access -->
+    <button type="button" class="navbar__action-btn activity-logs" title="Activity Logs" routerLink="/dashboard/activity-logs">
+      <i class="fas fa-history"></i>
+      <span class="activity-badge" *ngIf="recentActivityCount > 0">{{ recentActivityCount }}</span>
+    </button>
+
     <!-- Notifications -->
     <button type="button" class="navbar__action-btn notifications" title="Notifications">
       <i class="fas fa-bell"></i>

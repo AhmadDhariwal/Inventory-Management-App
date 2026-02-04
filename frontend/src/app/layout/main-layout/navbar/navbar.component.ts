@@ -31,6 +31,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   showSuggestions = false;
   searchSuggestions: SearchSuggestion[] = [];
   notificationCount = 3; // Mock notification count
+  recentActivityCount = 0; // Activity logs count
 
   private destroy$ = new Subject<void>();
   private searchSubject = new Subject<string>();

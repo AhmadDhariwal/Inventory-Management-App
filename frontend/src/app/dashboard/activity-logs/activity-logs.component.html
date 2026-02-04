@@ -1,0 +1,182 @@
+<div class="activity-logs-container">
+  <!-- Header -->
+  <mat-card class="header-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>history</mat-icon>
+        Activity Logs
+      </mat-card-title>
+      <mat-card-subtitle>
+        Track all system activities and user actions
+      </mat-card-subtitle>
+      <div class="header-actions">
+        <button mat-icon-button (click)="refreshLogs()" matTooltip="Refresh logs">
+          <mat-icon>refresh</mat-icon>
+        </button>
+      </div>
+    </mat-card-header>
+  </mat-card>
+
+  <!-- Filters -->
+  <mat-card class="filters-card">
+    <mat-card-content>
+      <form [formGroup]="filterForm" class="filters-form">
+        <div class="filter-row">
+          <mat-form-field appearance="outline" class="search-field">
+            <mat-label>Search</mat-label>
+            <input matInput formControlName="search" placeholder="Search by entity name or description...">
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Action</mat-label>
+            <mat-select formControlName="action">
+              <mat-option value="">All Actions</mat-option>
+              <mat-option *ngFor="let action of actionOptions" [value]="action">
+                {{ action }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Module</mat-label>
+            <mat-select formControlName="module">
+              <mat-option value="">All Modules</mat-option>
+              <mat-option *ngFor="let module of moduleOptions" [value]="module">
+                {{ module }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="filter-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Start Date</mat-label>
+            <input title="Start date" matInput [matDatepicker]="startPicker" formControlName="startDate">
+            <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+            <mat-datepicker #startPicker></mat-datepicker>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>End Date</mat-label>
+            <input title="End date" matInput [matDatepicker]="endPicker" formControlName="endDate">
+            <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+            <mat-datepicker #endPicker></mat-datepicker>
+          </mat-form-field>
+
+          <button mat-stroked-button (click)="clearFilters()" class="clear-filters-btn">
+            <mat-icon>clear</mat-icon>
+            Clear Filters
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Loading activity logs...</p>
+  </div>
+
+  <!-- Error Message -->
+  <mat-card *ngIf="error && !loading" class="error-card">
+    <mat-card-content>
+      <div class="error-content">
+        <mat-icon color="warn">error</mat-icon>
+        <span>{{ error }}</span>
+        <button mat-button (click)="loadLogs()">Retry</button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Data Table -->
+  <mat-card *ngIf="!loading && !error" class="table-card">
+    <mat-card-content>
+      <div class="table-container">
+        <table mat-table [dataSource]="logs" class="activity-table">
+          <!-- User Column -->
+          <ng-container matColumnDef="user">
+            <th mat-header-cell *matHeaderCellDef>User</th>
+            <td mat-cell *matCellDef="let log">
+              <div class="user-info">
+                <div class="user-avatar">{{ log.user?.name?.charAt(0) || 'U' }}</div>
+                <div class="user-details">
+                  <div class="user-name">{{ log.user?.name || 'Unknown' }}</div>
+                  <div class="user-email">{{ log.user?.email || '' }}</div>
+                </div>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Action Column -->
+          <ng-container matColumnDef="action">
+            <th mat-header-cell *matHeaderCellDef>Action</th>
+            <td mat-cell *matCellDef="let log">
+              <mat-chip [color]="getActionChipColor(log.action)" selected>
+                {{ log.action }}
+              </mat-chip>
+            </td>
+          </ng-container>
+
+          <!-- Module Column -->
+          <ng-container matColumnDef="module">
+            <th mat-header-cell *matHeaderCellDef>Module</th>
+            <td mat-cell *matCellDef="let log">
+              <span class="module-badge">{{ log.module }}</span>
+            </td>
+          </ng-container>
+
+          <!-- Entity Name Column -->
+          <ng-container matColumnDef="entityName">
+            <th mat-header-cell *matHeaderCellDef>Entity</th>
+            <td mat-cell *matCellDef="let log">
+              <span class="entity-name">{{ log.entityName || '-' }}</span>
+            </td>
+          </ng-container>
+
+          <!-- Description Column -->
+          <ng-container matColumnDef="description">
+            <th mat-header-cell *matHeaderCellDef>Description</th>
+            <td mat-cell *matCellDef="let log">
+              <span class="description" [matTooltip]="log.description">
+                {{ log.description || '-' }}
+              </span>
+            </td>
+          </ng-container>
+
+          <!-- Date Column -->
+          <ng-container matColumnDef="createdAt">
+            <th mat-header-cell *matHeaderCellDef>Date & Time</th>
+            <td mat-cell *matCellDef="let log">
+              <div class="date-info">
+                <div class="date">{{ log.createdAt | date:'MMM dd, yyyy' }}</div>
+                <div class="time">{{ log.createdAt | date:'HH:mm:ss' }}</div>
+              </div>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+
+        <!-- No Data Message -->
+        <div *ngIf="logs.length === 0" class="no-data">
+          <mat-icon>inbox</mat-icon>
+          <h3>No Activity Logs Found</h3>
+          <p>There are no activity logs matching your current filters.</p>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <mat-paginator
+        [length]="totalItems"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions"
+        [pageIndex]="currentPage"
+        (page)="onPageChange($event)"
+        showFirstLastButtons>
+      </mat-paginator>
+    </mat-card-content>
+  </mat-card>
+</div>

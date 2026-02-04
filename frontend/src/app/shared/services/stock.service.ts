@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { InventorySummary } from '../models/inventory/inventory-summary.model';
+import { ActivityLogsService } from './activity-logs.service';
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +11,10 @@ import { InventorySummary } from '../models/inventory/inventory-summary.model';
 export class StockService {
   private baseUrl = 'http://localhost:3000';
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private activityService: ActivityLogsService
+  ) {}
 
   getStockMovements(): Observable<any[]> {
     return this.http.get<any[]>(`${this.baseUrl}/api/reports/stockmovements`);
@@ -22,7 +27,16 @@ export class StockService {
       warehouseId: movement.warehouse,
       quantity: movement.quantity,
       reason: movement.reason
-    });
+    }).pipe(
+      tap(() => {
+        this.activityService.createLog({
+          action: 'CREATE',
+          module: 'Stock Management',
+          entityName: `Stock ${movement.type}`,
+          description: `${movement.type === 'IN' ? 'Added' : 'Removed'} ${movement.quantity} units - ${movement.reason}`
+        }).subscribe();
+      })
+    );
   }
 
   getStockLevels(): Observable<any[]> {
