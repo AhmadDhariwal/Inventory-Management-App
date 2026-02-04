@@ -243,6 +243,10 @@ const terminateSession = asyncHandler(async (req, res) => {
   await userService.terminateSession(req, res);
 });
 
+const toggleuserstatus = asyncHandler(async (req, res) => {
+  await userService.toggleuserstatus(req, res);
+})
+
 module.exports = {
     handleusersignup,
     handleuserlogin,
@@ -251,5 +255,6 @@ module.exports = {
     changePassword,
     getActiveSessions,
     terminateSession,
-    allusers
+    allusers,
+    toggleuserstatus
 };

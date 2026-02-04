@@ -196,6 +196,32 @@ async function terminateSession(req, res) {
     }
 }
 
+async function toggleuserstatus (req, res) {
+  try {
+    const user = await userschema.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ 
+        success: false,
+        message: "User not found" 
+      });
+    }
+    
+    user.isactive = !user.isactive;
+    await user.save();
+    
+    res.json({ 
+      success: true,
+      message: `User ${user.isactive ? 'activated' : 'deactivated'} successfully`, 
+      data: user
+    });
+  } catch (error) {
+    res.status(400).json({ 
+      success: false,
+      error: error.message 
+    });
+  }
+}
+
 module.exports = {
     handleusersignup,
     handleuserlogin,
@@ -204,5 +230,6 @@ module.exports = {
     changePassword,
     getActiveSessions,
     terminateSession,
-    allusers
+    allusers,
+    toggleuserstatus
 };

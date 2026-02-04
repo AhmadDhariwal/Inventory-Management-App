@@ -34,6 +34,11 @@ const userschema = new mongoose.Schema( {
         type: String,
         default: ''
     }
+    ,
+      isactive: {
+      type: Boolean,
+      default: true
+    }
 
 },{timestamps : true});
 
