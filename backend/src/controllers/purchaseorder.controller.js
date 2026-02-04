@@ -3,9 +3,12 @@ const purchaseorderservice = require("../services/purchaseorder.service");
 
 const createpurchaseorder = async (req, res) => {
   try {
+    console.log('Controller - req.user:', req.user);
+    console.log('Controller - req.user.userid:', req.user?.userid);
+    
     const purchaseorder = await purchaseorderservice.createpurchaseorder(
       req.body,
-      req.user.id
+      req.user?.userid
     );
 
     res.status(201).json({
@@ -13,6 +16,7 @@ const createpurchaseorder = async (req, res) => {
       data: purchaseorder,
     });
   } catch (error) {
+    console.error('Purchase order creation error:', error.message);
     res.status(400).json({ error: error.message });
   }
 };
@@ -42,7 +46,7 @@ const approvepurchaseorder = async (req, res) => {
   try {
     const purchaseorder = await purchaseorderservice.approvepurchaseorder(
       req.params.id,
-      req.user.id
+      req.user.userid
     );
     res.status(200).json({
       success: true,
@@ -61,7 +65,7 @@ const receivepurchaseorder = async (req, res) => {
   try {
     const result = await purchaseorderservice.receivepurchaseorder(
       req.params.id,
-      req.user.id
+      req.user.userid
     );
     res.status(200).json({
       success: true,
@@ -80,7 +84,7 @@ const deletepurchaseorder = async (req, res) => {
   try {
     const result = await purchaseorderservice.deletepurchaseorder(
       req.params.id,
-      req.user.id
+      req.user.userid
     );
     res.status(200).json({
       success: true,

@@ -5,10 +5,7 @@ import { RouterOutlet, RouterLink } from '@angular/router';
   selector: 'app-root',
   standalone: true,
   imports: [RouterOutlet],
-  // templateUrl: './app.component.html',
-  // styleUrl: './app.component.scss'
   template: `
-   <!-- <app-navbar></app-navbar> -->
    <router-outlet></router-outlet>
   `
 })

@@ -8,6 +8,12 @@ const Inventory = require("../models/model");
 const createpurchaseorder = async (data, userId) => {
   const { supplier, items, warehouse, totalamount } = data;
 
+  console.log('Creating purchase order with userId:', userId);
+  
+  if (!userId) {
+    throw new Error("User ID is required");
+  }
+  
   if (!warehouse) throw new Error("Warehouse is required");
 
   const supplierexists = await Supplier.findById(supplier);
@@ -25,6 +31,9 @@ const createpurchaseorder = async (data, userId) => {
     status: "PENDING"
   });
 
+  // Populate the createdBy field before returning
+  await purchaseorder.populate('createdBy', 'name');
+  
   return purchaseorder;
 };
 

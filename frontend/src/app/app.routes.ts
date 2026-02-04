@@ -1,8 +1,6 @@
 import { DashboardModule } from './dashboard/dashboard.module';
 import { Routes } from '@angular/router';
 import { AuthGuard } from './guards/auth.guard';
-import { ItemsListComponent } from './components/items-list/items-list.component';
-import { ItemcreateComponent } from './components/itemcreate/itemcreate.component';
 import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
 import { LoginComponent } from './auth/login/login.component';
 import { RegisterComponent } from './auth/register/register.component';
