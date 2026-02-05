@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { DashboardService } from '../../shared/services/dashboard.service';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { StockTrendComponent } from '../charts/stock-trend/stock-trend.component';
 import { PurchaseTrendComponent } from '../charts/purchase-trend/purchase-trend.component';
@@ -12,7 +12,7 @@ import { switchMap } from 'rxjs/operators';
 @Component({
   selector: 'app-overview',
   standalone: true,
-  imports: [CommonModule, StockTrendComponent, PurchaseTrendComponent, SalesTrendComponent, LowStockWidgetComponent],
+  imports: [CommonModule, RouterModule, StockTrendComponent, PurchaseTrendComponent, SalesTrendComponent, LowStockWidgetComponent],
   templateUrl: './overview.component.html',
   styleUrl: './overview.component.scss'
 })
@@ -20,6 +20,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
   loading = true;
   error: string | null = null;
   private refreshSubscription?: Subscription;
+
 
   stats: any = {
     totalproducts: 0,

@@ -27,10 +27,10 @@ export const routes: Routes = [
   { path: 'register', redirectTo: 'auth/register', pathMatch: 'full' },
 
   // Main application routes (with layout and auth guard)
-  {
-    path:'',
-    loadComponent :() => import('./components/homepage/homepage.component').then((m) => m.HomepageComponent)
-  },
+  // {
+  //   path:'',
+  //   loadComponent :() => import('./components/homepage/homepage.component').then((m) => m.HomepageComponent)
+  // },
   {
     path: '',
     component: MainLayoutComponent,

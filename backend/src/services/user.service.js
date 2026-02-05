@@ -62,22 +62,59 @@ async function handleuserlogin(req,res){
         if ( !body.username || !body.password) {
           return res.status(400).json({ error: " Valid Data is required" });
         }
+       
+        const logineduser = await userschema.findOne({ username: body.username });
+
+if (!logineduser) {
+  return res.status(401).json({
+    error: "Invalid username or password"
+  });
+}
+
+// check active status AFTER user exists
+if (!logineduser.isactive) {
+  return res.status(403).json({
+    error: `${body.username} is not active`
+  });
+}
+
+// check password
+const passwordMatch = await bcrypt.compare(
+  body.password,
+  logineduser.password
+);
+
+if (!passwordMatch) {
+  return res.status(401).json({
+    error: "Invalid username or password"
+  });
+}
+
+
+
         //const generatedId =  shortid.generate();   // We can also use it for the generateid `ITEM_${Date.now()}`;
     
-        const logineduser = await userschema.findOne({
-            username : body.username,
-           // password: body.password,
-           
-        })
-       // const passwordMatch = await bcrypt.compare(password, logineduser.password);
-        if(!logineduser){
-            return res.status(401).json({ error: "Invalid username or password" });
-        }
-        const passwordMatch = await bcrypt.compare(body.password, logineduser.password);
+    //     const logineduser = await userschema.findOne({
+    //         username : body.username,
+    //        // password: body.password,
+    //     })
+    //     const activeuser = await userschema.findOne({
+    //       username : body.username,
+    //        isactive: true
+    //     })
 
-        if (!passwordMatch) {
-           return res.status(401).json({ error: "Invalid username or password" });
-       }
+    //     if(!activeuser){
+    //         return res.status(401).json({ error: ` ${body.username} is not active` });
+    //     }
+    //    // const passwordMatch = await bcrypt.compare(password, logineduser.password);
+    //     else if(!logineduser){
+    //         return res.status(401).json({ error: "Invalid username or password" });
+    //     }
+    //     const passwordMatch = await bcrypt.compare(body.password, logineduser.password);
+
+    //     if (!passwordMatch) {
+    //        return res.status(401).json({ error: "Invalid username or password" });
+    //    }
         const token = jwt.sign({ userid : logineduser._id , role : logineduser.role }, "Hello", {expiresIn : '24h'});
       
         res.status(200).json({

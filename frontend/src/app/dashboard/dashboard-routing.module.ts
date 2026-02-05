@@ -1,18 +1,15 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { OverviewComponent } from './overview/overview.component';
-import { ActivityLogsComponent } from './activity-logs/activity-logs.component';
 
 const routes: Routes = [
   {
     path: '',
-    component: OverviewComponent
+    loadComponent: () => import('./overview/overview.component').then(m => m.OverviewComponent)
   },
   {
     path: 'activity-logs',
-    component: ActivityLogsComponent
+    loadComponent: () => import('./activity-logs/activity-logs.component').then(m => m.ActivityLogsComponent)
   }
-
 ];
 
 @NgModule({
