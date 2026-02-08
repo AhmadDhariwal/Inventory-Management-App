@@ -1,97 +1,93 @@
-<section class="movement-detail">
+<div class="stock-detail-container animate-fade-in" *ngIf="movement">
+    <header class="page-header">
+        <div class="header-content">
+            <div class="breadcrumb">
+                <a routerLink="/stock/movements">Movements</a>
+                <i class="fas fa-chevron-right"></i>
+                <span>Movement Details</span>
+            </div>
+            <h1>Stock Movement Details</h1>
+            <p>Immutable record of inventory transaction #{{ movement._id | slice:-6 }}</p>
+        </div>
+        <div class="header-actions">
+            <button class="btn-secondary" routerLink="/stock/movements">Back to List</button>
+            <button class="btn-primary" [routerLink]="['/stock/movements/edit', movement._id]">
+                <i class="fas fa-edit"></i> Edit Record
+            </button>
+        </div>
+    </header>
 
-  <!-- Header -->
-  <header class="movement-detail__header">
-    <div class="movement-detail__breadcrumb">
-      <a routerLink="/stock/movements">Stock Movements</a>
-      <span>/</span>
-      <span>Movement Details</span>
-    </div>
+    <main class="content-section">
+        <div class="detail-grid">
+            <!-- Primary Info -->
+            <div class="detail-card main-info">
+                <div class="card-header">
+                    <i class="fas fa-info-circle"></i>
+                    <h2>General Information</h2>
+                </div>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <label>Product</label>
+                        <div class="value">
+                            <strong>{{ movement.product?.name }}</strong>
+                            <span class="sub-value">{{ movement.product?.sku }}</span>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <label>Warehouse</label>
+                        <div class="value">{{ movement.warehouse?.name }}</div>
+                    </div>
+                    <div class="info-item">
+                        <label>Movement Type</label>
+                        <div class="value">
+                            <span class="status-badge" [ngClass]="{
+                                'success': movement.type === 'IN',
+                                'error': movement.type === 'OUT',
+                                'warning': movement.type === 'ADJUSTMENT'
+                            }">{{ movement.type }}</span>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <label>Quantity</label>
+                        <div class="value emphasize">{{ movement.quantity }} units</div>
+                    </div>
+                </div>
+            </div>
 
-    <div class="movement-detail__header-main">
-      <h1 class="movement-detail__title">Stock Movement</h1>
-      <span class="movement-detail__badge movement-detail__badge--inbound">
-        INBOUND
-      </span>
-    </div>
+            <!-- Meta Info -->
+            <div class="detail-card meta-info">
+                <div class="card-header">
+                    <i class="fas fa-history"></i>
+                    <h2>Audit Details</h2>
+                </div>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <label>Created By</label>
+                        <div class="value">{{ movement.user?.name || 'System' }}</div>
+                    </div>
+                    <div class="info-item">
+                        <label>Created At</label>
+                        <div class="value">{{ movement.createdAt | date:'MMM d, y, h:mm a' }}</div>
+                    </div>
+                    <div class="info-item" *ngIf="movement.reference">
+                        <label>Reference #</label>
+                        <div class="value">{{ movement.reference }}</div>
+                    </div>
+                </div>
+            </div>
 
-    <p class="movement-detail__subtitle">
-      Immutable record of inventory transaction
-    </p>
-  </header>
+            <!-- Reason/Notes -->
+            <div class="detail-card full-width">
+                <div class="card-header">
+                    <i class="fas fa-comment-dots"></i>
+                    <h2>Reason & Context</h2>
+                </div>
+                <p class="reason-text">{{ movement.reason || 'No reason provided.' }}</p>
+            </div>
+        </div>
+    </main>
+</div>
 
-  <!-- Summary -->
-  <section class="movement-detail__summary">
-    <div class="summary-item">
-      <span class="summary-item__label">Product</span>
-      <span class="summary-item__value">Laptop Dell XPS 15</span>
-    </div>
-
-    <div class="summary-item">
-      <span class="summary-item__label">Warehouse</span>
-      <span class="summary-item__value">Main Warehouse – New York</span>
-    </div>
-
-    <div class="summary-item">
-      <span class="summary-item__label">Quantity</span>
-      <span class="summary-item__value summary-item__value--numeric">+50</span>
-    </div>
-
-    <div class="summary-item">
-      <span class="summary-item__label">Created By</span>
-      <span class="summary-item__value">Ahmad Hassan</span>
-    </div>
-
-    <div class="summary-item">
-      <span class="summary-item__label">Created At</span>
-      <span class="summary-item__value">Mar 12, 2026 – 10:42 AM</span>
-    </div>
-  </section>
-
-  <!-- Details -->
-  <section class="movement-detail__info">
-    <div class="info-block">
-      <h3 class="info-block__title">Reason</h3>
-      <p class="info-block__text">
-        Stock received from supplier against purchase order PO-2026-014.
-      </p>
-    </div>
-
-    <div class="info-block">
-      <h3 class="info-block__title">Reference</h3>
-      <p class="info-block__text">PO-2026-014</p>
-    </div>
-  </section>
-
-  <!-- Audit Log -->
-  <section class="movement-detail__audit">
-    <h2 class="movement-detail__section-title">Audit Trail</h2>
-
-    <table class="audit-table">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>User</th>
-          <th>Action</th>
-          <th>Details</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Mar 12, 2026 – 10:42 AM</td>
-          <td>Ahmad Hassan</td>
-          <td>CREATED</td>
-          <td>Stock movement created</td>
-        </tr>
-
-        <tr>
-          <td>Mar 12, 2026 – 10:43 AM</td>
-          <td>System</td>
-          <td>POSTED</td>
-          <td>Inventory balance updated</td>
-        </tr>
-      </tbody>
-    </table>
-  </section>
-
-</section>
+<div class="loading-state" *ngIf="loading">
+    <p>Loading movement details...</p>
+</div>

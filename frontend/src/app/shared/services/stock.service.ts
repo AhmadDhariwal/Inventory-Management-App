@@ -39,6 +39,32 @@ export class StockService {
     );
   }
 
+  updateStockMovement(id: string, movement: any): Observable<any> {
+    return this.http.put<any>(`${this.baseUrl}/api/inventory/movements/${id}`, movement).pipe(
+      tap(() => {
+        this.activityService.createLog({
+          action: 'UPDATE',
+          module: 'Stock Management',
+          entityName: `Stock ${movement.type}`,
+          description: `Updated stock movement - ${movement.reason}`
+        }).subscribe();
+      })
+    );
+  }
+
+  deleteStockMovement(id: string): Observable<any> {
+    return this.http.delete<any>(`${this.baseUrl}/api/inventory/movements/${id}`).pipe(
+      tap(() => {
+        this.activityService.createLog({
+          action: 'DELETE',
+          module: 'Stock Management',
+          entityName: `Stock Movement`,
+          description: `Deleted stock movement`
+        }).subscribe();
+      })
+    );
+  }
+
   getStockLevels(): Observable<any[]> {
     return this.http.get<any[]>(`${this.baseUrl}/api/reports/stocklevels`);
   }

@@ -104,3 +104,24 @@ exports.getstocksummary = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
+exports.updatemovement = async (req, res) => {
+  try {
+    const movement = await inventoryservice.updatemovement(req.params.id, req.body, req.organizationId);
+    res.status(200).json({
+      message: "Stock movement updated successfully",
+      data: movement
+    });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+exports.deletemovement = async (req, res) => {
+  try {
+    const result = await inventoryservice.deletemovement(req.params.id, req.organizationId);
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};

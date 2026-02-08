@@ -15,4 +15,8 @@ router.get("/summary", verifytoken, inventorycontroller.getstocksummary);
 // Update stock levels - Admin only
 router.put("/stocklevels/:id", verifytoken, restrictto(['admin']), inventorycontroller.updatestocklevel);
 
+// Stock movements CRUD
+router.put("/movements/:id", verifytoken, restrictto(['admin', 'manager']), inventorycontroller.updatemovement);
+router.delete("/movements/:id", verifytoken, restrictto(['admin', 'manager']), inventorycontroller.deletemovement);
+
 module.exports = router;

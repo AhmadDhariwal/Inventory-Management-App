@@ -114,7 +114,25 @@ const getOrCreateStockLevel = async (productId, warehouseId, organizationId) => 
   }
 };
 
+// Update stock quantity for a specific product-warehouse combination
+const updateStockQuantity = async (productId, warehouseId, organizationId, quantityDelta) => {
+  try {
+    const stockLevel = await getOrCreateStockLevel(productId, warehouseId, organizationId);
+    stockLevel.quantity += quantityDelta;
+
+    // Ensure stock doesn't go below 0 if not allowed (optional, but good practice)
+    if (stockLevel.quantity < 0) stockLevel.quantity = 0;
+
+    await stockLevel.save();
+    return stockLevel;
+  } catch (error) {
+    console.error('Error updating stock quantity:', error);
+    throw error;
+  }
+};
+
 module.exports = {
   initializeStockLevels,
-  getOrCreateStockLevel
+  getOrCreateStockLevel,
+  updateStockQuantity
 };

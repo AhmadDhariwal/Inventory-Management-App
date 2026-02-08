@@ -1,144 +1,87 @@
-<section class="stock-form">
-  
-  <header class="stock-form__header">
-    <div class="stock-form__breadcrumb">
-      <a routerLink="/stock/movements" class="stock-form__breadcrumb-link">Stock Movements</a>
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-        <path d="M6 4L10 8L6 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-      <span class="stock-form__breadcrumb-current">New Movement</span>
-    </div>
-    <h1 class="stock-form__title">Create Stock Movement</h1>
-  </header>
+<div class="stock-form-container animate-fade-in">
+    <header class="page-header">
+        <div class="header-content">
+            <div class="breadcrumb">
+                <a routerLink="/stock/movements">Movements</a>
+                <i class="fas fa-chevron-right"></i>
+                <span>{{ isEditMode ? 'Edit' : 'New' }} Movement</span>
+            </div>
+            <h1>{{ isEditMode ? 'Edit' : 'Create' }} Stock Movement</h1>
+            <p>Define stock adjustments, inbound receipts, or outbound shipments.</p>
+        </div>
+        <div class="header-actions">
+            <button class="btn-secondary" routerLink="/stock/movements">Cancel</button>
+            <button class="btn-primary" (click)="onSubmit()" [disabled]="loading">
+                {{ loading ? 'Saving...' : (isEditMode ? 'Update' : 'Create') + ' Movement' }}
+            </button>
+        </div>
+    </header>
 
-  <div class="stock-form__container">
-    <form class="form" (ngSubmit)="onSubmit()">
-      
-      <div class="form__section">
-        <h2 class="form__section-title">Movement Details</h2>
-        
-        <div class="form__row">
-          <div class="form__group form__group--required">
-            <label class="form__label" for="product">Product</label>
-            <select class="form__select" id="product" title="Product" [(ngModel)]="movement.product" name="product" required>
-              <option value="">Select product</option>
-              <option *ngFor="let product of products" [value]="product._id">{{ product.name }}</option>
-            </select>
-            <span class="form__hint">Select the product for this movement</span>
-          </div>
-          
-          <div class="form__group form__group--required">
-            <label class="form__label" for="warehouse">Warehouse</label>
-            <select class="form__select" id="warehouse" title="Warehouse" [(ngModel)]="movement.warehouse" name="warehouse" required>
-              <option value="">Select warehouse</option>
-              <option *ngFor="let warehouse of warehouses" [value]="warehouse._id">{{ warehouse.name }}</option>
-            </select>
-            <span class="form__hint">Warehouse location for this movement</span>
-          </div>
-        </div>
-        
-        <div class="form__row">
-          <div class="form__group form__group--required">
-            <label class="form__label" for="movement-type">Movement Type</label>
-            <select class="form__select" id="movement-type" title="Movement Type" [(ngModel)]="movement.type" name="type" required>
-              <option value="">Select type</option>
-              <option value="IN">Inbound (IN)</option>
-              <option value="OUT">Outbound (OUT)</option>
-              <option value="ADJUSTMENT">Adjustment</option>
-            </select>
-            <span class="form__hint">Type of stock movement</span>
-          </div>
-          
-          <div class="form__group form__group--required">
-            <label class="form__label" for="quantity">Quantity</label>
-            <input 
-              class="form__input" 
-              type="number" 
-              id="quantity" 
-              title="Quantity" 
-              placeholder="0" 
-              min="1"
-              [(ngModel)]="movement.quantity"
-              name="quantity"
-              required
-            />
-            <span class="form__hint">Number of units</span>
-          </div>
-        </div>
-      </div>
-      
-      <div class="form__section">
-        <h2 class="form__section-title">Additional Information</h2>
-        
-        <div class="form__group">
-          <label class="form__label" for="reason">Reason</label>
-          <textarea 
-            class="form__textarea" 
-            id="reason" 
-            title="Reason" 
-            rows="4"
-            placeholder="Enter reason for this stock movement..."
-            [(ngModel)]="movement.reason"
-            name="reason"
-          ></textarea>
-          <span class="form__hint">Optional: Provide context for this movement</span>
-        </div>
-        
-        <div class="form__group">
-          <label class="form__label" for="reference">Reference Number</label>
-          <input 
-            class="form__input" 
-            type="text" 
-            id="reference" 
-            title="Reference Number" 
-            placeholder="e.g., PO-2024-001"
-            [(ngModel)]="movement.reference"
-            name="reference"
-          />
-          <span class="form__hint">Optional: Purchase order or reference ID</span>
-        </div>
-      </div>
-      
-      <div class="form__actions">
-        <button type="button" class="btn btn--secondary" routerLink="/stock/movements">
-          Cancel
-        </button>
-        <button type="submit" class="btn btn--primary" [disabled]="loading">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M13.3333 4L6 11.3333L2.66667 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          {{ loading ? 'Creating...' : 'Create Movement' }}
-        </button>
-      </div>
-      
-    </form>
-    
-    <aside class="stock-form__sidebar">
-      <div class="info-card">
-        <div class="info-card__header">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
-            <path d="M10 10V14M10 6V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-          </svg>
-          <h3 class="info-card__title">Movement Guidelines</h3>
-        </div>
-        <ul class="info-card__list">
-          <li><strong>Inbound:</strong> Stock received from suppliers or transfers</li>
-          <li><strong>Outbound:</strong> Stock shipped to customers or locations</li>
-          <li><strong>Adjustment:</strong> Corrections for inventory discrepancies</li>
-        </ul>
-      </div>
-      
-      <div class="info-card info-card--warning">
-        <div class="info-card__header">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <path d="M10 6V10M10 14H10.01M18 10C18 14.4183 14.4183 18 10 18C5.58172 18 2 14.4183 2 10C2 5.58172 5.58172 2 10 2C14.4183 2 18 5.58172 18 10Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-          </svg>
-          <h3 class="info-card__title">Important</h3>
-        </div>
-        <p class="info-card__text">All stock movements are tracked and audited. Ensure accuracy before submission.</p>
-      </div>
-    </aside>
-  </div>
+    <main class="content-section">
+        <div class="form-card">
+            <form (ngSubmit)="onSubmit()" #movementForm="ngForm">
+                <div class="form-grid">
+                    <!-- Product Selection -->
+                    <div class="form-group">
+                        <label>Product <span class="required">*</span></label>
+                        <select [(ngModel)]="movement.product" name="product" required #product="ngModel" [class.error]="product.invalid && product.touched">
+                            <option value="">Select a product</option>
+                            <option *ngFor="let p of products" [value]="p._id">{{ p.name }} ({{ p.sku }})</option>
+                        </select>
+                        <div class="error-msg" *ngIf="product.invalid && product.touched">Product is required</div>
+                    </div>
 
-</section>
+                    <!-- Warehouse Selection -->
+                    <div class="form-group">
+                        <label>Warehouse <span class="required">*</span></label>
+                        <select [(ngModel)]="movement.warehouse" name="warehouse" required #warehouse="ngModel" [class.error]="warehouse.invalid && warehouse.touched">
+                            <option value="">Select a warehouse</option>
+                            <option *ngFor="let w of warehouses" [value]="w._id">{{ w.name }}</option>
+                        </select>
+                        <div class="error-msg" *ngIf="warehouse.invalid && warehouse.touched">Warehouse is required</div>
+                    </div>
+
+                    <!-- Movement Type -->
+                    <div class="form-group">
+                        <label>Movement Type <span class="required">*</span></label>
+                        <select [(ngModel)]="movement.type" name="type" required #type="ngModel" [class.error]="type.invalid && type.touched">
+                            <option value="">Select type</option>
+                            <option value="IN">Inbound (Stock In)</option>
+                            <option value="OUT">Outbound (Stock Out)</option>
+                            <option value="ADJUSTMENT">Adjustment</option>
+                        </select>
+                        <div class="error-msg" *ngIf="type.invalid && type.touched">Type is required</div>
+                    </div>
+
+                    <!-- Quantity -->
+                    <div class="form-group">
+                        <label>Quantity <span class="required">*</span></label>
+                        <input type="number" [(ngModel)]="movement.quantity" name="quantity" required min="1" #qty="ngModel" [class.error]="qty.invalid && qty.touched">
+                        <div class="error-msg" *ngIf="qty.invalid && qty.touched">Quantity must be at least 1</div>
+                    </div>
+
+                    <!-- Reference -->
+                    <div class="form-group">
+                        <label>Reference #</label>
+                        <input type="text" [(ngModel)]="movement.reference" name="reference" placeholder="e.g. PO-12345">
+                    </div>
+
+                    <!-- Reason -->
+                    <div class="form-group full-width">
+                        <label>Reason <span class="required">*</span></label>
+                        <textarea [(ngModel)]="movement.reason" name="reason" required rows="3" placeholder="Explain why this movement is being made..." #reason="ngModel" [class.error]="reason.invalid && reason.touched"></textarea>
+                        <div class="error-msg" *ngIf="reason.invalid && reason.touched">Reason is required</div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="info-banner" *ngIf="!isEditMode">
+            <i class="fas fa-info-circle"></i>
+            <div class="banner-content">
+                <strong>Important Note:</strong>
+                <p>Creating a movement will immediately affect the available stock in the selected warehouse. Please double-check quantities before saving.</p>
+            </div>
+        </div>
+    </main>
+</div>

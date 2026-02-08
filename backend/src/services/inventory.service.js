@@ -125,8 +125,8 @@ const addstock = async (data) => {
 
   await movement.save();
 
-  // Update or create stock level
-  await stockLevelService.getOrCreateStockLevel(data.productId, data.warehouseId, data.organizationId);
+  // Update stock level quantity
+  await stockLevelService.updateStockQuantity(data.productId, data.warehouseId, data.organizationId, data.quantity);
 
   return movement;
 };
@@ -145,8 +145,8 @@ const removestock = async (data) => {
 
   await movement.save();
 
-  // Update or create stock level
-  await stockLevelService.getOrCreateStockLevel(data.productId, data.warehouseId, data.organizationId);
+  // Update stock level quantity
+  await stockLevelService.updateStockQuantity(data.productId, data.warehouseId, data.organizationId, -data.quantity);
 
   return movement;
 };
@@ -191,6 +191,38 @@ const getstocksummary = async (filters) => {
   };
 };
 
+// Update stock movement
+const updatemovement = async (id, data, organizationId) => {
+  const oldMovement = await StockMovement.findById(id);
+  if (!oldMovement) throw new Error('Movement not found');
+
+  // Reverse old effect
+  const reverseDelta = oldMovement.type === 'IN' ? -oldMovement.quantity : oldMovement.quantity;
+  await stockLevelService.updateStockQuantity(oldMovement.product, oldMovement.warehouse, organizationId, reverseDelta);
+
+  // Update record
+  const updatedMovement = await StockMovement.findByIdAndUpdate(id, data, { new: true });
+
+  // Apply new effect
+  const newDelta = updatedMovement.type === 'IN' ? updatedMovement.quantity : -updatedMovement.quantity;
+  await stockLevelService.updateStockQuantity(updatedMovement.product, updatedMovement.warehouse, organizationId, newDelta);
+
+  return updatedMovement;
+};
+
+// Delete stock movement
+const deletemovement = async (id, organizationId) => {
+  const movement = await StockMovement.findById(id);
+  if (!movement) throw new Error('Movement not found');
+
+  // Reverse effect before deleting
+  const reverseDelta = movement.type === 'IN' ? -movement.quantity : movement.quantity;
+  await stockLevelService.updateStockQuantity(movement.product, movement.warehouse, organizationId, reverseDelta);
+
+  await StockMovement.findByIdAndDelete(id);
+  return { message: 'Movement deleted successfully' };
+};
+
 module.exports = {
   checkNegativeStockAllowed,
   getUserStockThresholds,
@@ -201,5 +233,7 @@ module.exports = {
   removestock,
   getcurrentstock,
   updatestocklevel,
-  getstocksummary
+  getstocksummary,
+  updatemovement,
+  deletemovement
 };

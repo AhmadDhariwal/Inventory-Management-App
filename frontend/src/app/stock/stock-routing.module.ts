@@ -19,6 +19,7 @@ const routes: Routes = [
     ]
   },
   { path: 'movements/new', component: StockMovementFormComponent },
+  { path: 'movements/edit/:id', component: StockMovementFormComponent },
   { path: 'movements/:id', component: StockMovementDetailComponent }
 ];
 

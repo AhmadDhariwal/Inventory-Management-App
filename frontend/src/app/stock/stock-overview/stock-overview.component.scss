@@ -1,3 +1,31 @@
+@import '../../styles/theme';
+
+.page-header {
+  padding: 2rem;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-main);
+  margin-bottom: 2rem;
+
+  .header-content {
+    h1 {
+      @include enterprise-header;
+      background: var(--grad-primary);
+      background-clip: text;
+      -webkit-background-clip: text;
+      font-size: 2.2rem;
+      margin: 0;
+      font-weight: 800;
+    }
+
+    p {
+      color: var(--text-muted);
+      margin: 0.25rem 0 0;
+      font-weight: 500;
+      font-size: 1rem;
+    }
+  }
+}
+
 .inventory-overview {
   padding: 24px;
 
@@ -161,6 +189,7 @@
   color: var(--color-text-secondary);
   font-size: 14px;
 }
+
 /* NAVIGATION SECTION */
 
 .navigation-section {

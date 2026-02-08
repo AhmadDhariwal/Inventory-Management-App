@@ -1,111 +1,142 @@
-<section class="stock-movements">
-
-  <div class="stock-movements__filters">
-    <div class="filter-group">
-      <label class="filter-group__label">Movement Type</label>
-      <div class="filter-group__options">
-        <button class="filter-chip filter-chip--active">All</button>
-        <button class="filter-chip">Inbound</button>
-        <button class="filter-chip">Outbound</button>
-        <button class="filter-chip">Adjustment</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="stock-movements__table-container">
-    <table class="data-table">
-      <thead class="data-table__head">
-        <tr>
-          <th class="data-table__th data-table__th--sortable">
-            <div class="data-table__th-content">
-              <span>Product</span>
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                <path d="M6 3V9M6 3L4 5M6 3L8 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
+<div class="stock-movements animate-fade-in">
+    <header class="page-header">
+        <div class="header-content">
+            <div class="title-section">
+                <h1>Stock Movements</h1>
+                <p class="subtitle">Log of all inventory adjustments, receipts, and shipments.</p>
             </div>
-          </th>
-          <th class="data-table__th data-table__th--sortable">
-            <div class="data-table__th-content">
-              <span>Warehouse</span>
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                <path d="M6 3V9M6 3L4 5M6 3L8 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
+            <div class="header-actions">
+                <button class="btn-primary" [routerLink]="['/stock/movements/new']">
+                    <i class="fas fa-plus"></i> New Movement
+                </button>
             </div>
-          </th>
-          <th class="data-table__th">Type</th>
-          <th class="data-table__th data-table__th--align-right">Quantity</th>
-          <th class="data-table__th">Reason</th>
-          <th class="data-table__th">Created By</th>
-          <th class="data-table__th data-table__th--sortable">
-            <div class="data-table__th-content">
-              <span>Date</span>
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                <path d="M6 3V9M6 3L4 5M6 3L8 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </div>
-          </th>
-          <th class="data-table__th data-table__th--actions"></th>
-        </tr>
-      </thead>
-      <tbody class="data-table__body">
-        <tr class="data-table__row" *ngFor="let movement of movements">
-          <td class="data-table__td data-table__td--primary">
-            <div class="product-cell">
-              <div class="product-cell__icon">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                  <rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/>
-                </svg>
-              </div>
-              <span class="product-cell__name">{{ movement.product?.name }}</span>
-            </div>
-          </td>
-          <td class="data-table__td">{{ movement.warehouse?.name }}</td>
-          <td class="data-table__td">
-            <span class="status-badge status-badge--{{ movement.type.toLowerCase() }}">
-              {{ movement.type }}
-            </span>
-          </td>
-          <td class="data-table__td data-table__td--align-right data-table__td--numeric">
-            {{ movement.quantity }}
-          </td>
-          <td class="data-table__td data-table__td--secondary">{{ movement.reason }}</td>
-          <td class="data-table__td">{{ movement.user?.name || 'N/A' }}</td>
-          <td class="data-table__td data-table__td--secondary">{{ movement.createdAt | date:'MMM d, y, h:mm a' }}</td>
-          <td class="data-table__td data-table__td--actions">
-            <button class="action-btn" title="More actions">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <circle cx="8" cy="3" r="1" fill="currentColor"/>
-                <circle cx="8" cy="8" r="1" fill="currentColor"/>
-                <circle cx="8" cy="13" r="1" fill="currentColor"/>
-              </svg>
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+        </div>
+    </header>
 
-  <footer class="stock-movements__footer">
-    <div class="pagination">
-      <span class="pagination__info">Showing 1-10 of 245 movements</span>
-      <div class="pagination__controls">
-        <button class="pagination__btn" disabled title="Previous page">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M10 12L6 8L10 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-        <button class="pagination__btn pagination__btn--active">1</button>
-        <button class="pagination__btn">2</button>
-        <button class="pagination__btn">3</button>
-        <span class="pagination__ellipsis">...</span>
-        <button class="pagination__btn">25</button>
-        <button class="pagination__btn" title="Next page">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M6 4L10 8L6 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-      </div>
-    </div>
-  </footer>
+    <main class="content-section">
+        <div class="toolbar">
+            <div class="search-field">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" 
+                       class="search-control" 
+                       placeholder="Search products, warehouses or reasons..."
+                       (input)="onSearch($event)">
+            </div>
+            
+            <div class="filter-controls">
+                <div class="filter-chips">
+                    <button class="chip" [class.active]="typeFilter === 'ALL'" (click)="onFilterChange('ALL')">All</button>
+                    <button class="chip" [class.active]="typeFilter === 'IN'" (click)="onFilterChange('IN')">Stock In</button>
+                    <button class="chip" [class.active]="typeFilter === 'OUT'" (click)="onFilterChange('OUT')">Stock Out</button>
+                    <button class="chip" [class.active]="typeFilter === 'ADJUSTMENT'" (click)="onFilterChange('ADJUSTMENT')">Adjustment</button>
+                </div>
+            </div>
+        </div>
 
-</section>
+        <div class="table-container">
+            <div class="loading-state" *ngIf="loading">
+                <i class="fas fa-circle-notch fa-spin"></i>
+                <p>Synchronizing Movement Log...</p>
+            </div>
+
+            <div *ngIf="!loading && filteredMovements.length === 0" class="empty-state">
+                <i class="fas fa-history"></i>
+                <h3>No Movements Found</h3>
+                <p>Try adjusting your search or filters to find specific records.</p>
+            </div>
+
+            <div class="table-wrapper" *ngIf="!loading && filteredMovements.length > 0">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Date / Time</th>
+                            <th>Product Details</th>
+                            <th>Warehouse</th>
+                            <th class="type-col">Type</th>
+                            <th class="numeric">Quantity</th>
+                            <th>Reason / Ref</th>
+                            <th>Recorded By</th>
+                            <th class="actions-col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let m of filteredMovements" class="row-hover">
+                            <td class="date-cell">
+                                <span class="primary-text">{{ m.createdAt | date:'MMM d, y' }}</span>
+                                <span class="secondary-text">{{ m.createdAt | date:'h:mm a' }}</span>
+                            </td>
+                            <td>
+                                <div class="product-info">
+                                    <span class="product-name">{{ m.product?.name }}</span>
+                                    <span class="sku-badge">{{ m.product?.sku }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="warehouse-info">
+                                    <i class="fas fa-warehouse muted"></i>
+                                    <span>{{ m.warehouse?.name }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="status-badge" [ngClass]="{
+                                    'success': m.type === 'IN',
+                                    'error': m.type === 'OUT',
+                                    'warning': m.type === 'ADJUSTMENT'
+                                }">
+                                    <i class="fas" [ngClass]="{
+                                        'fa-arrow-down': m.type === 'IN',
+                                        'fa-arrow-up': m.type === 'OUT',
+                                        'fa-sliders-h': m.type === 'ADJUSTMENT'
+                                    }"></i>
+                                    {{ m.type }}
+                                </span>
+                            </td>
+                            <td class="numeric">
+                                <span class="qty-value" [ngClass]="{
+                                    'text-success': m.type === 'IN',
+                                    'text-error': m.type === 'OUT'
+                                }">
+                                    {{ m.type === 'IN' ? '+' : (m.type === 'OUT' ? '-' : '') }}{{ m.quantity }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="reason-cell">
+                                    <span class="reason-text">{{ m.reason || 'Manual Adjustment' }}</span>
+                                    <span class="ref-text" *ngIf="m.reference">#{{ m.reference }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="user-info">
+                                    <i class="fas fa-user-circle"></i>
+                                    <span>{{ m.user?.name || 'System' }}</span>
+                                </div>
+                            </td>
+                            <td class="actions-cell">
+                                <div class="action-menu">
+                                    <button class="btn-ghost" [routerLink]="['/stock/movements/edit', m._id]" title="Edit Movement">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn-ghost btn-danger" (click)="onDelete(m._id)" title="Delete Movement">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+</div>
+
+<app-confirm-modal
+    [isVisible]="showDeleteModal"
+    title="Delete Movement Record"
+    [message]="getDeleteMessage()"
+    confirmText="Delete & Reconcile"
+    cancelText="Cancel"
+    type="warning"
+    (confirm)="confirmDelete()"
+    (cancel)="cancelDelete()">
+</app-confirm-modal>
