@@ -4,11 +4,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { StockMovement } from '../../shared/models/inventory/stock-movement.model';
 import { StockService } from '../../shared/services/stock.service';
+import { ExportService } from '../../shared/services/export.service';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-stock-movement-report',
   standalone: true,
   imports: [CommonModule, FormsModule],
+  providers: [DatePipe],
   templateUrl: './stock-movement-report.component.html',
   styleUrls: ['./stock-movement-report.component.scss']
 })
@@ -24,7 +27,11 @@ export class StockMovementReportComponent implements OnInit {
   warehouses: string[] = ['ALL'];
   types: string[] = ['ALL', 'IN', 'OUT', 'ADJUSTMENT'];
 
-  constructor(private stockService: StockService) {}
+  constructor(
+    private stockService: StockService,
+    private exportService: ExportService,
+    private datePipe: DatePipe
+  ) {}
 
   exportCSV(): void {
     this.stockService.exportStockMovementsCSV({
@@ -46,22 +53,34 @@ export class StockMovementReportComponent implements OnInit {
   }
 
   exportExcel(): void {
-    this.stockService.exportStockMovementsExcel({
-      type: this.selectedType !== 'ALL' ? this.selectedType : undefined,
-      warehouse: this.selectedWarehouse !== 'ALL' ? this.selectedWarehouse : undefined
-    }).subscribe({
-      next: (blob) => {
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `stock-movements-${new Date().toISOString().split('T')[0]}.xlsx`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
-      },
-      error: (err) => console.error('Export failed:', err)
-    });
+    const dataToExport = this.filteredMovements.map(m => ({
+      Date: this.datePipe.transform(m.createdAt, 'mediumDate'),
+      SKU: this.getSku(m),
+      Product: this.getProductName(m),
+      Warehouse: this.getWarehouseName(m),
+      Type: m.type,
+      Quantity: m.quantity,
+      Reason: m.reason || 'N/A',
+      'Performed By': this.getUserName(m)
+    }));
+
+    this.exportService.exportToExcel(dataToExport, 'Stock_Movements', 'Movements');
+  }
+
+  exportPDF(): void {
+    const headers = ['Date', 'SKU', 'Product', 'Warehouse', 'Type', 'Qty', 'Reason', 'User'];
+    const data = this.filteredMovements.map(m => [
+      this.datePipe.transform(m.createdAt, 'MMM d, y'),
+      this.getSku(m),
+      this.getProductName(m),
+      this.getWarehouseName(m),
+      m.type,
+      m.quantity.toString(),
+      m.reason || 'N/A',
+      this.getUserName(m)
+    ]);
+
+    this.exportService.exportToPdf(headers, data, 'Stock_Movements', 'Stock Movement Detailed Report');
   }
 
   printReport(): void {

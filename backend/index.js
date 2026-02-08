@@ -17,6 +17,7 @@ const businesssettingsroutes = require("./src/routes/businesssettings.routes");
 const settingsroutes = require("./src/routes/settings.routes");
 const activitylogroutes = require("./src/routes/activitylog.routes");
 const organizationroutes = require("./src/routes/organization.routes");
+const forecastingroutes = require("./src/routes/forecasting.routes");
 const cors = require('cors');
 const userroute = require('./src/routes/user');
 const { verifytoken, restrictto } = require('./src/middleware/auth.middleware');
@@ -25,7 +26,11 @@ const { ensureOrganizationContext } = require('./src/middleware/organization.mid
 
 
 
+const http = require('http');
+const socketUtils = require('./src/utils/socket');
+
 const app = express();
+const server = http.createServer(app);
 const port = 3000;
 
 const allowedOrigins = ['http://localhost:4200',
@@ -36,6 +41,9 @@ app.use(cors({
   origin: allowedOrigins,
   credentials: true
 }));
+
+// Initialize Socket.io
+socketUtils.init(server, allowedOrigins);
 
 connecttomongodb('mongodb://localhost:27017/inventorymanagement')
   .then(() => console.log('MongoDB connected'))
@@ -66,6 +74,7 @@ app.use("/api/warehouses", verifytoken, ensureOrganizationContext, warehouserout
 app.use("/api/business-settings", verifytoken, ensureOrganizationContext, businesssettingsroutes);
 app.use("/api/settings", verifytoken, ensureOrganizationContext, settingsroutes);
 app.use("/api/activitylog", verifytoken, ensureOrganizationContext, activitylogroutes);
+app.use("/api/forecasting", verifytoken, ensureOrganizationContext, forecastingroutes);
 
 
 // app.get('/', (req, res) => {
@@ -76,4 +85,4 @@ app.use((req, res) => {
   res.status(404).json({ error: 'Not Found', path: req.originalUrl });
 });
 
-app.listen(port, () => console.log(`Server Started at ${port}`));
+server.listen(port, () => console.log(`Server Started at ${port}`));

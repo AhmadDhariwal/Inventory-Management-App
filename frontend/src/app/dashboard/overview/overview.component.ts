@@ -6,13 +6,15 @@ import { StockTrendComponent } from '../charts/stock-trend/stock-trend.component
 import { PurchaseTrendComponent } from '../charts/purchase-trend/purchase-trend.component';
 import { SalesTrendComponent } from '../charts/sales-trend/sales-trend.component';
 import { LowStockWidgetComponent } from '../widgets/low-stock-widget/low-stock-widget.component';
+import { SkeletonComponent } from '../../shared/components/skeleton/skeleton.component';
+import { StockDepletionWidgetComponent } from '../widgets/stock-depletion-widget/stock-depletion-widget.component';
 import { interval, Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-overview',
   standalone: true,
-  imports: [CommonModule, RouterModule, StockTrendComponent, PurchaseTrendComponent, SalesTrendComponent, LowStockWidgetComponent],
+  imports: [CommonModule, RouterModule, StockTrendComponent, PurchaseTrendComponent, SalesTrendComponent, LowStockWidgetComponent, SkeletonComponent, StockDepletionWidgetComponent],
   templateUrl: './overview.component.html',
   styleUrl: './overview.component.scss'
 })

@@ -4,6 +4,7 @@ import { ProductService } from '../../shared/services/product.service';
 import { Product } from '../../shared/models/inventory/product.model';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ForecastingService, StockForecast } from '../../shared/services/forecasting.service';
 
 @Component({
   selector: 'app-product-details',
@@ -18,11 +19,20 @@ export class ProductDetailsComponent implements OnInit {
   totalStock = 0;
   loading = true;
   updating = false;
+  forecast?: StockForecast;
+  protected readonly Infinity = Infinity;
+
+  getRiskClass(days: number): string {
+    if (days <= 3) return 'risk-high';
+    if (days <= 7) return 'risk-medium';
+    return 'risk-low';
+  }
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private productService: ProductService
+    private productService: ProductService,
+    private forecastingService: ForecastingService
   ) {}
 
   ngOnInit(): void {
@@ -30,6 +40,7 @@ export class ProductDetailsComponent implements OnInit {
     if (productId) {
       this.loadProduct(productId);
       this.loadStockLevels(productId);
+      this.loadForecast(productId);
     }
   }
 
@@ -58,6 +69,17 @@ export class ProductDetailsComponent implements OnInit {
         const sanitizedError = String(err.message || 'Unknown error').replace(/[\r\n\t]/g, ' ');
         console.error('Error loading stock levels:', sanitizedError);
         this.loading = false;
+      }
+    });
+  }
+
+  loadForecast(id: string): void {
+    this.forecastingService.getProductForecast(id).subscribe({
+      next: (forecast) => {
+        this.forecast = forecast;
+      },
+      error: (err) => {
+        console.error('Error loading forecast:', err);
       }
     });
   }

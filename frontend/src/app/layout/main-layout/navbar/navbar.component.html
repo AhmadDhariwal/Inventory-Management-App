@@ -29,6 +29,14 @@
       />
       <button
         type="button"
+        class="search-barcode"
+        (click)="toggleScanner()"
+        title="Scan Barcode"
+      >
+        <i class="fas fa-barcode"></i>
+      </button>
+      <button
+        type="button"
         *ngIf="searchQuery"
         class="search-clear"
         (click)="clearSearch()"
@@ -36,6 +44,16 @@
       >
         <i class="fas fa-times"></i>
       </button>
+    </div>
+
+    <!-- Barcode Scanner Modal Integration -->
+    <div class="scanner-modal-overlay" *ngIf="showScanner" (click)="toggleScanner()">
+      <div class="scanner-modal-content" (click)="$event.stopPropagation()">
+        <app-barcode-scanner
+          (scanSuccess)="onScanSuccess($event)"
+          (close)="toggleScanner()">
+        </app-barcode-scanner>
+      </div>
     </div>
     <div class="search-suggestions" *ngIf="showSuggestions && searchSuggestions.length > 0">
       <div
@@ -72,10 +90,58 @@
     </button>
 
     <!-- Notifications -->
-    <button type="button" class="navbar__action-btn notifications" title="Notifications">
-      <i class="fas fa-bell"></i>
-      <span class="notification-badge" *ngIf="notificationCount > 0">{{ notificationCount }}</span>
-    </button>
+    <div class="notifications-wrapper">
+      <button
+        type="button"
+        class="navbar__action-btn notifications"
+        [class.active]="showNotifications"
+        (click)="toggleNotifications($event)"
+        title="Notifications"
+      >
+        <i class="fas fa-bell"></i>
+        <span class="notification-badge" *ngIf="notificationCount > 0">{{ notificationCount }}</span>
+      </button>
+
+      <!-- Notification Dropdown -->
+      <div class="notification-dropdown" [class.show]="showNotifications" (click)="$event.stopPropagation()">
+        <div class="dropdown-header">
+          <h3>Notifications</h3>
+          <button class="mark-read-link" *ngIf="notifications.length > 0" (click)="markAllAsRead()">
+            Mark all as read
+          </button>
+        </div>
+
+        <div class="dropdown-body custom-scrollbar">
+          <div *ngIf="notifications.length === 0" class="empty-notifications">
+            <i class="fas fa-bell-slash"></i>
+            <p>No new notifications</p>
+          </div>
+
+          <div
+            *ngFor="let notification of notifications"
+            class="notification-item"
+            [class.unread]="!notification.read"
+            (click)="onNotificationClick(notification)"
+          >
+            <div class="notification-icon" [ngClass]="notification.type">
+              <i class="fas" [ngClass]="{
+                'fa-exclamation-triangle': notification.type === 'LOW_STOCK',
+                'fa-info-circle': notification.type === 'INFO',
+                'fa-check-circle': notification.type === 'SUCCESS'
+              }"></i>
+            </div>
+            <div class="notification-content">
+              <p class="notification-message">{{ notification.data?.message || 'New system update' }}</p>
+              <span class="notification-time">{{ notification.timestamp | date:'shortTime' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="dropdown-footer" *ngIf="notifications.length > 0">
+          <button class="view-all-btn">View All Activity</button>
+        </div>
+      </div>
+    </div>
 
     <!-- User Menu -->
     <div class="navbar__user-menu" (click)="toggleUserMenu()">

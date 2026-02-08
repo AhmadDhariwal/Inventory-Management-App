@@ -8,24 +8,25 @@
   align-items: center;
   gap: 8px;
   font-size: 14px;
-  
+  border: 1px solid transparent;
+
   &.alert-success {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-    
+    background-color: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+    border-color: rgba(16, 185, 129, 0.2);
+
     i {
-      color: #28a745;
+      color: #10b981;
     }
   }
-  
+
   &.alert-error {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-    
+    background-color: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border-color: rgba(239, 68, 68, 0.2);
+
     i {
-      color: #dc3545;
+      color: #ef4444;
     }
   }
 }
@@ -33,40 +34,42 @@
 .password-form {
   margin-top: 16px;
   padding: 20px;
-  background-color: #f8f9fa;
+  background-color: var(--bg-main);
   border-radius: 8px;
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--border-main);
 }
 
 .sessions-list {
   margin-top: 12px;
-  
+
   .session-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 12px;
-    background-color: #f8f9fa;
+    background-color: var(--bg-main);
     border-radius: 6px;
     margin-bottom: 8px;
-    
+    border: 1px solid var(--border-light);
+
     .session-info {
       display: flex;
       flex-direction: column;
       gap: 4px;
-      
+
       strong {
         font-weight: 600;
+        color: var(--text-main);
       }
-      
+
       small {
-        color: #6c757d;
+        color: var(--text-muted);
         font-size: 12px;
       }
-      
+
       .current-badge {
         display: inline-block;
-        background-color: #28a745;
+        background-color: #10b981;
         color: white;
         padding: 2px 8px;
         border-radius: 12px;
@@ -85,6 +88,6 @@
 }
 
 .loading {
-  color: #6c757d;
+  color: var(--text-muted);
   font-style: italic;
 }

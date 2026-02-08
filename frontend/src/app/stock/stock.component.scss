@@ -2,7 +2,8 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: #f8f9fa;
+  background: var(--bg-main);
+  transition: background var(--transition-normal);
 }
 
 .stock-header {
@@ -10,8 +11,9 @@
   justify-content: space-between;
   align-items: center;
   padding: 2rem 2.5rem;
-  background: white;
-  border-bottom: 1px solid #e5e7eb;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-main);
+  transition: background var(--transition-normal), border var(--transition-normal);
 
   &__content {
     flex: 1;
@@ -20,14 +22,14 @@
   &__title {
     font-size: 1.875rem;
     font-weight: 700;
-    color: #111827;
+    color: var(--text-main);
     margin: 0 0 0.5rem 0;
     letter-spacing: -0.025em;
   }
 
   &__subtitle {
     font-size: 0.875rem;
-    color: #6b7280;
+    color: var(--text-muted);
     margin: 0;
   }
 
@@ -41,8 +43,9 @@
   display: flex;
   gap: 0.5rem;
   padding: 0 2.5rem;
-  background: white;
-  border-bottom: 2px solid #e5e7eb;
+  background: var(--bg-surface);
+  border-bottom: 2px solid var(--border-main);
+  transition: background var(--transition-normal), border var(--transition-normal);
 
   &__item {
     display: flex;
@@ -51,7 +54,7 @@
     padding: 1rem 1.5rem;
     font-size: 0.875rem;
     font-weight: 500;
-    color: #6b7280;
+    color: var(--text-muted);
     text-decoration: none;
     border-bottom: 2px solid transparent;
     margin-bottom: -2px;
@@ -66,13 +69,13 @@
     }
 
     &:hover {
-      color: #111827;
-      background: #f9fafb;
+      color: var(--text-main);
+      background: var(--bg-main);
     }
 
     &--active {
-      color: #2563eb;
-      border-bottom-color: #2563eb;
+      color: var(--brand-primary);
+      border-bottom-color: var(--brand-primary);
       background: transparent;
 
       &:hover {
@@ -107,11 +110,11 @@
   }
 
   &--primary {
-    background: #2563eb;
+    background: var(--brand-primary);
     color: white;
 
     &:hover {
-      background: #1d4ed8;
+      background: var(--brand-primary-dark);
       transform: translateY(-1px);
       box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
     }
@@ -122,13 +125,13 @@
   }
 
   &--secondary {
-    background: white;
-    color: #374151;
-    border: 1px solid #d1d5db;
+    background: var(--bg-surface);
+    color: var(--text-main);
+    border: 1px solid var(--border-main);
 
     &:hover {
-      background: #f9fafb;
-      border-color: #9ca3af;
+      background: var(--bg-main);
+      border-color: var(--text-muted);
     }
   }
 }

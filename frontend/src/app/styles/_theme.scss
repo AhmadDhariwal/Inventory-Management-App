@@ -42,6 +42,13 @@
     @include super-header;
 }
 
+@mixin section-header {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    color: var(--text-main);
+    letter-spacing: -0.02em;
+}
+
 @mixin stat-card-max($gradient) {
     @include hero-card;
     padding: 2.25rem;
@@ -161,13 +168,36 @@
 
     --transition-normal: 0.25s ease;
     --transition-smooth: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-theme: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 :root.dark-theme {
     --bg-main: #0f172a;
     --bg-surface: #1e293b;
-    --bg-card: rgba(30, 41, 59, 0.95);
+    --bg-card: rgba(30, 41, 59, 0.85);
+
     --border-main: #334155;
+    --border-light: #1e293b;
+
     --text-main: #f8fafc;
-    --shadow-max: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    --text-muted: #94a3b8;
+    --text-light: #64748b;
+
+    --hover: #334155;
+    --brand-primary-light: #1e293b;
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6);
+    --shadow-max: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+
+    --glass-opacity: 0.8;
+}
+
+// Global transition for theme changes
+*,
+*::before,
+*::after {
+    transition: var(--transition-theme);
 }

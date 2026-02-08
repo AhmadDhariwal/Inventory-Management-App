@@ -116,6 +116,39 @@
           </div>
         </div>
       </div>
+
+      <!-- AI Insights & Forecasting -->
+      <div class="card forecast-card animate-slide-up" *ngIf="forecast">
+        <div class="card-header">
+          <h2>AI Intelligence & Forecasting</h2>
+          <span class="forecast-badge" [ngClass]="getRiskClass(forecast.daysRemaining)">
+            {{ forecast.daysRemaining === Infinity ? 'Stable' : (forecast.daysRemaining <= 7 ? 'Critical Risk' : 'Healthy') }}
+          </span>
+        </div>
+        <div class="card-content">
+          <div class="forecast-insights">
+            <div class="insight-item">
+              <span class="label">Avg. Daily Burn Rate</span>
+              <span class="value">{{ forecast.avgDailyConsumption }} Units</span>
+            </div>
+            <div class="insight-item highlighted">
+              <span class="label">Predicted Stock-Out</span>
+              <span class="valueHighlight">{{ forecast.daysRemaining === Infinity ? 'Unlikely' : (forecast.predictionDate | date:'fullDate') }}</span>
+              <span class="subText" *ngIf="forecast.daysRemaining !== Infinity">({{ forecast.daysRemaining }} days remaining)</span>
+            </div>
+            <div class="insight-item" *ngIf="forecast.daysToReorder > 0">
+              <span class="label">Reorder Window</span>
+              <span class="value">{{ forecast.daysToReorder }} days until reorder point</span>
+            </div>
+          </div>
+          <div class="forecast-hint">
+            <div class="bot-icon">
+              <i class="fas fa-robot"></i>
+            </div>
+            <p>Our predictive model analyzes your last 30 days of outbound movements to forecast future depletion velocity.</p>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 </main>

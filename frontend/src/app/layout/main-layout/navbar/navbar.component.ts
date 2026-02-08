@@ -7,6 +7,9 @@ import { filter, map, debounceTime, distinctUntilChanged, Subject, takeUntil } f
 import { AuthService } from '../../../shared/services/auth.service';
 import { ProductService } from '../../../shared/services/product.service';
 import { OrganizationService, Organization } from '../../../shared/services/organization.service';
+import { ThemeService } from '../../../shared/services/theme.service';
+import { BarcodeScannerComponent } from '../../../shared/components/barcode-scanner/barcode-scanner.component';
+import { NotificationService, AppNotification } from '../../../shared/services/notification.service';
 
 interface SearchSuggestion {
   _id: string;
@@ -17,7 +20,7 @@ interface SearchSuggestion {
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, BarcodeScannerComponent],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.scss'
 })
@@ -31,8 +34,11 @@ export class NavbarComponent implements OnInit, OnDestroy {
   showUserMenu = false;
   showSuggestions = false;
   searchSuggestions: SearchSuggestion[] = [];
-  notificationCount = 3; // Mock notification count
-  recentActivityCount = 0; // Activity logs count
+  notificationCount = 0;
+  recentActivityCount = 0;
+  showScanner = false;
+  showNotifications = false;
+  notifications: AppNotification[] = [];
   organization: Organization | null = null;
 
   private destroy$ = new Subject<void>();
@@ -40,10 +46,11 @@ export class NavbarComponent implements OnInit, OnDestroy {
   private authservice = inject(AuthService);
   private productService = inject(ProductService);
   private organizationService = inject(OrganizationService);
+  private themeService = inject(ThemeService);
+  private notificationService = inject(NotificationService);
 
   constructor(private router: Router, private route: ActivatedRoute) {
-    this.isDarkMode = localStorage.getItem('darkMode') === 'true';
-    this.applyTheme();
+    this.isDarkMode = this.themeService.getCurrentTheme();
   }
 
   ngOnInit() {
@@ -74,6 +81,15 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
     // Load organization data
     this.loadOrganization();
+
+    // Subscribe to notifications
+    this.notificationService.unreadCount$.pipe(takeUntil(this.destroy$)).subscribe(count => {
+      this.notificationCount = count;
+    });
+
+    this.notificationService.notifications$.pipe(takeUntil(this.destroy$)).subscribe(notifications => {
+      this.notifications = notifications;
+    });
   }
 
   private loadOrganization(): void {
@@ -103,20 +119,9 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   toggleDarkMode(): void {
-    this.isDarkMode = !this.isDarkMode;
-    localStorage.setItem('darkMode', this.isDarkMode.toString());
-    this.applyTheme();
-    console.log('Dark mode toggled:', this.isDarkMode);
-  }
-
-  private applyTheme(): void {
-    const root = document.documentElement;
-    if (this.isDarkMode) {
-      root.classList.add('dark-theme');
-    } else {
-      root.classList.remove('dark-theme');
-    }
-    console.log('Theme applied:', this.isDarkMode ? 'dark' : 'light');
+    this.themeService.toggleTheme();
+    this.isDarkMode = this.themeService.getCurrentTheme();
+    console.log('Dark mode toggled via service:', this.isDarkMode);
   }
 
   onSearchInput(): void {
@@ -132,8 +137,10 @@ export class NavbarComponent implements OnInit, OnDestroy {
   onSearch(): void {
     if (this.searchQuery.trim()) {
       this.showSuggestions = false;
+      this.showScanner = false;
       const exactMatch = this.searchSuggestions.find(s =>
-        s.name.toLowerCase() === this.searchQuery.trim().toLowerCase()
+        s.name.toLowerCase() === this.searchQuery.trim().toLowerCase() ||
+        s.sku.toLowerCase() === this.searchQuery.trim().toLowerCase()
       );
       if (exactMatch) {
         this.router.navigate(['/products/details', exactMatch._id]);
@@ -141,6 +148,15 @@ export class NavbarComponent implements OnInit, OnDestroy {
         this.router.navigate(['/products'], { queryParams: { search: this.searchQuery.trim() } });
       }
     }
+  }
+
+  toggleScanner(): void {
+    this.showScanner = !this.showScanner;
+  }
+
+  onScanSuccess(result: string): void {
+    this.searchQuery = result;
+    this.onSearch();
   }
 
   clearSearch(): void {
@@ -216,6 +232,25 @@ export class NavbarComponent implements OnInit, OnDestroy {
   closeAllDropdowns(): void {
     this.showUserMenu = false;
     this.showSuggestions = false;
+    this.showNotifications = false;
+  }
+
+  toggleNotifications(event: MouseEvent): void {
+    event.stopPropagation();
+    this.showNotifications = !this.showNotifications;
+    if (this.showNotifications) {
+      this.showUserMenu = false;
+      this.showSuggestions = false;
+    }
+  }
+
+  markAllAsRead(): void {
+    this.notificationService.markAllAsRead();
+  }
+
+  onNotificationClick(notification: AppNotification): void {
+    // Handle specific notification navigation if needed
+    this.showNotifications = false;
   }
 
   private getPageTitle(url: string): string {

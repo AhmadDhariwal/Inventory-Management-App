@@ -35,9 +35,25 @@
     </div>
   </header>
 
-  <div *ngIf="loading" class="loading-state">
-    <div class="loading-spinner"></div>
-    <p>Loading Dashboard...</p>
+  <div *ngIf="loading" class="dashboard-content animate-fade-in">
+    <section class="kpi-section">
+      <div class="kpi-grid">
+        <div class="kpi-card" *ngFor="let i of [1,2,3,4,5]">
+           <div class="kpi-icon"><app-skeleton type="circle" width="40px" height="40px"></app-skeleton></div>
+           <div class="kpi-content">
+             <app-skeleton type="line" width="60%" height="0.8rem"></app-skeleton>
+             <app-skeleton type="rect" width="80%" height="2rem" style="margin: 0.5rem 0"></app-skeleton>
+             <app-skeleton type="line" width="40%" height="0.6rem"></app-skeleton>
+           </div>
+        </div>
+      </div>
+    </section>
+    
+    <div class="charts-container">
+      <section class="charts-section" *ngFor="let i of [1,2,3]">
+        <app-skeleton type="rect" width="100%" height="300px"></app-skeleton>
+      </section>
+    </div>
   </div>
 
   <div *ngIf="error" class="error-state">
@@ -192,6 +208,11 @@
         </div>
       </section>
     </div>
+
+    <!-- AI Forecasting Widget -->
+    <section class="widget-section">
+      <app-stock-depletion-widget></app-stock-depletion-widget>
+    </section>
 
     <!-- Health Widget -->
     <section class="widget-section">

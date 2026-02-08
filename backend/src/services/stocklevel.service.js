@@ -1,14 +1,15 @@
 const StockLevel = require('../models/stocklevel');
 const Product = require('../models/product');
 const Warehouse = require('../models/warehouse');
+const socketUtils = require('../utils/socket');
 
-// Initialize stock levels for all products in all warehouses
-// Initialize stock levels for all products in all warehouses for a specific organization
+/**
+ * Initialize stock levels for all products in all warehouses for a specific organization
+ */
 const initializeStockLevels = async (organizationId) => {
   try {
     const query = organizationId ? { organizationId } : {};
 
-    // Only fetch products/warehouses for this organization (or global if no orgId provided/legacy)
     const products = await Product.find(query);
     const warehouses = await Warehouse.find({ ...query, isActive: true });
 
@@ -22,9 +23,6 @@ const initializeStockLevels = async (organizationId) => {
 
     for (const product of products) {
       for (const warehouse of warehouses) {
-        // Find existing stock level for this product-warehouse combo
-        // Note: We don't strictly need organizationId here as product+warehouse should be unique
-        // but adding it makes it safer.
         const stockQuery = {
           product: product._id,
           warehouse: warehouse._id
@@ -40,7 +38,7 @@ const initializeStockLevels = async (organizationId) => {
           const newStock = {
             product: product._id,
             warehouse: warehouse._id,
-            quantity: Math.floor(Math.random() * 100) + 10, // Random quantity between 10-110
+            quantity: Math.floor(Math.random() * 100) + 10,
             reservedQuantity: 0,
             reorderLevel: 20,
             minStock: 10
@@ -69,7 +67,9 @@ const initializeStockLevels = async (organizationId) => {
   }
 };
 
-// Get or create stock level for a specific product-warehouse combination
+/**
+ * Get or create stock level for a specific product-warehouse combination
+ */
 const getOrCreateStockLevel = async (productId, warehouseId, organizationId) => {
   try {
     let query = {
@@ -101,7 +101,6 @@ const getOrCreateStockLevel = async (productId, warehouseId, organizationId) => 
 
       stockLevel = await StockLevel.create(newStock);
 
-      // Populate the created stock level
       stockLevel = await StockLevel.findById(stockLevel._id)
         .populate('product', 'name sku')
         .populate('warehouse', 'name');
@@ -114,16 +113,33 @@ const getOrCreateStockLevel = async (productId, warehouseId, organizationId) => 
   }
 };
 
-// Update stock quantity for a specific product-warehouse combination
+/**
+ * Update stock quantity for a specific product-warehouse combination
+ */
 const updateStockQuantity = async (productId, warehouseId, organizationId, quantityDelta) => {
   try {
     const stockLevel = await getOrCreateStockLevel(productId, warehouseId, organizationId);
+    const oldQuantity = stockLevel.quantity;
     stockLevel.quantity += quantityDelta;
 
-    // Ensure stock doesn't go below 0 if not allowed (optional, but good practice)
     if (stockLevel.quantity < 0) stockLevel.quantity = 0;
 
     await stockLevel.save();
+
+    // Trigger notification if stock drops below reorder level
+    if (stockLevel.quantity <= stockLevel.reorderLevel && (oldQuantity > stockLevel.reorderLevel || (quantityDelta < 0 && oldQuantity <= stockLevel.reorderLevel))) {
+      const productName = stockLevel.product ? stockLevel.product.name : 'Unknown Product';
+      const warehouseName = stockLevel.warehouse ? stockLevel.warehouse.name : 'Unknown Warehouse';
+
+      socketUtils.sendNotification(organizationId, 'LOW_STOCK', {
+        message: `Low stock alert: ${productName} in ${warehouseName} is at ${stockLevel.quantity}.`,
+        productId: productId,
+        warehouseId: warehouseId,
+        currentQuantity: stockLevel.quantity,
+        reorderLevel: stockLevel.reorderLevel
+      });
+    }
+
     return stockLevel;
   } catch (error) {
     console.error('Error updating stock quantity:', error);
