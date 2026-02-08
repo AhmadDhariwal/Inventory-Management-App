@@ -120,4 +120,25 @@ export class StockMovementReportComponent implements OnInit {
     console.log('Filtered movements count:', this.filteredMovements.length);
     console.log('Total movements count:', this.movements.length);
   }
+
+  getMovementClass(type: string | undefined): string {
+    return type ? type.toLowerCase() : '';
+  }
+
+  // Helper methods to avoid template errors with optional chaining
+  getSku(m: StockMovement): string {
+    return m.product ? m.product.sku : 'N/A';
+  }
+
+  getProductName(m: StockMovement): string {
+    return m.product ? m.product.name : 'N/A';
+  }
+
+  getWarehouseName(m: StockMovement): string {
+    return m.warehouse ? m.warehouse.name : 'N/A';
+  }
+
+  getUserName(m: StockMovement): string {
+    return m.user ? m.user.name : 'System';
+  }
 }

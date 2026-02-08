@@ -15,7 +15,7 @@ const dashboardService = require('../services/dashboard.service');
 
 exports.getdashboardstats = async (req, res) => {
   try {
-    const data = await dashboardService.getDashboardSummary();
+    const data = await dashboardService.getDashboardSummary(req.user, req.organizationId);
     res.status(200).json(data);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -25,7 +25,7 @@ exports.getdashboardstats = async (req, res) => {
 exports.getStockTrend = async (req, res) => {
   try {
     const days = parseInt(req.query.days) || 30;
-    const data = await dashboardService.getStockTrend(days);
+    const data = await dashboardService.getStockTrend(days, req.user, req.organizationId);
     res.status(200).json(data);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -35,7 +35,7 @@ exports.getStockTrend = async (req, res) => {
 exports.getPurchaseTrend = async (req, res) => {
   try {
     const days = parseInt(req.query.days) || 30;
-    const data = await dashboardService.getPurchaseTrend(days);
+    const data = await dashboardService.getPurchaseTrend(days, req.user, req.organizationId);
     res.status(200).json(data);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -45,7 +45,7 @@ exports.getPurchaseTrend = async (req, res) => {
 exports.getSalesTrend = async (req, res) => {
   try {
     const days = parseInt(req.query.days) || 30;
-    const data = await dashboardService.getSalesTrend(days);
+    const data = await dashboardService.getSalesTrend(days, req.user, req.organizationId);
     res.status(200).json(data);
   } catch (error) {
     res.status(500).json({ error: error.message });

@@ -8,6 +8,7 @@ import { InventorySettingsComponent} from './inventory-settings/inventory-settin
 import { NotificationSettingsComponent } from './notification-settings/notification-settings.component';
 import { SecuritySettingsComponent } from './security-settings/security-settings.component';
 import { RolesComponent } from './roles/roles.component';
+import { UserManagementComponent } from './user-management/user-management.component';
 
 const routes: Routes = [
   {
@@ -42,6 +43,12 @@ const routes: Routes = [
       {
         path: 'roles',
         component: RolesComponent,
+        canActivate: [AuthGuard],
+        data: { roles: ['admin'] }
+      },
+      {
+        path: 'users',
+        component: UserManagementComponent,
         canActivate: [AuthGuard],
         data: { roles: ['admin'] }
       }

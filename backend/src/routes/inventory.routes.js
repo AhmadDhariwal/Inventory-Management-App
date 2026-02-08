@@ -3,9 +3,9 @@ const router = express.Router();
 const inventorycontroller = require("../controllers/inventory.controller");
 const { verifytoken, restrictto } = require("../middleware/auth.middleware");
 
-// Stock movements - Admin only
-router.post("/add", verifytoken, restrictto(['admin']), inventorycontroller.addstock);
-router.post("/remove", verifytoken, restrictto(['admin']), inventorycontroller.removestock);
+// Stock movements - Accessible to all roles for operational flexibility
+router.post("/add", verifytoken, restrictto(['admin', 'manager', 'user']), inventorycontroller.addstock);
+router.post("/remove", verifytoken, restrictto(['admin', 'manager', 'user']), inventorycontroller.removestock);
 
 // View stock - Both admin and user
 router.get("/stock/:productId/:warehouseId", verifytoken, inventorycontroller.getstock);

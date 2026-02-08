@@ -9,9 +9,9 @@ exports.createsupplier = async (req, res) => {
       data: supplier
     });
   } catch (error) {
-    res.status(400).json({ 
+    res.status(400).json({
       success: false,
-      error: error.message 
+      error: error.message
     });
   }
 };
@@ -24,9 +24,9 @@ exports.getsuppliers = async (req, res) => {
       data: suppliers
     });
   } catch (error) {
-    res.status(500).json({ 
+    res.status(500).json({
       success: false,
-      error: error.message 
+      error: error.message
     });
   }
 };
@@ -35,9 +35,9 @@ exports.getsupplierById = async (req, res) => {
   try {
     const supplier = await Supplier.findById(req.params.id);
     if (!supplier) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         success: false,
-        message: "Supplier not found" 
+        message: "Supplier not found"
       });
     }
     res.json({
@@ -45,9 +45,9 @@ exports.getsupplierById = async (req, res) => {
       data: supplier
     });
   } catch (error) {
-    res.status(400).json({ 
+    res.status(400).json({
       success: false,
-      error: error.message 
+      error: error.message
     });
   }
 };
@@ -60,9 +60,9 @@ exports.updatesupplier = async (req, res) => {
       { new: true, runValidators: true }
     );
     if (!supplier) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         success: false,
-        message: "Supplier not found" 
+        message: "Supplier not found"
       });
     }
     res.json({
@@ -71,9 +71,9 @@ exports.updatesupplier = async (req, res) => {
       data: supplier
     });
   } catch (error) {
-    res.status(400).json({ 
+    res.status(400).json({
       success: false,
-      error: error.message 
+      error: error.message
     });
   }
 };
@@ -82,19 +82,19 @@ exports.deletesupplier = async (req, res) => {
   try {
     const supplier = await Supplier.findByIdAndDelete(req.params.id);
     if (!supplier) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         success: false,
-        message: "Supplier not found" 
+        message: "Supplier not found"
       });
     }
-    res.json({ 
+    res.json({
       success: true,
-      message: "Supplier deleted successfully" 
+      message: "Supplier deleted successfully"
     });
   } catch (error) {
-    res.status(400).json({ 
+    res.status(400).json({
       success: false,
-      error: error.message 
+      error: error.message
     });
   }
 };
@@ -103,24 +103,24 @@ exports.disablesupplier = async (req, res) => {
   try {
     const supplier = await Supplier.findByIdAndUpdate(
       req.params.id,
-      { isactive: false },
+      { isActive: false },
       { new: true }
     );
     if (!supplier) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         success: false,
-        message: "Supplier not found" 
+        message: "Supplier not found"
       });
     }
-    res.json({ 
+    res.json({
       success: true,
-      message: "Supplier disabled successfully", 
-      data: supplier 
+      message: "Supplier disabled successfully",
+      data: supplier
     });
   } catch (error) {
-    res.status(400).json({ 
+    res.status(400).json({
       success: false,
-      error: error.message 
+      error: error.message
     });
   }
 };
@@ -129,24 +129,24 @@ exports.togglesupplierstatus = async (req, res) => {
   try {
     const supplier = await Supplier.findById(req.params.id);
     if (!supplier) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         success: false,
-        message: "Supplier not found" 
+        message: "Supplier not found"
       });
     }
-    
-    supplier.isactive = !supplier.isactive;
+
+    supplier.isActive = !supplier.isActive;
     await supplier.save();
-    
-    res.json({ 
+
+    res.json({
       success: true,
-      message: `Supplier ${supplier.isactive ? 'activated' : 'deactivated'} successfully`, 
-      data: supplier 
+      message: `Supplier ${supplier.isActive ? 'activated' : 'deactivated'} successfully`,
+      data: supplier
     });
   } catch (error) {
-    res.status(400).json({ 
+    res.status(400).json({
       success: false,
-      error: error.message 
+      error: error.message
     });
   }
 };

@@ -4,7 +4,8 @@ const createsalesorder = async (req, res) => {
   try {
     const salesorder = await salesorderservice.createsalesorder(
       req.body,
-      req.user.id
+      req.user.userid,
+      req.organizationId
     );
 
     res.status(201).json({
@@ -16,14 +17,14 @@ const createsalesorder = async (req, res) => {
   }
 };
 
-const getallsalesorders = async(req,res) => {
-try{
-   const salesorder = await salesorderservice.getallsalesorders();
+const getallsalesorders = async (req, res) => {
+  try {
+    const salesorder = await salesorderservice.getallsalesorders(req.user, req.organizationId);
     res.status(200).json(salesorder);
-}
-catch(error){
-    res.status(400).json({error:error.message});
-}
+  }
+  catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 }
 
-module.exports = { createsalesorder,getallsalesorders };
+module.exports = { createsalesorder, getallsalesorders };

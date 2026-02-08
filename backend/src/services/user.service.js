@@ -1,274 +1,565 @@
-const express = require('express');
-const userschema = require ('../models/user');
+const User = require('../models/user');
 const jwt = require("jsonwebtoken");
 const bcrypt = require('bcrypt');
+const { validateRoleAssignment } = require('../utils/rbac.helpers');
 
-//const { v4: uuidv4 } = require('uuid');
-
-async function handleusersignup(req,res){
-
-    try {
-        const body = req.body;
-        if (!body.name || !body.email || !body.username || !body.password) {
-          return res.status(400).json({ error: "Data is required" });
-        }
-        //const generatedId =  shortid.generate();   // We can also use it for the generateid `ITEM_${Date.now()}`;
-       const hashedpassword = await bcrypt.hash(body.password, 8);
-       //console.log(hashedpassword);
-        const createduser = await userschema.create({
-            name: body.name,
-            email : body.email,
-            username : body.username,
-            password: hashedpassword,
-            phone: body.phone,
-            department : body.department,
-           role : body.role,
-        })
-      await createduser.save();
-
-        const token = jwt.sign({ userid : createduser._id , role : createduser.role }, "Hello", {expiresIn : '1h'});
-       
-        res.status(201).json({
-             message: "User created successfully",
-             token: token,
-              role : createduser.role,
-            item: createduser,
-        });
-    
-            }
-        catch (err) {
-        console.error("createitem error:", err);
-        res.status(500).json({ error: "Server error" });
-      }
-    }
-
-    async function allusers(req,res){
-        try {
-            const allusers = await userschema.find().select('-password');
-            res.status(200).json({
-                message: "All users fetched successfully",
-                items: allusers,
-            });
-        } catch (err) {
-            console.error("allusers error:", err);
-            res.status(500).json({ error: "Server error" });
-        }
-    }
-
-async function handleuserlogin(req,res){
-
-    try {
-        const body = req.body;
-        if ( !body.username || !body.password) {
-          return res.status(400).json({ error: " Valid Data is required" });
-        }
-       
-        const logineduser = await userschema.findOne({ username: body.username });
-
-if (!logineduser) {
-  return res.status(401).json({
-    error: "Invalid username or password"
-  });
-}
-
-// check active status AFTER user exists
-if (!logineduser.isactive) {
-  return res.status(403).json({
-    error: `${body.username} is not active`
-  });
-}
-
-// check password
-const passwordMatch = await bcrypt.compare(
-  body.password,
-  logineduser.password
-);
-
-if (!passwordMatch) {
-  return res.status(401).json({
-    error: "Invalid username or password"
-  });
-}
-
-
-
-        //const generatedId =  shortid.generate();   // We can also use it for the generateid `ITEM_${Date.now()}`;
-    
-    //     const logineduser = await userschema.findOne({
-    //         username : body.username,
-    //        // password: body.password,
-    //     })
-    //     const activeuser = await userschema.findOne({
-    //       username : body.username,
-    //        isactive: true
-    //     })
-
-    //     if(!activeuser){
-    //         return res.status(401).json({ error: ` ${body.username} is not active` });
-    //     }
-    //    // const passwordMatch = await bcrypt.compare(password, logineduser.password);
-    //     else if(!logineduser){
-    //         return res.status(401).json({ error: "Invalid username or password" });
-    //     }
-    //     const passwordMatch = await bcrypt.compare(body.password, logineduser.password);
-
-    //     if (!passwordMatch) {
-    //        return res.status(401).json({ error: "Invalid username or password" });
-    //    }
-        const token = jwt.sign({ userid : logineduser._id , role : logineduser.role }, "Hello", {expiresIn : '24h'});
-      
-        res.status(200).json({
-             message: "User found successfully",
-             token: token,
-             role : logineduser.role,
-            item: logineduser ,
-        });
-    
-            }
-        catch (err) {
-        console.error("finduser error:", err);
-        res.status(500).json({ error: "Server error" });
-      }
-    }
-
-async function updateUserProfile(req, res) {
-    try {
-        const userId = req.user.userid;
-        const { name, phone, department } = req.body;
-        
-        const updatedUser = await userschema.findByIdAndUpdate(
-            userId,
-            { name, phone, department },
-            { new: true, runValidators: true }
-        ).select('-password');
-        
-        if (!updatedUser) {
-            return res.status(404).json({ error: "User not found" });
-        }
-        
-        res.status(200).json({
-            success: true,
-            message: "Profile updated successfully",
-            data: updatedUser
-        });
-    } catch (err) {
-        console.error("Update profile error:", err);
-        res.status(500).json({ error: "Server error" });
-    }
-}
-
-async function getUserProfile(req, res) {
-    try {
-        const userId = req.user.userid;
-        const user = await userschema.findById(userId).select('-password');
-        
-        if (!user) {
-            return res.status(404).json({ error: "User not found" });
-        }
-        
-        res.status(200).json({
-            success: true,
-            data: user
-        });
-    } catch (err) {
-        console.error("Get profile error:", err);
-        res.status(500).json({ error: "Server error" });
-    }
-}
-
-async function changePassword(req, res) {
-    try {
-        const userId = req.user.userid;
-        const { currentPassword, newPassword } = req.body;
-        
-        const user = await userschema.findById(userId);
-        if (!user) {
-            return res.status(404).json({ error: "User not found" });
-        }
-        
-        if (user.password !== currentPassword) {
-            return res.status(400).json({ error: "Current password is incorrect" });
-        }
-        
-        user.password = newPassword;
-        await user.save();
-        
-        res.status(200).json({
-            success: true,
-            message: "Password changed successfully"
-        });
-    } catch (err) {
-        console.error("Change password error:", err);
-        res.status(500).json({ error: "Server error" });
-    }
-}
-
-async function getActiveSessions(req, res) {
-    try {
-        const sessions = [{
-            id: '1',
-            device: 'Chrome on Windows',
-            location: 'New York, US',
-            lastActive: new Date(),
-            current: true
-        }];
-        
-        res.status(200).json({
-            success: true,
-            data: sessions
-        });
-    } catch (err) {
-        console.error("Get sessions error:", err);
-        res.status(500).json({ error: "Server error" });
-    }
-}
-
-async function terminateSession(req, res) {
-    try {
-        res.status(200).json({
-            success: true,
-            message: "Session terminated successfully"
-        });
-    } catch (err) {
-        console.error("Terminate session error:", err);
-        res.status(500).json({ error: "Server error" });
-    }
-}
-
-async function toggleuserstatus (req, res) {
+/**
+ * User signup with organization context
+ * Admins can create managers and users
+ * Managers can create users (assigned to them automatically)
+ */
+async function handleusersignup(req, res) {
   try {
-    const user = await userschema.findById(req.params.id);
-    if (!user) {
-      return res.status(404).json({ 
+    const body = req.body;
+
+    if (!body.name || !body.email || !body.username || !body.password) {
+      return res.status(400).json({
         success: false,
-        message: "User not found" 
+        error: "Name, email, username, and password are required"
       });
     }
-    
-    user.isactive = !user.isactive;
-    await user.save();
-    
-    res.json({ 
+
+    let organizationId = req.organizationId || body.organizationId;
+
+    // Auto-create organization if organizationName is provided and no organizationId
+    if (!organizationId && body.organizationName) {
+      const Organization = require('../models/organization');
+
+      // Create new organization
+      const newOrganization = await Organization.create({
+        name: body.organizationName,
+        email: body.email,
+        phone: body.phone || '',
+        address: {
+          country: 'US' // Default country
+        },
+        settings: {
+          currency: 'USD',
+          timezone: 'UTC',
+          dateFormat: 'MM/DD/YYYY'
+        },
+        subscription: {
+          plan: 'free',
+          status: 'active',
+          startDate: new Date()
+        }
+      });
+
+      organizationId = newOrganization._id;
+
+      // First user of organization becomes admin
+      body.role = 'admin';
+    }
+
+    if (!organizationId) {
+      return res.status(400).json({
+        success: false,
+        error: "Organization ID or organization name is required"
+      });
+    }
+
+    // Validate role assignment if user is authenticated
+    if (req.user && req.userRole) {
+      const validation = validateRoleAssignment(req.userRole, body.role || 'user');
+      if (!validation.valid) {
+        return res.status(403).json({
+          success: false,
+          error: validation.message
+        });
+      }
+    }
+
+    const hashedpassword = await bcrypt.hash(body.password, 8);
+
+    const userData = {
+      name: body.name,
+      email: body.email,
+      username: body.username,
+      password: hashedpassword,
+      phone: body.phone,
+      department: body.department,
+      role: body.role || 'user',
+      organizationId: organizationId,
+      createdBy: req.user?.userid || null
+    };
+
+    // If created by a manager, assign the user to that manager
+    if (req.userRole === 'manager' && userData.role === 'user') {
+      userData.managerId = req.user.userid;
+    }
+
+    const createduser = await User.create(userData);
+
+    // If manager created a user, add to manager's assignedUsers
+    if (req.userRole === 'manager' && userData.role === 'user') {
+      await User.findByIdAndUpdate(
+        req.user.userid,
+        { $addToSet: { assignedUsers: createduser._id } }
+      );
+    }
+
+    // Generate token with organization context
+    const token = jwt.sign(
+      {
+        userid: createduser._id,
+        role: createduser.role,
+        organizationId: createduser.organizationId
+      },
+      "Hello",
+      { expiresIn: '24h' }
+    );
+
+    res.status(201).json({
       success: true,
-      message: `User ${user.isactive ? 'activated' : 'deactivated'} successfully`, 
+      message: "User created successfully",
+      token: token,
+      role: createduser.role,
+      data: {
+        _id: createduser._id,
+        name: createduser.name,
+        email: createduser.email,
+        username: createduser.username,
+        role: createduser.role,
+        organizationId: createduser.organizationId,
+        department: createduser.department
+      }
+    });
+  } catch (err) {
+    console.error("Create user error:", err);
+
+    if (err.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        error: "Username or email already exists"
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      error: "Server error"
+    });
+  }
+}
+
+/**
+ * Get all users with organization and role-based filtering
+ * Admins see all users in their organization
+ * Managers see only assigned users
+ * Users see only themselves
+ */
+async function allusers(req, res) {
+  try {
+    let query = { organizationId: req.organizationId };
+
+    // Role-based filtering
+    if (req.userRole === 'manager') {
+      // Managers see their assigned users + themselves
+      query._id = { $in: [...req.assignedUsers, req.user.userid] };
+    } else if (req.userRole === 'user') {
+      // Users see only themselves
+      query._id = req.user.userid;
+    }
+    // Admins see all users in organization (no additional filter)
+
+    const users = await User.find(query)
+      .select('-password')
+      .populate('managerId', 'name email')
+      .populate('createdBy', 'name email')
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      message: "Users fetched successfully",
+      data: users,
+      count: users.length
+    });
+  } catch (err) {
+    console.error("Get all users error:", err);
+    res.status(500).json({
+      success: false,
+      error: "Server error"
+    });
+  }
+}
+
+const ActivityLog = require('../models/activitylog');
+const activityLogService = require('./activitylog.service');
+
+/**
+ * User login with organization context
+ */
+async function handleuserlogin(req, res) {
+  try {
+    const body = req.body;
+
+    if (!body.username || !body.password) {
+      return res.status(400).json({
+        success: false,
+        error: "Username and password are required"
+      });
+    }
+
+    const logineduser = await User.findOne({ username: body.username });
+
+    if (!logineduser) {
+      return res.status(401).json({
+        success: false,
+        error: "Invalid username or password"
+      });
+    }
+
+    // Check active status
+    if (!logineduser.isActive) {
+      return res.status(403).json({
+        success: false,
+        error: `Account ${body.username} is not active`
+      });
+    }
+
+    // Check password
+    const passwordMatch = await bcrypt.compare(body.password, logineduser.password);
+
+    if (!passwordMatch) {
+      return res.status(401).json({
+        success: false,
+        error: "Invalid username or password"
+      });
+    }
+
+    // Update last login timestamp
+    logineduser.lastLogin = new Date();
+    await logineduser.save();
+
+    // Log login activity
+    await activityLogService.logActivity({
+      userId: logineduser._id,
+      action: 'LOGIN',
+      module: 'AUTH',
+      description: `User ${logineduser.username} logged in`,
+      ip: req.ip || req.connection.remoteAddress
+    });
+
+    // Generate token with organization context
+    const token = jwt.sign(
+      {
+        userid: logineduser._id,
+        role: logineduser.role,
+        organizationId: logineduser.organizationId
+      },
+      "Hello",
+      { expiresIn: '24h' }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Login successful",
+      token: token,
+      role: logineduser.role,
+      data: {
+        _id: logineduser._id,
+        name: logineduser.name,
+        email: logineduser.email,
+        username: logineduser.username,
+        role: logineduser.role,
+        organizationId: logineduser.organizationId,
+        department: logineduser.department
+      }
+    });
+  } catch (err) {
+    console.error("Login error:", err);
+    res.status(500).json({
+      success: false,
+      error: "Server error"
+    });
+  }
+}
+
+/**
+ * Assign user to manager
+ * Only admins can assign users to managers
+ */
+async function assignUserToManager(req, res) {
+  try {
+    const { userId, managerId } = req.body;
+
+    if (!userId || !managerId) {
+      return res.status(400).json({
+        success: false,
+        error: "User ID and Manager ID are required"
+      });
+    }
+
+    // Verify both users exist and belong to same organization
+    const user = await User.findById(userId);
+    const manager = await User.findById(managerId);
+
+    if (!user || !manager) {
+      return res.status(404).json({
+        success: false,
+        error: "User or Manager not found"
+      });
+    }
+
+    if (user.organizationId.toString() !== req.organizationId.toString() ||
+      manager.organizationId.toString() !== req.organizationId.toString()) {
+      return res.status(403).json({
+        success: false,
+        error: "Users must belong to your organization"
+      });
+    }
+
+    if (manager.role !== 'manager') {
+      return res.status(400).json({
+        success: false,
+        error: "Assigned user must have manager role"
+      });
+    }
+
+    if (user.role !== 'user') {
+      return res.status(400).json({
+        success: false,
+        error: "Only users with role 'user' can be assigned to managers"
+      });
+    }
+
+    // Remove from previous manager if exists
+    if (user.managerId) {
+      await User.findByIdAndUpdate(
+        user.managerId,
+        { $pull: { assignedUsers: userId } }
+      );
+    }
+
+    // Assign to new manager
+    user.managerId = managerId;
+    await user.save();
+
+    // Add to manager's assignedUsers
+    await User.findByIdAndUpdate(
+      managerId,
+      { $addToSet: { assignedUsers: userId } }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "User assigned to manager successfully",
       data: user
     });
   } catch (error) {
-    res.status(400).json({ 
+    console.error("Assign user to manager error:", error);
+    res.status(500).json({
       success: false,
-      error: error.message 
+      error: "Server error"
+    });
+  }
+}
+
+/**
+ * Get users assigned to a manager
+ */
+async function getManagerUsers(req, res) {
+  try {
+    const managerId = req.params.managerId || req.user.userid;
+
+    const users = await User.find({
+      managerId: managerId,
+      organizationId: req.organizationId
+    }).select('-password');
+
+    res.status(200).json({
+      success: true,
+      data: users,
+      count: users.length
+    });
+  } catch (error) {
+    console.error("Get manager users error:", error);
+    res.status(500).json({
+      success: false,
+      error: "Server error"
+    });
+  }
+}
+
+async function updateUserProfile(req, res) {
+  try {
+    const userId = req.user.userid;
+    const { name, phone, department } = req.body;
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { name, phone, department },
+      { new: true, runValidators: true }
+    ).select('-password');
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        success: false,
+        error: "User not found"
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Profile updated successfully",
+      data: updatedUser
+    });
+  } catch (err) {
+    console.error("Update profile error:", err);
+    res.status(500).json({
+      success: false,
+      error: "Server error"
+    });
+  }
+}
+
+async function getUserProfile(req, res) {
+  try {
+    const userId = req.user.userid;
+    const user = await User.findById(userId)
+      .select('-password')
+      .populate('organizationId', 'name email')
+      .populate('managerId', 'name email');
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error: "User not found"
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: user
+    });
+  } catch (err) {
+    console.error("Get profile error:", err);
+    res.status(500).json({
+      success: false,
+      error: "Server error"
+    });
+  }
+}
+
+async function changePassword(req, res) {
+  try {
+    const userId = req.user.userid;
+    const { currentPassword, newPassword } = req.body;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error: "User not found"
+      });
+    }
+
+    const passwordMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!passwordMatch) {
+      return res.status(400).json({
+        success: false,
+        error: "Current password is incorrect"
+      });
+    }
+
+    user.password = await bcrypt.hash(newPassword, 8);
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Password changed successfully"
+    });
+  } catch (err) {
+    console.error("Change password error:", err);
+    res.status(500).json({
+      success: false,
+      error: "Server error"
+    });
+  }
+}
+
+async function getActiveSessions(req, res) {
+  try {
+    const sessions = [{
+      id: '1',
+      device: 'Chrome on Windows',
+      location: 'New York, US',
+      lastActive: new Date(),
+      current: true
+    }];
+
+    res.status(200).json({
+      success: true,
+      data: sessions
+    });
+  } catch (err) {
+    console.error("Get sessions error:", err);
+    res.status(500).json({
+      success: false,
+      error: "Server error"
+    });
+  }
+}
+
+async function terminateSession(req, res) {
+  try {
+    res.status(200).json({
+      success: true,
+      message: "Session terminated successfully"
+    });
+  } catch (err) {
+    console.error("Terminate session error:", err);
+    res.status(500).json({
+      success: false,
+      error: "Server error"
+    });
+  }
+}
+
+async function toggleuserstatus(req, res) {
+  try {
+    const user = await User.findById(req.params.id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    // Verify user belongs to same organization
+    if (user.organizationId.toString() !== req.organizationId.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied"
+      });
+    }
+
+    user.isActive = !user.isActive;
+    await user.save();
+
+    res.json({
+      success: true,
+      message: `User ${user.isActive ? 'activated' : 'deactivated'} successfully`,
+      data: user
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      error: error.message
     });
   }
 }
 
 module.exports = {
-    handleusersignup,
-    handleuserlogin,
-    updateUserProfile,
-    getUserProfile,
-    changePassword,
-    getActiveSessions,
-    terminateSession,
-    allusers,
-    toggleuserstatus
+  handleusersignup,
+  handleuserlogin,
+  updateUserProfile,
+  getUserProfile,
+  changePassword,
+  getActiveSessions,
+  terminateSession,
+  allusers,
+  toggleuserstatus,
+  assignUserToManager,
+  getManagerUsers
 };

@@ -10,7 +10,8 @@
 
 .auth-container {
   width: 100%;
-  max-width: 450px;
+  max-width: 520px;
+  /* Increased for better form layout */
 }
 
 .auth-card {
@@ -94,6 +95,44 @@
 
 .form-group {
   margin-bottom: 1.5rem;
+}
+
+/* Form Sections */
+.form-section {
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.form-section:last-of-type {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 0.5rem 0;
+}
+
+.section-title svg {
+  color: #3b82f6;
+}
+
+.section-description {
+  font-size: 0.8125rem;
+  color: #6b7280;
+  margin: 0 0 1.5rem 0;
+}
+
+/* Required field indicator */
+.required {
+  color: #ef4444;
+  margin-left: 0.125rem;
 }
 
 .form-row {
@@ -253,12 +292,12 @@
   margin-top: 2px;
 }
 
-.checkbox-input:checked + .checkbox-custom {
+.checkbox-input:checked+.checkbox-custom {
   background-color: #3b82f6;
   border-color: #3b82f6;
 }
 
-.checkbox-input:checked + .checkbox-custom::after {
+.checkbox-input:checked+.checkbox-custom::after {
   content: '';
   width: 10px;
   height: 10px;
@@ -268,7 +307,7 @@
   background-position: center;
 }
 
-.checkbox-input:focus + .checkbox-custom {
+.checkbox-input:focus+.checkbox-custom {
   outline: 2px solid #3b82f6;
   outline-offset: 2px;
 }
@@ -334,8 +373,13 @@
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Divider */
@@ -400,15 +444,15 @@
     grid-template-columns: 1fr;
     gap: 1.5rem;
   }
-  
+
   .auth-card {
     padding: 1.5rem 1rem;
   }
-  
+
   .auth-brand h1 {
     font-size: 1.5rem;
   }
-  
+
   .social-buttons {
     flex-direction: column;
   }
@@ -418,7 +462,7 @@
   .auth-layout {
     padding: 0.5rem;
   }
-  
+
   .checkbox-label {
     font-size: 0.8125rem;
   }
@@ -438,15 +482,15 @@
   .auth-card {
     border: 2px solid #000;
   }
-  
+
   .form-input {
     border-width: 2px;
   }
-  
+
   .checkbox-custom {
     border-width: 3px;
   }
-  
+
   .strength-bar {
     border: 1px solid #000;
   }

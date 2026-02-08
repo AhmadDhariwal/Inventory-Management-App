@@ -10,250 +10,348 @@
           </svg>
         </div>
         <h1>Create your account</h1>
-        <p>Join thousands of businesses managing their inventory efficiently</p>
+        <p>Start managing your inventory efficiently</p>
       </div>
 
       <!-- Error Alert -->
-      <div *ngIf="error" class="alert alert--error" (click)="clearError()">
-        <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+      <div *ngIf="error" class="alert alert--error" (click)="clearError()" role="alert" aria-live="assertive">
+        <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
           <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
         </svg>
         {{ error }}
-        <button type="button" class="alert__close">&times;</button>
+        <button type="button" class="alert__close" aria-label="Close error message">&times;</button>
       </div>
 
       <!-- Form -->
-      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="auth-form">
-        <!-- Name Fields Row -->
-        <div class="form-row">
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="auth-form" novalidate>
+        
+        <!-- Organization Section -->
+        <div class="form-section">
+          <h3 class="section-title">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+              <path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5v-3zM2.5 2a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6.5.5A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zM1 10.5A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6.5.5A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3z"/>
+            </svg>
+            Organization Information
+          </h3>
+          <p class="section-description">You'll be the administrator of your organization</p>
+
+          <!-- Company Name -->
           <div class="form-group">
-            <label for="firstName" class="form-label">First Name</label>
+            <label for="companyName" class="form-label">
+              Company Name <span class="required" aria-label="required">*</span>
+            </label>
             <div class="input-wrapper">
-              <svg class="input-icon" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM12.735 14c.618 0 1.093-.561.872-1.139a6.002 6.002 0 0 0-11.215 0c-.22.578.254 1.139.872 1.139h9.47z"/>
+              <svg class="input-icon" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M2.5 14V1.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 .5.5V14a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5zm1-13v12h8V1h-8z"/>
+                <path d="M4.5 3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H5a.5.5 0 0 1-.5-.5V3zm3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H8a.5.5 0 0 1-.5-.5V3zm-3 3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H5a.5.5 0 0 1-.5-.5V6zm3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H8a.5.5 0 0 1-.5-.5V6zm-3 3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H5a.5.5 0 0 1-.5-.5V9zm3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H8a.5.5 0 0 1-.5-.5V9z"/>
               </svg>
               <input
-                id="firstName"
+                id="companyName"
                 type="text"
-                formControlName="firstName"
-                placeholder="Enter your first name"
+                formControlName="companyName"
+                placeholder="Enter your company name"
                 class="form-input"
-                [class.error]="f['firstName'].touched && f['firstName'].invalid"
-                autocomplete="given-name"
+                [class.error]="f['companyName'].touched && f['companyName'].invalid"
+                autocomplete="organization"
+                aria-required="true"
+                [attr.aria-invalid]="f['companyName'].touched && f['companyName'].invalid"
+                [attr.aria-describedby]="f['companyName'].touched && f['companyName'].invalid ? 'companyName-error' : null"
               />
             </div>
-            <div *ngIf="f['firstName'].touched && f['firstName'].invalid" class="form-error">
-              <span *ngIf="f['firstName'].errors?.['required']">First name is required</span>
-              <span *ngIf="f['firstName'].errors?.['minlength']">First name must be at least 2 characters</span>
+            <div *ngIf="f['companyName'].touched && f['companyName'].invalid" class="form-error" id="companyName-error" role="alert">
+              <span *ngIf="f['companyName'].errors?.['required']">Company name is required</span>
+              <span *ngIf="f['companyName'].errors?.['minlength']">Company name must be at least 2 characters</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Personal Information Section -->
+        <div class="form-section">
+          <h3 class="section-title">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+              <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM12.735 14c.618 0 1.093-.561.872-1.139a6.002 6.002 0 0 0-11.215 0c-.22.578.254 1.139.872 1.139h9.47z"/>
+            </svg>
+            Personal Information
+          </h3>
+
+          <!-- Name Fields Row -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="firstName" class="form-label">
+                First Name <span class="required" aria-label="required">*</span>
+              </label>
+              <div class="input-wrapper">
+                <svg class="input-icon" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                  <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM12.735 14c.618 0 1.093-.561.872-1.139a6.002 6.002 0 0 0-11.215 0c-.22.578.254 1.139.872 1.139h9.47z"/>
+                </svg>
+                <input
+                  id="firstName"
+                  type="text"
+                  formControlName="firstName"
+                  placeholder="Enter your first name"
+                  class="form-input"
+                  [class.error]="f['firstName'].touched && f['firstName'].invalid"
+                  autocomplete="given-name"
+                  aria-required="true"
+                  [attr.aria-invalid]="f['firstName'].touched && f['firstName'].invalid"
+                  [attr.aria-describedby]="f['firstName'].touched && f['firstName'].invalid ? 'firstName-error' : null"
+                />
+              </div>
+              <div *ngIf="f['firstName'].touched && f['firstName'].invalid" class="form-error" id="firstName-error" role="alert">
+                <span *ngIf="f['firstName'].errors?.['required']">First name is required</span>
+                <span *ngIf="f['firstName'].errors?.['minlength']">First name must be at least 2 characters</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="lastName" class="form-label">
+                Last Name <span class="required" aria-label="required">*</span>
+              </label>
+              <div class="input-wrapper">
+                <svg class="input-icon" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                  <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM12.735 14c.618 0 1.093-.561.872-1.139a6.002 6.002 0 0 0-11.215 0c-.22.578.254 1.139.872 1.139h9.47z"/>
+                </svg>
+                <input
+                  id="lastName"
+                  type="text"
+                  formControlName="lastName"
+                  placeholder="Enter your last name"
+                  class="form-input"
+                  [class.error]="f['lastName'].touched && f['lastName'].invalid"
+                  autocomplete="family-name"
+                  aria-required="true"
+                  [attr.aria-invalid]="f['lastName'].touched && f['lastName'].invalid"
+                  [attr.aria-describedby]="f['lastName'].touched && f['lastName'].invalid ? 'lastName-error' : null"
+                />
+              </div>
+              <div *ngIf="f['lastName'].touched && f['lastName'].invalid" class="form-error" id="lastName-error" role="alert">
+                <span *ngIf="f['lastName'].errors?.['required']">Last name is required</span>
+                <span *ngIf="f['lastName'].errors?.['minlength']">Last name must be at least 2 characters</span>
+              </div>
             </div>
           </div>
 
+          <!-- Email -->
           <div class="form-group">
-            <label for="lastName" class="form-label">Last Name</label>
+            <label for="email" class="form-label">
+              Email Address <span class="required" aria-label="required">*</span>
+            </label>
             <div class="input-wrapper">
-              <svg class="input-icon" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM12.735 14c.618 0 1.093-.561.872-1.139a6.002 6.002 0 0 0-11.215 0c-.22.578.254 1.139.872 1.139h9.47z"/>
+              <svg class="input-icon" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M2 2a2 2 0 0 0-2 2v8.01A2 2 0 0 0 2 14h5.5a.5.5 0 0 0 0-1H2a1 1 0 0 1-.966-.741l5.64-3.471L8 9.583l7-4.2V8.5a.5.5 0 0 0 1 0V4a2 2 0 0 0-2-2H2Zm3.708 6.208L1 11.105V5.383l4.708 2.825ZM1 4.217V4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v.217l-7 4.2-7-4.2Z"/>
               </svg>
               <input
-                id="lastName"
+                id="email"
+                type="email"
+                formControlName="email"
+                placeholder="Enter your email address"
+                class="form-input"
+                [class.error]="f['email'].touched && f['email'].invalid"
+                autocomplete="email"
+                aria-required="true"
+                [attr.aria-invalid]="f['email'].touched && f['email'].invalid"
+                [attr.aria-describedby]="f['email'].touched && f['email'].invalid ? 'email-error' : null"
+              />
+            </div>
+            <div *ngIf="f['email'].touched && f['email'].invalid" class="form-error" id="email-error" role="alert">
+              <span *ngIf="f['email'].errors?.['required']">Email is required</span>
+              <span *ngIf="f['email'].errors?.['email'] || f['email'].errors?.['invalidEmail']">Please enter a valid email address</span>
+            </div>
+          </div>
+
+          <!-- Username -->
+          <div class="form-group">
+            <label for="username" class="form-label">
+              Username <span class="required" aria-label="required">*</span>
+            </label>
+            <div class="input-wrapper">
+              <svg class="input-icon" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+                <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
+              </svg>
+              <input
+                id="username"
                 type="text"
-                formControlName="lastName"
-                placeholder="Enter your last name"
+                formControlName="username"
+                placeholder="Choose a username"
                 class="form-input"
-                [class.error]="f['lastName'].touched && f['lastName'].invalid"
-                autocomplete="family-name"
+                [class.error]="f['username'].touched && f['username'].invalid"
+                autocomplete="username"
+                aria-required="true"
+                [attr.aria-invalid]="f['username'].touched && f['username'].invalid"
+                [attr.aria-describedby]="f['username'].touched && f['username'].invalid ? 'username-error' : null"
               />
             </div>
-            <div *ngIf="f['lastName'].touched && f['lastName'].invalid" class="form-error">
-              <span *ngIf="f['lastName'].errors?.['required']">Last name is required</span>
-              <span *ngIf="f['lastName'].errors?.['minlength']">Last name must be at least 2 characters</span>
+            <div *ngIf="f['username'].touched && f['username'].invalid" class="form-error" id="username-error" role="alert">
+              <span *ngIf="f['username'].errors?.['required']">Username is required</span>
+              <span *ngIf="f['username'].errors?.['minlength']">Username must be at least 3 characters</span>
+              <span *ngIf="f['username'].errors?.['pattern']">Username can only contain letters, numbers, and underscores</span>
+            </div>
+          </div>
+
+          <!-- Phone and Department Row -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="phone" class="form-label">
+                Phone Number <span class="required" aria-label="required">*</span>
+              </label>
+              <div class="input-wrapper">
+                <svg class="input-icon" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                  <path d="M3.654 1.328a.678.678 0 0 0-1.015-.063L1.605 2.3c-.483.484-.661 1.169-.45 1.77a17.568 17.568 0 0 0 4.168 6.608 17.569 17.569 0 0 0 6.608 4.168c.601.211 1.286.033 1.77-.45l1.034-1.034a.678.678 0 0 0-.063-1.015l-2.307-1.794a.678.678 0 0 0-.58-.122L9.98 10.97a.68.68 0 0 1-.441-.148 6.924 6.924 0 0 1-1.44-1.144 6.924 6.924 0 0 1-1.144-1.44.68.68 0 0 1-.148-.441l.537-1.804a.678.678 0 0 0-.122-.58L5.428 2.946a.678.678 0 0 0-.58-.122L3.654 1.328z"/>
+                </svg>
+                <input
+                  id="phone"
+                  type="tel"
+                  formControlName="phone"
+                  placeholder="+1 (555) 123-4567"
+                  class="form-input"
+                  [class.error]="f['phone'].touched && f['phone'].invalid"
+                  autocomplete="tel"
+                  aria-required="true"
+                  [attr.aria-invalid]="f['phone'].touched && f['phone'].invalid"
+                  [attr.aria-describedby]="f['phone'].touched && f['phone'].invalid ? 'phone-error' : null"
+                />
+              </div>
+              <div *ngIf="f['phone'].touched && f['phone'].invalid" class="form-error" id="phone-error" role="alert">
+                <span *ngIf="f['phone'].errors?.['required']">Phone number is required</span>
+                <span *ngIf="f['phone'].errors?.['pattern']">Please enter a valid phone number</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="department" class="form-label">
+                Department <span class="required" aria-label="required">*</span>
+              </label>
+              <div class="input-wrapper">
+                <svg class="input-icon" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                  <path d="M1.5 14.5A1.5 1.5 0 0 1 0 13V6a1.5 1.5 0 0 1 1.5-1.5h13A1.5 1.5 0 0 1 16 6v7a1.5 1.5 0 0 1-1.5 1.5h-13zm13-1a.5.5 0 0 0 .5-.5V7H1v6a.5.5 0 0 0 .5.5h13zM2 3a.5.5 0 0 1 .5-.5h4A.5.5 0 0 1 7 3v1H2V3zm5.5 0a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v1H7.5V3z"/>
+                </svg>
+                <input
+                  id="department"
+                  type="text"
+                  formControlName="department"
+                  placeholder="e.g., Sales, IT, Operations"
+                  class="form-input"
+                  [class.error]="f['department'].touched && f['department'].invalid"
+                  aria-required="true"
+                  [attr.aria-invalid]="f['department'].touched && f['department'].invalid"
+                  [attr.aria-describedby]="f['department'].touched && f['department'].invalid ? 'department-error' : null"
+                />
+              </div>
+              <div *ngIf="f['department'].touched && f['department'].invalid" class="form-error" id="department-error" role="alert">
+                <span *ngIf="f['department'].errors?.['required']">Department is required</span>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Email -->
-        <div class="form-group">
-          <label for="email" class="form-label">Email Address</label>
-          <div class="input-wrapper">
-            <svg class="input-icon" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-              <path d="M2 2a2 2 0 0 0-2 2v8.01A2 2 0 0 0 2 14h5.5a.5.5 0 0 0 0-1H2a1 1 0 0 1-.966-.741l5.64-3.471L8 9.583l7-4.2V8.5a.5.5 0 0 0 1 0V4a2 2 0 0 0-2-2H2Zm3.708 6.208L1 11.105V5.383l4.708 2.825ZM1 4.217V4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v.217l-7 4.2-7-4.2Z"/>
+        <!-- Security Section -->
+        <div class="form-section">
+          <h3 class="section-title">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+              <path d="M5.338 1.59a61.44 61.44 0 0 0-2.837.856.481.481 0 0 0-.328.39c-.554 4.157.726 7.19 2.253 9.188a10.725 10.725 0 0 0 2.287 2.233c.346.244.652.42.893.533.12.057.218.095.293.118a.55.55 0 0 0 .101.025.615.615 0 0 0 .1-.025c.076-.023.174-.061.294-.118.24-.113.547-.29.893-.533a10.726 10.726 0 0 0 2.287-2.233c1.527-1.997 2.807-5.031 2.253-9.188a.48.48 0 0 0-.328-.39c-.651-.213-1.75-.56-2.837-.855C9.552 1.29 8.531 1.067 8 1.067c-.53 0-1.552.223-2.662.524zM5.072.56C6.157.265 7.31 0 8 0s1.843.265 2.928.56c1.11.3 2.229.655 2.887.87a1.54 1.54 0 0 1 1.044 1.262c.596 4.477-.787 7.795-2.465 9.99a11.775 11.775 0 0 1-2.517 2.453 7.159 7.159 0 0 1-1.048.625c-.28.132-.581.24-.829.24s-.548-.108-.829-.24a7.158 7.158 0 0 1-1.048-.625 11.777 11.777 0 0 1-2.517-2.453C1.928 10.487.545 7.169 1.141 2.692A1.54 1.54 0 0 1 2.185 1.43 62.456 62.456 0 0 1 5.072.56z"/>
             </svg>
-            <input
-              id="email"
-              type="email"
-              formControlName="email"
-              placeholder="Enter your email address"
-              class="form-input"
-              [class.error]="f['email'].touched && f['email'].invalid"
-              autocomplete="email"
-            />
-          </div>
-          <div *ngIf="f['email'].touched && f['email'].invalid" class="form-error">
-            <span *ngIf="f['email'].errors?.['required']">Email is required</span>
-            <span *ngIf="f['email'].errors?.['email']">Please enter a valid email address</span>
-          </div>
-        </div>
+            Security
+          </h3>
 
-        <!-- Username -->
-        <div class="form-group">
-          <label for="username" class="form-label">Username</label>
-          <div class="input-wrapper">
-            <svg class="input-icon" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-              <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
-              <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
-            </svg>
-            <input
-              id="username"
-              type="text"
-              formControlName="username"
-              placeholder="Choose a username"
-              class="form-input"
-              [class.error]="f['username'].touched && f['username'].invalid"
-              autocomplete="username"
-            />
-          </div>
-          <div *ngIf="f['username'].touched && f['username'].invalid" class="form-error">
-            <span *ngIf="f['username'].errors?.['required']">Username is required</span>
-            <span *ngIf="f['username'].errors?.['minlength']">Username must be at least 3 characters</span>
-            <span *ngIf="f['username'].errors?.['pattern']">Username can only contain letters, numbers, and underscores</span>
-          </div>
-        </div>
-
-        <!-- Phone and Department Row -->
-        <div class="form-row">
+          <!-- Password -->
           <div class="form-group">
-            <label for="phone" class="form-label">Phone Number</label>
+            <label for="password" class="form-label">
+              Password <span class="required" aria-label="required">*</span>
+            </label>
             <div class="input-wrapper">
-              <svg class="input-icon" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M3.654 1.328a.678.678 0 0 0-1.015-.063L1.605 2.3c-.483.484-.661 1.169-.45 1.77a17.568 17.568 0 0 0 4.168 6.608 17.569 17.569 0 0 0 6.608 4.168c.601.211 1.286.033 1.77-.45l1.034-1.034a.678.678 0 0 0-.063-1.015l-2.307-1.794a.678.678 0 0 0-.58-.122L9.98 10.97a.68.68 0 0 1-.441-.148 6.924 6.924 0 0 1-1.44-1.144 6.924 6.924 0 0 1-1.144-1.44.68.68 0 0 1-.148-.441l.537-1.804a.678.678 0 0 0-.122-.58L5.428 2.946a.678.678 0 0 0-.58-.122L3.654 1.328z"/>
+              <svg class="input-icon" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zM3 7a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/>
               </svg>
               <input
-                id="phone"
-                type="tel"
-                formControlName="phone"
-                placeholder="+1 (555) 123-4567"
+                id="password"
+                [type]="showPassword ? 'text' : 'password'"
+                formControlName="password"
+                placeholder="Create a strong password"
                 class="form-input"
-                [class.error]="f['phone'].touched && f['phone'].invalid"
-                autocomplete="tel"
+                [class.error]="f['password'].touched && f['password'].invalid"
+                autocomplete="new-password"
+                aria-required="true"
+                [attr.aria-invalid]="f['password'].touched && f['password'].invalid"
+                [attr.aria-describedby]="f['password'].touched && f['password'].invalid ? 'password-error' : 'password-strength'"
               />
+              <button
+                type="button"
+                class="password-toggle"
+                (click)="togglePassword()"
+                [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+              >
+                <svg *ngIf="!showPassword" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                  <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+                  <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+                </svg>
+                <svg *ngIf="showPassword" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                  <path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7.028 7.028 0 0 0-2.79.588l.77.771A5.944 5.944 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.134 13.134 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755-.165.165-.337.328-.517.486l.708.709z"/>
+                  <path d="M11.297 9.176a3.5 3.5 0 0 0-4.474-4.474l.823.823a2.5 2.5 0 0 1 2.829 2.829l.822.822zm-2.943 1.299.822.822a3.5 3.5 0 0 1-4.474-4.474l.823.823a2.5 2.5 0 0 0 2.829 2.829z"/>
+                  <path d="M3.35 5.47c-.18.16-.353.322-.518.487A13.134 13.134 0 0 0 1.172 8l.195.288c.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c.716 0 1.39-.133 2.02-.36l.77.772A7.029 7.029 0 0 1 8 13.5C3 13.5 0 8 0 8s.939-1.721 2.641-3.238l.708.709zm10.296 8.884-12-12 .708-.708 12 12-.708.708z"/>
+                </svg>
+              </button>
             </div>
-            <div *ngIf="f['phone'].touched && f['phone'].invalid" class="form-error">
-              <span *ngIf="f['phone'].errors?.['required']">Phone number is required</span>
-              <span *ngIf="f['phone'].errors?.['pattern']">Please enter a valid phone number</span>
+
+            <!-- Password Strength Indicator -->
+            <div *ngIf="registerForm.get('password')?.value" class="password-strength" id="password-strength" aria-live="polite">
+              <div class="strength-bar">
+                <div class="strength-fill" [ngClass]="getPasswordStrengthClass()"></div>
+              </div>
+              <div class="strength-text" [ngClass]="getPasswordStrengthClass()">
+                {{ getPasswordStrengthText() }}
+              </div>
+            </div>
+
+            <div *ngIf="f['password'].touched && f['password'].invalid" class="form-error" id="password-error" role="alert">
+              <span *ngIf="f['password'].errors?.['required']">Password is required</span>
+              <span *ngIf="f['password'].errors?.['minlength']">Password must be at least 8 characters</span>
+              <span *ngIf="f['password'].errors?.['passwordStrength']">Password must contain uppercase, lowercase, and number</span>
             </div>
           </div>
 
+          <!-- Confirm Password -->
           <div class="form-group">
-            <label for="department" class="form-label">Department</label>
+            <label for="confirmPassword" class="form-label">
+              Confirm Password <span class="required" aria-label="required">*</span>
+            </label>
             <div class="input-wrapper">
-              <svg class="input-icon" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M1.5 14.5A1.5 1.5 0 0 1 0 13V6a1.5 1.5 0 0 1 1.5-1.5h13A1.5 1.5 0 0 1 16 6v7a1.5 1.5 0 0 1-1.5 1.5h-13zm13-1a.5.5 0 0 0 .5-.5V7H1v6a.5.5 0 0 0 .5.5h13zM2 3a.5.5 0 0 1 .5-.5h4A.5.5 0 0 1 7 3v1H2V3zm5.5 0a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v1H7.5V3z"/>
+              <svg class="input-icon" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zM3 7a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/>
               </svg>
               <input
-                id="department"
-                type="text"
-                formControlName="department"
-                placeholder="e.g., Sales, IT, Operations"
+                id="confirmPassword"
+                [type]="showConfirmPassword ? 'text' : 'password'"
+                formControlName="confirmPassword"
+                placeholder="Confirm your password"
                 class="form-input"
-                [class.error]="f['department'].touched && f['department'].invalid"
+                [class.error]="f['confirmPassword'].touched && f['confirmPassword'].invalid"
+                autocomplete="new-password"
+                aria-required="true"
+                [attr.aria-invalid]="f['confirmPassword'].touched && f['confirmPassword'].invalid"
+                [attr.aria-describedby]="f['confirmPassword'].touched && f['confirmPassword'].invalid ? 'confirmPassword-error' : null"
               />
+              <button
+                type="button"
+                class="password-toggle"
+                (click)="toggleConfirmPassword()"
+                [attr.aria-label]="showConfirmPassword ? 'Hide password' : 'Show password'"
+              >
+                <svg *ngIf="!showConfirmPassword" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                  <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+                  <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+                </svg>
+                <svg *ngIf="showConfirmPassword" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                  <path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7.028 7.028 0 0 0-2.79.588l.77.771A5.944 5.944 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.134 13.134 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755-.165.165-.337.328-.517.486l.708.709z"/>
+                  <path d="M11.297 9.176a3.5 3.5 0 0 0-4.474-4.474l.823.823a2.5 2.5 0 0 1 2.829 2.829l.822.822zm-2.943 1.299.822.822a3.5 3.5 0 0 1-4.474-4.474l.823.823a2.5 2.5 0 0 0 2.829 2.829z"/>
+                  <path d="M3.35 5.47c-.18.16-.353.322-.518.487A13.134 13.134 0 0 0 1.172 8l.195.288c.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c.716 0 1.39-.133 2.02-.36l.77.772A7.029 7.029 0 0 1 8 13.5C3 13.5 0 8 0 8s.939-1.721 2.641-3.238l.708.709zm10.296 8.884-12-12 .708-.708 12 12-.708.708z"/>
+                </svg>
+              </button>
             </div>
-            <div *ngIf="f['department'].touched && f['department'].invalid" class="form-error">
-              <span *ngIf="f['department'].errors?.['required']">Department is required</span>
+            <div *ngIf="f['confirmPassword'].touched && f['confirmPassword'].invalid" class="form-error" id="confirmPassword-error" role="alert">
+              <span *ngIf="f['confirmPassword'].errors?.['required']">Please confirm your password</span>
+              <span *ngIf="f['confirmPassword'].errors?.['passwordMismatch']">Passwords do not match</span>
             </div>
-          </div>
-        </div>
-
-        <!-- Password -->
-        <div class="form-group">
-          <label for="password" class="form-label">Password</label>
-          <div class="input-wrapper">
-            <svg class="input-icon" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-              <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zM3 7a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/>
-            </svg>
-            <input
-              id="password"
-              [type]="showPassword ? 'text' : 'password'"
-              formControlName="password"
-              placeholder="Create a strong password"
-              class="form-input"
-              [class.error]="f['password'].touched && f['password'].invalid"
-              autocomplete="new-password"
-            />
-            <button
-              type="button"
-              class="password-toggle"
-              (click)="togglePassword()"
-              title="Password toggle"
-              [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
-            >
-              <svg *ngIf="!showPassword" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
-                <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
-              </svg>
-              <svg *ngIf="showPassword" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7.028 7.028 0 0 0-2.79.588l.77.771A5.944 5.944 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.134 13.134 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755-.165.165-.337.328-.517.486l.708.709z"/>
-                <path d="M11.297 9.176a3.5 3.5 0 0 0-4.474-4.474l.823.823a2.5 2.5 0 0 1 2.829 2.829l.822.822zm-2.943 1.299.822.822a3.5 3.5 0 0 1-4.474-4.474l.823.823a2.5 2.5 0 0 0 2.829 2.829z"/>
-                <path d="M3.35 5.47c-.18.16-.353.322-.518.487A13.134 13.134 0 0 0 1.172 8l.195.288c.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c.716 0 1.39-.133 2.02-.36l.77.772A7.029 7.029 0 0 1 8 13.5C3 13.5 0 8 0 8s.939-1.721 2.641-3.238l.708.709zm10.296 8.884-12-12 .708-.708 12 12-.708.708z"/>
-              </svg>
-            </button>
-          </div>
-
-          <!-- Password Strength Indicator -->
-          <div *ngIf="registerForm.get('password')?.value" class="password-strength">
-            <div class="strength-bar">
-              <div class="strength-fill" [ngClass]="getPasswordStrengthClass()"></div>
-            </div>
-            <div class="strength-text" [ngClass]="getPasswordStrengthClass()">
-              {{ getPasswordStrengthText() }}
-            </div>
-          </div>
-
-          <div *ngIf="f['password'].touched && f['password'].invalid" class="form-error">
-            <span *ngIf="f['password'].errors?.['required']">Password is required</span>
-            <span *ngIf="f['password'].errors?.['minlength']">Password must be at least 8 characters</span>
-            <span *ngIf="f['password'].errors?.['passwordStrength']">Password must contain uppercase, lowercase, and number</span>
-          </div>
-        </div>
-
-        <!-- Confirm Password -->
-        <div class="form-group">
-          <label for="confirmPassword" class="form-label">Confirm Password</label>
-          <div class="input-wrapper">
-            <svg class="input-icon" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-              <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zM3 7a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/>
-            </svg>
-            <input
-              id="confirmPassword"
-              [type]="showConfirmPassword ? 'text' : 'password'"
-              formControlName="confirmPassword"
-              placeholder="Confirm your password"
-              class="form-input"
-              [class.error]="f['confirmPassword'].touched && f['confirmPassword'].invalid"
-              autocomplete="new-password"
-            />
-            <button
-              type="button"
-              class="password-toggle"
-              (click)="toggleConfirmPassword()"
-              title="Password toggle"
-
-              [attr.aria-label]="showConfirmPassword ? 'Hide password' : 'Show password'"
-            >
-              <svg *ngIf="!showConfirmPassword" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
-                <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
-              </svg>
-              <svg *ngIf="showConfirmPassword" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7.028 7.028 0 0 0-2.79.588l.77.771A5.944 5.944 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.134 13.134 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755-.165.165-.337.328-.517.486l.708.709z"/>
-                <path d="M11.297 9.176a3.5 3.5 0 0 0-4.474-4.474l.823.823a2.5 2.5 0 0 1 2.829 2.829l.822.822zm-2.943 1.299.822.822a3.5 3.5 0 0 1-4.474-4.474l.823.823a2.5 2.5 0 0 0 2.829 2.829z"/>
-                <path d="M3.35 5.47c-.18.16-.353.322-.518.487A13.134 13.134 0 0 0 1.172 8l.195.288c.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c.716 0 1.39-.133 2.02-.36l.77.772A7.029 7.029 0 0 1 8 13.5C3 13.5 0 8 0 8s.939-1.721 2.641-3.238l.708.709zm10.296 8.884-12-12 .708-.708 12 12-.708.708z"/>
-              </svg>
-            </button>
-          </div>
-          <div *ngIf="f['confirmPassword'].touched && f['confirmPassword'].invalid" class="form-error">
-            <span *ngIf="f['confirmPassword'].errors?.['required']">Please confirm your password</span>
-            <span *ngIf="f['confirmPassword'].errors?.['passwordMismatch']">Passwords do not match</span>
           </div>
         </div>
 
@@ -264,13 +362,16 @@
               type="checkbox"
               formControlName="acceptTerms"
               class="checkbox-input"
+              aria-required="true"
+              [attr.aria-invalid]="f['acceptTerms'].touched && f['acceptTerms'].invalid"
+              [attr.aria-describedby]="f['acceptTerms'].touched && f['acceptTerms'].invalid ? 'terms-error' : null"
             />
             <span class="checkbox-custom"></span>
             <span class="checkbox-text">
               I agree to the <a href="#" class="link">Terms of Service</a> and <a href="#" class="link">Privacy Policy</a>
             </span>
           </label>
-          <div *ngIf="f['acceptTerms'].touched && f['acceptTerms'].invalid" class="form-error">
+          <div *ngIf="f['acceptTerms'].touched && f['acceptTerms'].invalid" class="form-error" id="terms-error" role="alert">
             <span *ngIf="f['acceptTerms'].errors?.['required']">Please accept the terms and conditions</span>
           </div>
         </div>
@@ -280,8 +381,9 @@
           type="submit"
           class="btn btn--primary btn--full"
           [disabled]="loading || registerForm.invalid"
+          [attr.aria-busy]="loading"
         >
-          <svg *ngIf="loading" class="btn-spinner" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+          <svg *ngIf="loading" class="btn-spinner" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
             <path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z"/>
             <path fill-rule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3zM3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9H3.1z"/>
           </svg>
@@ -296,8 +398,8 @@
 
         <!-- Social Login -->
         <div class="social-buttons">
-          <button type="button" class="btn btn--social" (click)="signUpWithGoogle()">
-            <svg width="16" height="16" viewBox="0 0 24 24">
+          <button type="button" class="btn btn--social" (click)="signUpWithGoogle()" aria-label="Sign up with Google">
+            <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
               <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
               <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
@@ -306,8 +408,8 @@
             Google
           </button>
 
-          <button type="button" class="btn btn--social" (click)="signUpWithGitHub()">
-            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+          <button type="button" class="btn btn--social" (click)="signUpWithGitHub()" aria-label="Sign up with GitHub">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
               <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
             </svg>
             GitHub

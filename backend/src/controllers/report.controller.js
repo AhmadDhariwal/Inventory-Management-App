@@ -75,7 +75,7 @@ const getpurchasereport = async (req, res) => {
 
 const getallsuppliers = async (req, res) => {
   try {
-    const suppliers = await Supplier.find({ isactive: true })
+    const suppliers = await Supplier.find({ isActive: true })
       .select('_id name')
       .sort({ name: 1 });
     res.status(200).json({
@@ -90,14 +90,14 @@ const getallsuppliers = async (req, res) => {
 const getstocklevelsreport = async (req, res) => {
   try {
     let report = await reportservice.getstocklevelsreport();
-    
+
     // If no stock levels found, initialize them
     if (!report || report.length === 0) {
       console.log('No stock levels found, initializing...');
       await stockLevelService.initializeStockLevels();
       report = await reportservice.getstocklevelsreport();
     }
-    
+
     res.status(200).json(report);
   } catch (error) {
     res.status(500).json({ error: error.message });

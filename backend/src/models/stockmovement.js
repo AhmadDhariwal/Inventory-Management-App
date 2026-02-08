@@ -33,9 +33,20 @@ const stockmovementschema = new mongoose.Schema({
   referenceId: {
     type: mongoose.Schema.Types.ObjectId,
     required: false
+  },
+  // Multi-tenant field
+  organizationId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Organization',
+    required: true,
+    index: true
   }
 }, { timestamps: true });
 
+// Indexes for efficient manager queries (organizationId + user)
+stockmovementschema.index({ organizationId: 1, user: 1 });
+stockmovementschema.index({ organizationId: 1, createdAt: -1 });
+
 const stockmovement = mongoose.model("stockmovement", stockmovementschema);
 
-module.exports =  stockmovement;
+module.exports = stockmovement;

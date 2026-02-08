@@ -27,11 +27,19 @@ const activityLogSchema = new mongoose.Schema(
     },
     ipAddress: {
       type: String
+    },
+    // Multi-tenant field
+    organizationId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Organization',
+      required: false, // Changed to false to prevent validation errors
+      index: true
     }
   },
   { timestamps: true }
 );
 
-activityLogSchema.index({ createdAt: -1 });
+activityLogSchema.index({ organizationId: 1, createdAt: -1 });
+activityLogSchema.index({ organizationId: 1, user: 1 });
 
 module.exports = mongoose.model("ActivityLog", activityLogSchema);

@@ -32,13 +32,28 @@ const supplierschema = new mongoose.Schema(
       default: "CASH"
     },
 
-    isactive: {
+    isActive: {
       type: Boolean,
       default: true
+    },
+    // Multi-tenant fields
+    organizationId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Organization',
+      required: true,
+      index: true
+    },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'user',
+      required: true
     }
   },
   { timestamps: true }
 );
 
+// Index for organization-scoped queries
+supplierschema.index({ organizationId: 1, isActive: 1 });
+
 const supplier = mongoose.model("Supplier", supplierschema);
-module.exports= supplier;
+module.exports = supplier;

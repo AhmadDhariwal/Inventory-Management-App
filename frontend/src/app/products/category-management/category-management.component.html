@@ -1,0 +1,168 @@
+<div class="container-fluid fade-in">
+  <div class="header-section">
+    <h2>Category Management</h2>
+    <p>Efficiently organize and manage product categories across your enterprise.</p>
+  </div>
+
+  <!-- Alerts -->
+  <div *ngIf="error" class="alert alert-error">
+    <i class="fas fa-exclamation-circle"></i>
+    {{ error }}
+  </div>
+
+  <div *ngIf="success" class="alert alert-success">
+    <i class="fas fa-check-circle"></i>
+    {{ success }}
+  </div>
+
+  <div class="row">
+    <!-- ================= ADD / EDIT CATEGORY FORM ================= -->
+    <div class="col-lg-4 mb-4">
+      <div class="card side-form shadow-lg">
+        <div class="card-header gradient-header">
+          <h5 class="mb-0">
+            {{ isEditing ? 'Edit Category' : 'Create Category' }}
+          </h5>
+        </div>
+
+        <div class="card-body">
+          <form (ngSubmit)="addCategory()">
+            <div class="form-group">
+              <label>
+                Category Name <span class="text-danger">*</span>
+              </label>
+              <input
+                type="text"
+                class="form-control"
+                [(ngModel)]="newCategoryName"
+                name="name"
+                required
+                placeholder="e.g., Industrial Hardware"
+              />
+            </div>
+
+            <div class="form-group">
+              <label>Detailed Description</label>
+              <textarea
+                class="form-control"
+                [(ngModel)]="newCategoryDescription"
+                name="description"
+                rows="4"
+                placeholder="Briefly describe the category use case..."
+              ></textarea>
+            </div>
+
+            <div class="d-flex gap-2 mt-4">
+              <button
+                type="submit"
+                class="btn btn-primary flex-grow-1"
+                [disabled]="isLoading || !newCategoryName"
+              >
+                <span
+                  *ngIf="isLoading"
+                  class="spinner-border spinner-border-sm me-1"
+                ></span>
+                <i
+                  class="fas"
+                  [ngClass]="isEditing ? 'fa-save' : 'fa-plus-circle'"
+                ></i>
+                {{ isEditing ? 'Update Details' : 'Add Category' }}
+              </button>
+
+              <button
+                *ngIf="isEditing"
+                type="button"
+                class="btn btn-secondary"
+                (click)="cancelEdit()"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= CATEGORY LIST TABLE ================= -->
+    <div class="col-lg-8">
+      <div class="card shadow-md">
+        <div class="card-header">
+          <h5 class="mb-0">Product Categories</h5>
+        </div>
+
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table-enterprise">
+              <thead>
+                <tr>
+                  <th>Category Identity</th>
+                  <th>Description</th>
+                  <th>Onboarded At</th>
+                  <th class="text-end">Actions</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <!-- CATEGORY ROWS -->
+                <tr *ngFor="let cat of categories">
+                  <td>
+                    <div class="category-name">{{ cat.name }}</div>
+                  </td>
+
+                  <td>
+                    <div class="category-desc">
+                      {{ cat.description || 'No description provided' }}
+                    </div>
+                  </td>
+
+                  <td>
+                    <span class="date-pill">
+                      {{ cat.createdAt | date: 'mediumDate' }}
+                    </span>
+                  </td>
+
+                  <td class="text-end">
+                    <button
+                      class="btn btn-icon edit me-2"
+                      (click)="editCategory(cat)"
+                      [disabled]="isLoading"
+                      title="Edit Category"
+                    >
+                      <i class="fas fa-pencil-alt"></i>
+                    </button>
+
+                    <button
+                      class="btn btn-icon delete"
+                      (click)="deleteCategory(cat._id)"
+                      [disabled]="isLoading"
+                      title="Remove Category"
+                    >
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+
+                <!-- EMPTY STATE -->
+                <tr *ngIf="categories.length === 0 && !isLoading">
+                  <td colspan="4" class="text-center py-5 text-muted">
+                    <i
+                      class="fas fa-folder-open mb-3"
+                      style="font-size: 2rem; display: block; opacity: 0.3;"
+                    ></i>
+                    No categories found. Start by creating one on the left.
+                  </td>
+                </tr>
+
+                <!-- ❌ ERROR WAS HERE (REMOVED)
+                  You had ANOTHER <tr> OUTSIDE the table and tbody,
+                  which is INVALID HTML and breaks layout rendering.
+                  <tr> MUST always be inside <table><tbody>.
+                -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

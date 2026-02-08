@@ -6,6 +6,7 @@ import { RouterModule } from '@angular/router';
 import { filter, map, debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
 import { AuthService } from '../../../shared/services/auth.service';
 import { ProductService } from '../../../shared/services/product.service';
+import { OrganizationService, Organization } from '../../../shared/services/organization.service';
 
 interface SearchSuggestion {
   _id: string;
@@ -32,11 +33,13 @@ export class NavbarComponent implements OnInit, OnDestroy {
   searchSuggestions: SearchSuggestion[] = [];
   notificationCount = 3; // Mock notification count
   recentActivityCount = 0; // Activity logs count
+  organization: Organization | null = null;
 
   private destroy$ = new Subject<void>();
   private searchSubject = new Subject<string>();
   private authservice = inject(AuthService);
   private productService = inject(ProductService);
+  private organizationService = inject(OrganizationService);
 
   constructor(private router: Router, private route: ActivatedRoute) {
     this.isDarkMode = localStorage.getItem('darkMode') === 'true';
@@ -67,6 +70,22 @@ export class NavbarComponent implements OnInit, OnDestroy {
       takeUntil(this.destroy$)
     ).subscribe(query => {
       this.loadSearchSuggestions(query);
+    });
+
+    // Load organization data
+    this.loadOrganization();
+  }
+
+  private loadOrganization(): void {
+    this.organizationService.getCurrentOrganization().subscribe({
+      next: (response) => {
+        if (response.success && response.data) {
+          this.organization = response.data;
+        }
+      },
+      error: (err) => {
+        console.error('Error loading organization:', err);
+      }
     });
   }
 

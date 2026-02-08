@@ -34,10 +34,10 @@ const checkLowStockAlertsEnabled = async (userId) => {
   try {
     const inventorySettings = await InventorySettings.findOne({ user: userId });
     const notificationSettings = await NotificationSettings.findOne({ user: userId });
-    
+
     const inventoryAlertsEnabled = inventorySettings ? inventorySettings.enableLowStockAlert : true;
     const notificationAlertsEnabled = notificationSettings ? notificationSettings.lowStockAlerts : true;
-    
+
     return inventoryAlertsEnabled && notificationAlertsEnabled;
   } catch (error) {
     console.error('Error checking low stock alerts setting:', error);
@@ -46,22 +46,28 @@ const checkLowStockAlertsEnabled = async (userId) => {
 };
 
 // Get low stock items based on user settings
-const getLowStockItems = async (userId) => {
+const getLowStockItems = async (userId, organizationId) => {
   try {
     const thresholds = await getUserStockThresholds(userId);
     const alertsEnabled = await checkLowStockAlertsEnabled(userId);
-    
+
     if (!alertsEnabled) {
       return [];
     }
-    
-    const lowStockItems = await StockLevel.find({
+
+    const query = {
       $expr: { $lte: ["$quantity", thresholds.lowStockThreshold] }
-    })
-    .populate('product', 'name sku')
-    .populate('warehouse', 'name')
-    .lean();
-    
+    };
+
+    if (organizationId) {
+      query.organizationId = organizationId;
+    }
+
+    const lowStockItems = await StockLevel.find(query)
+      .populate('product', 'name sku')
+      .populate('warehouse', 'name')
+      .lean();
+
     return lowStockItems.map(item => ({
       ...item,
       status: item.quantity <= thresholds.criticalStockThreshold ? 'CRITICAL' : 'LOW'
@@ -73,27 +79,31 @@ const getLowStockItems = async (userId) => {
 };
 
 // Get stock levels for a specific product or all products
-const getstocklevels = async (productId) => {
+const getstocklevels = async (productId, organizationId) => {
   try {
     let query = {};
     if (productId) {
       query.product = productId;
     }
-    
+
+    if (organizationId) {
+      query.organizationId = organizationId;
+    }
+
     let stockLevels = await StockLevel.find(query)
       .populate('product', 'name sku cost price')
       .populate('warehouse', 'name')
       .lean();
-    
+
     // If no stock levels found and productId is provided, initialize them
     if (stockLevels.length === 0 && productId) {
-      await stockLevelService.initializeStockLevels();
+      await stockLevelService.initializeStockLevels(organizationId);
       stockLevels = await StockLevel.find(query)
         .populate('product', 'name sku cost price')
         .populate('warehouse', 'name')
         .lean();
     }
-    
+
     return stockLevels;
   } catch (error) {
     console.error('Error getting stock levels:', error);
@@ -109,14 +119,15 @@ const addstock = async (data) => {
     type: 'IN',
     quantity: data.quantity,
     reason: data.reason,
-    user: data.userId
+    user: data.userId,
+    organizationId: data.organizationId // Use organizationId
   });
-  
+
   await movement.save();
-  
+
   // Update or create stock level
-  await stockLevelService.getOrCreateStockLevel(data.productId, data.warehouseId);
-  
+  await stockLevelService.getOrCreateStockLevel(data.productId, data.warehouseId, data.organizationId);
+
   return movement;
 };
 
@@ -128,24 +139,31 @@ const removestock = async (data) => {
     type: 'OUT',
     quantity: data.quantity,
     reason: data.reason,
-    user: data.userId
+    user: data.userId,
+    organizationId: data.organizationId // Use organizationId
   });
-  
+
   await movement.save();
-  
+
   // Update or create stock level
-  await stockLevelService.getOrCreateStockLevel(data.productId, data.warehouseId);
-  
+  await stockLevelService.getOrCreateStockLevel(data.productId, data.warehouseId, data.organizationId);
+
   return movement;
 };
 
 // Get current stock for a product in a warehouse
-const getcurrentstock = async (productId, warehouseId) => {
-  const stockLevel = await StockLevel.findOne({
+const getcurrentstock = async (productId, warehouseId, organizationId) => {
+  const query = {
     product: productId,
     warehouse: warehouseId
-  });
-  
+  };
+
+  if (organizationId) {
+    query.organizationId = organizationId;
+  }
+
+  const stockLevel = await StockLevel.findOne(query);
+
   return stockLevel ? stockLevel.quantity : 0;
 };
 
@@ -156,13 +174,14 @@ const updatestocklevel = async (stockLevelId, updateData) => {
     updateData,
     { new: true }
   ).populate('product', 'name sku').populate('warehouse', 'name');
-  
+
   return updatedStockLevel;
 };
 
 // Get stock summary
 const getstocksummary = async (filters) => {
   // Implementation for stock summary
+  // TODO: Add actual summary logic using filters.organizationId
   return {
     totalProducts: 0,
     totalStock: 0,

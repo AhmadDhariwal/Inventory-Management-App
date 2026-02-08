@@ -3,7 +3,13 @@ const Category = require('../models/category');
 const getCategories = async (req, res) => {
   try {
     console.log('Getting categories...');
-    const categories = await Category.find({ isActive: true }).sort({ name: 1 });
+    // Scope by organizationId
+    const query = { isActive: true };
+    if (req.organizationId) {
+      query.organizationId = req.organizationId;
+    }
+
+    const categories = await Category.find(query).sort({ name: 1 });
     console.log('Found categories:', categories.length);
     res.status(200).json(categories);
   } catch (error) {
@@ -14,7 +20,19 @@ const getCategories = async (req, res) => {
 
 const createCategory = async (req, res) => {
   try {
-    const category = new Category(req.body);
+    const categoryData = req.body;
+
+    // Add organization context
+    if (req.organizationId) {
+      categoryData.organizationId = req.organizationId;
+    }
+
+    // Add createdBy if available
+    if (req.userid) {
+      categoryData.createdBy = req.userid;
+    }
+
+    const category = new Category(categoryData);
     await category.save();
     res.status(201).json(category);
   } catch (error) {
@@ -22,7 +40,40 @@ const createCategory = async (req, res) => {
   }
 };
 
+const updateCategory = async (req, res) => {
+  try {
+    const category = await Category.findOneAndUpdate(
+      { _id: req.params.id, organizationId: req.organizationId },
+      req.body,
+      { new: true, runValidators: true }
+    );
+    if (!category) {
+      return res.status(404).json({ error: 'Category not found' });
+    }
+    res.status(200).json(category);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+const deleteCategory = async (req, res) => {
+  try {
+    const category = await Category.findOneAndDelete({
+      _id: req.params.id,
+      organizationId: req.organizationId
+    });
+    if (!category) {
+      return res.status(404).json({ error: 'Category not found' });
+    }
+    res.status(200).json({ message: 'Category deleted successfully' });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
 module.exports = {
   getCategories,
-  createCategory
+  createCategory,
+  updateCategory,
+  deleteCategory
 };

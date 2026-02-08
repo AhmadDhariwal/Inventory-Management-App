@@ -12,8 +12,23 @@ const warehouseschema = new mongoose.Schema({
   isActive: {
     type: Boolean,
     default: true
+  },
+  // Multi-tenant fields
+  organizationId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Organization',
+    required: true,
+    index: true
+  },
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'user',
+    required: true
   }
 }, { timestamps: true });
+
+// Index for organization-scoped queries
+warehouseschema.index({ organizationId: 1, isActive: 1 });
 
 const warehouse = mongoose.model("warehouse", warehouseschema);
 

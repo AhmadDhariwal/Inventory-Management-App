@@ -1,142 +1,118 @@
-<main class="product-details-container" role="main">
+<main class="product-details-container">
   <!-- Loading State -->
-  <div *ngIf="loading" class="loading-state" role="status" aria-live="polite">
-    <div class="loading-spinner">
-      <svg class="spinner" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" opacity="0.25"/>
-        <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
-      </svg>
-    </div>
-    <p>Loading product details...</p>
+  <div *ngIf="loading" class="loading-state">
+    <i class="fas fa-circle-notch fa-spin"></i>
+    <p>Retrieving Asset Profile...</p>
   </div>
 
   <!-- Product Details -->
-  <section *ngIf="!loading && product" class="product-details">
+  <section *ngIf="!loading && product" class="product-details animate-fade-in">
     <!-- Page Header -->
-    <div class="page-header">
+    <header class="page-header">
       <div class="header-content">
         <div class="title-section">
           <h1>{{ product.name }}</h1>
-          <p class="subtitle">{{ product.description || 'Product Details' }}</p>
+          <p class="subtitle">{{ product.category?.name || 'Uncategorized Asset' }} • Verified Status</p>
         </div>
         <div class="header-actions">
-          <button type="button" class="btn btn-outline" (click)="goBack()">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-              <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
-            </svg>
-            Back to Products
+          <button class="btn-outline" (click)="goBack()">
+            <i class="fas fa-arrow-left"></i>
+            Back to Registry
           </button>
         </div>
       </div>
-    </div>
+    </header>
 
-    <!-- Product Information Card -->
     <div class="details-grid">
+      <!-- General Specs -->
       <div class="card product-card">
         <div class="card-header">
-          <h2>Product Information</h2>
+          <h2>Technical Specifications</h2>
           <span class="sku-badge">{{ product.sku }}</span>
         </div>
         <div class="card-content">
-          <div class="product-info-wrapper">
-            <div class="table-responsive">
-              <table class="product-info-table">
-                <tbody>
-                  <tr>
-                    <td class="label-cell">Product Name</td>
-                    <td class="value-cell">{{ product.name }}</td>
-                  </tr>
-                  <tr>
-                    <td class="label-cell">SKU</td>
-                    <td class="value-cell">{{ product.sku }}</td>
-                  </tr>
-                  <tr>
-                    <td class="label-cell">Category</td>
-                    <td class="value-cell">{{ product.category?.name || 'Uncategorized' }}</td>
-                  </tr>
-                  <tr>
-                    <td class="label-cell">Status</td>
-                    <td class="value-cell">
-                      <span class="status-badge" [ngClass]="product.status.toLowerCase()">{{ product.status || 'Active' }}</span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td class="label-cell">Cost Price</td>
-                    <td class="value-cell">
-                      <span class="amount">{{ product.cost | currency:'USD':'symbol':'1.2-2' }}</span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td class="label-cell">Selling Price</td>
-                    <td class="value-cell">
-                      <span class="amount">{{ product.price | currency:'USD':'symbol':'1.2-2' }}</span>
-                    </td>
-                  </tr>
-                  <tr *ngIf="product.description">
-                    <td class="label-cell">Description</td>
-                    <td class="value-cell">{{ product.description }}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
+          <table class="product-info-table">
+            <tbody>
+              <tr>
+                <td class="label-cell">Asset Identifier</td>
+                <td class="value-cell">{{ product.sku }}</td>
+              </tr>
+              <tr>
+                <td class="label-cell">Classification</td>
+                <td class="value-cell">{{ product.category?.name || 'Standard' }}</td>
+              </tr>
+              <tr>
+                <td class="label-cell">Operational Status</td>
+                <td class="value-cell">
+                  <span class="status-badge" [ngClass]="product.status.toLowerCase()">
+                    {{ product.status }}
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td class="label-cell">Unit Acquisition Cost</td>
+                <td class="value-cell">
+                  <span class="amount">{{ product.cost | currency }}</span>
+                </td>
+              </tr>
+              <tr>
+                <td class="label-cell">Market Equilibrium Price</td>
+                <td class="value-cell">
+                  <span class="amount" style="color: var(--brand-primary)">{{ product.price | currency }}</span>
+                </td>
+              </tr>
+              <tr *ngIf="product.description">
+                <td class="label-cell">System Annotation</td>
+                <td class="value-cell" style="font-weight: 400; font-size: 0.9rem;">{{ product.description }}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
-      <!-- Stock Information Card -->
+      <!-- Stock Logistics -->
       <div class="card stock-card">
         <div class="card-header">
-          <h2>Stock Information</h2>
-          <span class="total-stock">Total: {{ totalStock }}</span>
+          <h2>Inventory Logistics</h2>
+          <span class="total-stock">Aggregate: {{ totalStock }}</span>
         </div>
         <div class="card-content">
           <div *ngIf="stockLevels.length === 0" class="empty-state">
-            <p>No stock information available</p>
+            <i class="fas fa-warehouse"></i>
+            <p>No deployment data detected for this asset.</p>
           </div>
-          <div *ngIf="stockLevels.length > 0" class="stock-table-wrapper">
-            <div class="table-responsive">
-              <table class="stock-table">
-                <thead>
-                  <tr>
-                    <th class="warehouse-col">Warehouse</th>
-                    <th class="numeric-col">Available</th>
-                    <th class="numeric-col">Reserved</th>
-                    <th class="numeric-col">Min Stock</th>
-                    <th class="numeric-col">Reorder Level</th>
-                    <th class="status-col">Status</th>
-                    <th class="actions-col">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let stock of stockLevels">
-                    <td class="warehouse-cell">{{ stock.warehouse?.name || 'Unknown' }}</td>
-                    <td class="numeric-cell">{{ stock.quantity || 0 }}</td>
-                    <td class="numeric-cell">
-                      <input title="Reserved Quantity" type="number" [(ngModel)]="stock.reservedQuantity" min="0" class="stock-input">
-                    </td>
-                    <td class="numeric-cell">
-                      <input title="Minstock" type="number" [(ngModel)]="stock.minStock" min="0" class="stock-input">
-                    </td>
-                    <td class="numeric-cell">
-                      <input title="Reorder Level" type="number" [(ngModel)]="stock.reorderLevel" min="0" class="stock-input">
-                    </td>
-                    <td class="status-cell">
-                      <span class="status-badge" [ngClass]="getStockStatus(stock)">
-                        {{ getStockStatusText(stock) }}
-                      </span>
-                    </td>
-                    <td class="actions-cell">
-                      <button class="btn btn-sm btn-primary" (click)="updateStockRule(stock)" routerLink="/products">
-                        <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
-                          <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
-                        </svg>
-                        Update
-                      </button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+          
+          <div *ngIf="stockLevels.length > 0" class="table-wrapper">
+            <table class="stock-table">
+              <thead>
+                <tr>
+                  <th>Node</th>
+                  <th style="text-align: center">Onhand</th>
+                  <th style="text-align: center">Min Safe</th>
+                  <th style="text-align: center">Status</th>
+                  <th style="text-align: right">Control</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let stock of stockLevels">
+                  <td style="font-weight: 700">{{ stock.warehouse?.name || 'Edge Node' }}</td>
+                  <td style="text-align: center; font-weight: 800">{{ stock.quantity || 0 }}</td>
+                  <td style="text-align: center">
+                    <input title="Min Stock" type="number" [(ngModel)]="stock.minStock" class="stock-input">
+                  </td>
+                  <td style="text-align: center">
+                    <span class="status-badge" [ngClass]="getStockStatus(stock)">
+                      {{ getStockStatusText(stock) }}
+                    </span>
+                  </td>
+                  <td style="text-align: right">
+                    <button class="btn-ghost" (click)="updateStockRule(stock)" title="Update Rule">
+                      <i class="fas fa-save"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>

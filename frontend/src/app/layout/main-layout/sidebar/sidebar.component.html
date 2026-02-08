@@ -4,15 +4,24 @@
   <nav class="sidebar__nav">
     <a routerLink="/dashboard" routerLinkActive="active" (click)="close.emit()">Dashboard</a>
     <a routerLink="/dashboard/activity-logs" routerLinkActive="active" (click)="close.emit()">
-      <!-- <i class="fas fa-history"></i> -->
        Activity Logs
     </a>
-    <a routerLink="/products" (click)="close.emit()">Products</a>
-    <a routerLink="/suppliers" routerLinkActive="active" (click)="close.emit()">Suppliers</a>
-    <a routerLink="/purchases" (click)="close.emit()">Purchases</a>
-    <a routerLink="/stock" (click)="close.emit()">Stock</a>
-    <a routerLink="/reports" (click)="close.emit()">Reports</a>
-    <a routerLink="/settings" (click)="close.emit()">Settings</a>
+    <a routerLink="/products" routerLinkActive="active" (click)="close.emit()">Products</a>
+    
+    <!-- Admin & Manager Only -->
+    <a *ngIf="hasRole(['admin', 'manager'])" routerLink="/products/categories" routerLinkActive="active" (click)="close.emit()">Categories</a>
+    <a *ngIf="hasRole(['admin', 'manager'])" routerLink="/suppliers" routerLinkActive="active" (click)="close.emit()">Suppliers</a>
+    
+    <!-- Available to All Roles -->
+    <a routerLink="/purchases" routerLinkActive="active" (click)="close.emit()">Purchases</a>
+    
+    <a routerLink="/stock" routerLinkActive="active" (click)="close.emit()">Stock</a>
+    
+    <!-- Admin & Manager Only -->
+    <a *ngIf="hasRole(['admin', 'manager'])" routerLink="/reports" routerLinkActive="active" (click)="close.emit()">Reports</a>
+    
+    <!-- Admin Only -->
+    <a *ngIf="hasRole(['admin'])" routerLink="/settings" routerLinkActive="active" (click)="close.emit()">Settings</a>
   </nav>
 </aside>
 <div class="sidebar__overlay" (click)="close.emit()"></div>

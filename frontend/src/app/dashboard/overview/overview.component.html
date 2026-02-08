@@ -1,37 +1,35 @@
 <div class="dashboard-container">
-  <div class="floating-particles">
-    <div class="particle" *ngFor="let i of [1,2,3,4,5,6,7,8]"></div>
-  </div>
-
-  <header class="dashboard-header">
+  <header class="dashboard-header animate-fade-in">
     <div class="header-content">
       <h1 class="dashboard-title">
-        <i class="fas fa-chart-line"></i>
-        Inventory Dashboard
+        <i class="fas fa-meteor"></i>
+        System Dynamics
       </h1>
-      <p class="dashboard-subtitle">Real-time overview of your inventory management system</p>
-      <div class="last-updated">
-        <i class="fas fa-sync-alt"></i>
-        Auto-refreshing every 30 seconds
-      </div>
+      <p class="dashboard-subtitle">Monitor real-time inventory flow and operational performance with precision.</p>
+      
       <div class="header-stats">
         <div class="quick-stat">
-          <span class="stat-number">{{ stats.totalproducts | number }}</span>
-          <span class="stat-label">Products</span>
+          <span class="stat-label">System Integrity</span>
+          <span class="stat-number">
+            <i class="fas fa-check-circle" style="color: var(--status-success)"></i>
+            Optimized
+          </span>
         </div>
         <div class="quick-stat">
-          <span class="stat-number">{{ stats.totalsuppliers | number }}</span>
-          <span class="stat-label">Suppliers</span>
+          <span class="stat-label">Inventory Health</span>
+          <span class="stat-number">
+            {{ (1 - (stats.lowStockItems / (stats.totalproducts || 1))) * 100 | number:'1.0-0' }}%
+          </span>
         </div>
         <div class="quick-stat">
-          <span class="stat-number">{{ stats.totalStock | number }}</span>
-          <span class="stat-label">Stock Units</span>
+          <span class="stat-label">Flow Velocity</span>
+          <span class="stat-number">{{ stats.pendingPurchases | number }} Active</span>
         </div>
-        <div class="quick-stat">
-          <button class="activity-logs-btn" routerLink="/dashboard/activity-logs">
-            <!-- <i class="fas fa-history"></i> -->
-            <span>Activity Logs</span>
-          </button>
+        <div class="quick-access">
+          <a class="activity-logs-btn" routerLink="/dashboard/activity-logs">
+            <i class="fas fa-stream"></i>
+            <span>Activity Stream</span>
+          </a>
         </div>
       </div>
     </div>
@@ -39,191 +37,163 @@
 
   <div *ngIf="loading" class="loading-state">
     <div class="loading-spinner"></div>
-    <p>Loading dashboard data...</p>
+    <p>Loading Dashboard...</p>
   </div>
 
   <div *ngIf="error" class="error-state">
-    <i class="fas fa-exclamation-triangle"></i>
+    <i class="fas fa-exclamation-circle"></i>
     <p>{{ error }}</p>
     <button class="retry-btn" (click)="loadDashboard()">
-      <i class="fas fa-redo"></i>
+      <i class="fas fa-sync"></i>
       Retry
     </button>
   </div>
 
-  <div *ngIf="!loading && !error" class="dashboard-content">
-    <!-- KPI Section -->
+  <div *ngIf="!loading && !error" class="dashboard-content animate-fade-in">
+    <!-- Refined KPI Section -->
     <section class="kpi-section">
-      <h2 class="section-title">Key Performance Indicators</h2>
+      <h2 class="section-title">Core Performance Metrics</h2>
       <div class="kpi-grid">
-        <div class="kpi-card kpi-primary" [style.animation-delay]="'0.1s'">
-          <div class="kpi-icon">
-            <i class="fas fa-box"></i>
-          </div>
+        <div class="kpi-card kpi-primary" tabindex="0">
+          <div class="kpi-icon"><i class="fas fa-cube"></i></div>
           <div class="kpi-content">
-            <h3>Total Products</h3>
-            <p class="kpi-value" [attr.data-count]="stats.totalproducts">{{ stats.totalproducts | number }}</p>
-            <span class="kpi-label">Active inventory items</span>
-            <div class="kpi-trend">
-              <i class="fas fa-arrow-up trend-up"></i>
-              <span class="trend-text">+5.2% from last month</span>
+            <h3>Unified Catalog</h3>
+            <p class="kpi-value">{{ stats.totalproducts | number }}</p>
+            <span class="kpi-label">Registered SKUs in system</span>
+            <div class="kpi-trend up">
+              <i class="fas fa-caret-up"></i>
+              <span>+5.2% Growth</span>
             </div>
           </div>
         </div>
 
-        <div class="kpi-card kpi-success" [style.animation-delay]="'0.2s'">
-          <div class="kpi-icon">
-            <i class="fas fa-users"></i>
-          </div>
+        <div class="kpi-card kpi-success" tabindex="0">
+          <div class="kpi-icon"><i class="fas fa-handshake"></i></div>
           <div class="kpi-content">
-            <h3>Total Suppliers</h3>
-            <p class="kpi-value" [attr.data-count]="stats.totalsuppliers">{{ stats.totalsuppliers | number }}</p>
-            <span class="kpi-label">Active suppliers</span>
-            <div class="kpi-trend">
-              <i class="fas fa-arrow-up trend-up"></i>
-              <span class="trend-text">+2.1% from last month</span>
+            <h3>Verified Partners</h3>
+            <p class="kpi-value">{{ stats.totalsuppliers | number }}</p>
+            <span class="kpi-label">Active trade network</span>
+            <div class="kpi-trend up">
+              <i class="fas fa-caret-up"></i>
+              <span>+2.1% Active</span>
             </div>
           </div>
         </div>
 
-        <div class="kpi-card kpi-info" [style.animation-delay]="'0.3s'">
-          <div class="kpi-icon">
-            <i class="fas fa-warehouse"></i>
-          </div>
+        <div class="kpi-card kpi-info" tabindex="0">
+          <div class="kpi-icon"><i class="fas fa-boxes"></i></div>
           <div class="kpi-content">
-            <h3>Total Stock</h3>
-            <p class="kpi-value" [attr.data-count]="stats.totalStock">{{ stats.totalStock | number }}</p>
-            <span class="kpi-label">Units in inventory</span>
-            <div class="kpi-trend">
-              <i class="fas fa-arrow-down trend-down"></i>
-              <span class="trend-text">-1.3% from last month</span>
+            <h3>Aggregate Volume</h3>
+            <p class="kpi-value">{{ stats.totalStock | number }}</p>
+            <span class="kpi-label">Units available for dispatch</span>
+            <div class="kpi-trend down">
+              <i class="fas fa-caret-down"></i>
+              <span>-1.3% Velocity</span>
             </div>
           </div>
         </div>
 
-        <div class="kpi-card kpi-warning" [style.animation-delay]="'0.4s'">
-          <div class="kpi-icon">
-            <i class="fas fa-dollar-sign"></i>
-          </div>
+        <div class="kpi-card kpi-warning" tabindex="0">
+          <div class="kpi-icon"><i class="fas fa-wallet"></i></div>
           <div class="kpi-content">
-            <h3>Purchase Value</h3>
-            <p class="kpi-value" [attr.data-count]="stats.totalpurchases">{{ stats.totalpurchases | currency:'USD':'symbol':'1.0-0' }}</p>
-            <span class="kpi-label">Total purchase amount</span>
-            <div class="kpi-trend">
-              <i class="fas fa-arrow-up trend-up"></i>
-              <span class="trend-text">+12.8% from last month</span>
+            <h3>Procurement Cycle</h3>
+            <p class="kpi-value">{{ stats.totalpurchases | currency:'USD':'symbol':'1.0-0' }}</p>
+            <span class="kpi-label">Total monthly spend</span>
+            <div class="kpi-trend up">
+              <i class="fas fa-caret-up"></i>
+              <span>+12.8% Velocity</span>
             </div>
           </div>
         </div>
 
-        <div class="kpi-card kpi-danger" [class.kpi-alert]="stats.lowStockItems > 0" [style.animation-delay]="'0.5s'">
-          <div class="kpi-icon">
-            <i class="fas fa-exclamation-triangle"></i>
-          </div>
+        <div class="kpi-card kpi-danger" [class.kpi-alert]="stats.lowStockItems > 0" tabindex="0">
+          <div class="kpi-icon"><i class="fas fa-shield-alt"></i></div>
           <div class="kpi-content">
-            <h3>Low Stock Alerts</h3>
-            <p class="kpi-value" [attr.data-count]="stats.lowStockItems">{{ stats.lowStockItems | number }}</p>
-            <span class="kpi-label">Items need attention</span>
+            <h3>Security Stock</h3>
+            <p class="kpi-value">{{ stats.lowStockItems | number }}</p>
+            <span class="kpi-label">Items at critical threshold</span>
             <div class="kpi-trend" *ngIf="stats.lowStockItems > 0">
-              <i class="fas fa-exclamation-circle trend-alert"></i>
-              <span class="trend-text alert-text">Immediate action required</span>
+              <span style="color: var(--status-error); font-weight: 700">Action Required</span>
+            </div>
+            <div class="kpi-trend up" *ngIf="stats.lowStockItems === 0">
+              <span style="color: var(--status-success)">Optimized</span>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Today's Activity Section -->
+    <!-- Operational Momentum -->
     <section class="activity-section">
-      <h2 class="section-title">Today's Activity</h2>
+      <h2 class="section-title">Operational Momentum</h2>
       <div class="activity-grid">
         <div class="activity-card activity-positive">
-          <div class="activity-icon">
-            <i class="fas fa-arrow-up"></i>
+          <div class="activity-header">
+            <div class="activity-icon"><i class="fas fa-arrow-up"></i></div>
+            <h3>Inbound Volume</h3>
           </div>
           <div class="activity-content">
-            <h3>Stock In</h3>
-            <p class="activity-value">+{{ stats.stockInToday | number }}</p>
-            <span class="activity-label">Units received today</span>
+            <p class="activity-value">+ {{ stats.stockInToday | number }} Units</p>
           </div>
         </div>
 
         <div class="activity-card activity-negative">
-          <div class="activity-icon">
-            <i class="fas fa-arrow-down"></i>
+          <div class="activity-header">
+            <div class="activity-icon"><i class="fas fa-arrow-down"></i></div>
+            <h3>Outbound Volume</h3>
           </div>
           <div class="activity-content">
-            <h3>Stock Out</h3>
-            <p class="activity-value">-{{ stats.stockOutToday | number }}</p>
-            <span class="activity-label">Units dispatched today</span>
+            <p class="activity-value">- {{ stats.stockOutToday | number }} Units</p>
           </div>
         </div>
 
-        <div class="activity-card activity-neutral">
-          <div class="activity-icon">
-            <i class="fas fa-exchange-alt"></i>
+        <div class="activity-card">
+          <div class="activity-header">
+            <div class="activity-icon"><i class="fas fa-check-double"></i></div>
+            <h3>Order Performance</h3>
           </div>
           <div class="activity-content">
-            <h3>Net Movement</h3>
-            <p class="activity-value"
-               [class.positive]="(stats.stockInToday - stats.stockOutToday) > 0"
-               [class.negative]="(stats.stockInToday - stats.stockOutToday) < 0">
-              {{ (stats.stockInToday - stats.stockOutToday) >= 0 ? '+' : '-' }}
-              {{ (stats.stockInToday - stats.stockOutToday) | number:'1.0-0' }}
-            </p>
-            <span class="activity-label">Today's net change</span>
+            <p class="activity-value">{{ stats.approvedpurchases | number }} Approved</p>
           </div>
         </div>
 
-         <div class="activity-card activity-warning">
-          <div class="activity-icon">
-            <i class="fas fa-shopping-cart"></i>
+        <div class="activity-card">
+          <div class="activity-header">
+            <div class="activity-icon"><i class="fas fa-clock"></i></div>
+            <h3>Backlog Queue</h3>
           </div>
           <div class="activity-content">
-            <h3>Approved Purchases</h3>
-            <p class="activity-value">{{ stats.approvedpurchases | number }}</p>
-            <span class="activity-label">Approved Purchases</span>
-          </div>
-        </div>
-
-        <div class="activity-card activity-warning">
-          <div class="activity-icon">
-            <i class="fas fa-shopping-cart"></i>
-          </div>
-          <div class="activity-content">
-            <h3>Pending Orders</h3>
-            <p class="activity-value">{{ stats.pendingPurchases | number }}</p>
-            <span class="activity-label">Awaiting receipt</span>
+            <p class="activity-value">{{ stats.pendingPurchases | number }} Pending</p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Stock Trend Section -->
-    <section class="charts-section">
-      <h2 class="section-title">Stock Movement Analysis</h2>
-      <div class="single-chart">
-        <app-stock-trend [trend]="stockTrendData"></app-stock-trend>
-      </div>
-    </section>
+    <!-- Data Visuals -->
+    <div class="charts-container">
+      <section class="charts-section">
+        <h2 class="section-title">Inventory Fluctuations</h2>
+        <div class="single-chart">
+          <app-stock-trend [trend]="stockTrendData"></app-stock-trend>
+        </div>
+      </section>
 
-    <!-- Purchase Trend Section -->
-    <section class="charts-section">
-      <h2 class="section-title">Purchase Analytics</h2>
-      <div class="single-chart">
-        <app-purchase-trend [trend]="purchaseTrendData"></app-purchase-trend>
-      </div>
-    </section>
+      <section class="charts-section">
+        <h2 class="section-title">Procurement Foresight</h2>
+        <div class="single-chart">
+          <app-purchase-trend [trend]="purchaseTrendData"></app-purchase-trend>
+        </div>
+      </section>
 
-    <!-- Sales Trend Section -->
-    <section class="charts-section">
-      <h2 class="section-title">Sales Performance</h2>
-      <div class="single-chart">
-        <app-sales-trend [trend]="salesTrendData"></app-sales-trend>
-      </div>
-    </section>
+      <section class="charts-section">
+        <h2 class="section-title">Operational Throughput</h2>
+        <div class="single-chart">
+          <app-sales-trend [trend]="salesTrendData"></app-sales-trend>
+        </div>
+      </section>
+    </div>
 
-    <!-- Low Stock Widget Section -->
+    <!-- Health Widget -->
     <section class="widget-section">
       <app-low-stock-widget
         [lowStockItems]="lowStockItems"
@@ -232,51 +202,16 @@
       </app-low-stock-widget>
     </section>
 
-    <!-- Low Stock Alerts Section -->
-    <section class="alerts-section" *ngIf="lowStockItems.length > 0">
-     <!-- <div class="section-header">
-        <h2 class="section-title">
-          <i class="fas fa-exclamation-triangle"></i>
-          Low Stock Alerts
-        </h2>
-        <span class="alert-count">{{ lowStockItems.length }} items need attention</span>
-      </div>
-
-      <div class="alerts-grid">
-        <div class="alert-card"
-             *ngFor="let item of lowStockItems.slice(0, 6); trackBy: trackByProductId"
-             (click)="navigateToProduct(item)"
-             role="button"
-             tabindex="0">
-          <div class="alert-header">
-            <h4 class="alert-product">{{ item.productName }}</h4>
-            <span class="alert-sku">{{ item.sku }}</span>
-          </div>
-          <div class="alert-location">
-            <i class="fas fa-map-marker-alt"></i>
-            {{ item.warehouseName }}
-          </div>
-          <div class="alert-metrics">
-            <div class="metric">
-              <span class="metric-label">Current</span>
-              <span class="metric-value critical">{{ item.availableQty | number }}</span>
-            </div>
-            <div class="metric">
-              <span class="metric-label">Min Required</span>
-              <span class="metric-value">{{ item.minStock | number }}</span>
-            </div>
-          </div>
-          <div class="alert-action">
-            <i class="fas fa-arrow-right"></i>
-          </div>
-        </div>
-      </div> -->
-
-      <div class="alerts-footer" *ngIf="lowStockItems.length > 6">
-        <p>The Length of Low Stock Alerts is Exceeded and Now the Total Low Stock Count is {{ lowStockItems.length }} which is Highly Alarming  </p>
+    <!-- Global Integrity Alert -->
+    <section class="alerts-section" *ngIf="lowStockItems.length > 5">
+      <div class="alerts-footer">
+        <p>
+          <i class="fas fa-info-circle"></i>
+          <strong>Integrity Alert:</strong> System detected <strong>{{ lowStockItems.length }}</strong> products below safety threshold. Restocking recommended.
+        </p>
         <button class="view-all-btn" (click)="router.navigate(['/stock/levels'])">
-          View All Alerts
-          <i class="fas fa-external-link-alt"></i>
+          Resolve Now
+          <i class="fas fa-chevron-right" style="margin-left: 0.5rem"></i>
         </button>
       </div>
     </section>

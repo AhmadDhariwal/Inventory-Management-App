@@ -29,10 +29,10 @@ const purchaseorderschema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    warehouse : {
+    warehouse: {
       type: mongoose.Schema.Types.ObjectId,
-      ref:"warehouse",
-      required:true,
+      ref: "warehouse",
+      required: true,
     },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
@@ -54,9 +54,20 @@ const purchaseorderschema = new mongoose.Schema(
     receivedAt: {
       type: Date
     },
+    // Multi-tenant field
+    organizationId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Organization',
+      required: true,
+      index: true
+    }
   },
   { timestamps: true }
 );
 
+// Index for organization-scoped queries
+purchaseorderschema.index({ organizationId: 1, status: 1 });
+purchaseorderschema.index({ organizationId: 1, createdAt: -1 });
+
 const purchaseorder = mongoose.model("PurchaseOrder", purchaseorderschema);
-module.exports= purchaseorder;
+module.exports = purchaseorder;

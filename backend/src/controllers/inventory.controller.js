@@ -1,4 +1,4 @@
-const express = require ("express");
+const express = require("express");
 const inventoryservice = require("../services/inventory.service");
 
 
@@ -10,6 +10,7 @@ exports.addstock = async (req, res) => {
       quantity: req.body.quantity,
       reason: req.body.reason,
       userId: req.userid,
+      organizationId: req.organizationId // Pass organizationId
     });
 
     res.status(201).json({
@@ -29,6 +30,7 @@ exports.removestock = async (req, res) => {
       quantity: req.body.quantity,
       reason: req.body.reason,
       userId: req.userid,
+      organizationId: req.organizationId // Pass organizationId
     });
 
     res.status(201).json({
@@ -44,7 +46,8 @@ exports.getstock = async (req, res) => {
   try {
     const stock = await inventoryservice.getcurrentstock(
       req.params.productId,
-      req.params.warehouseId
+      req.params.warehouseId,
+      req.organizationId // Pass organizationId
     );
 
     res.status(200).json({ stock });
@@ -56,7 +59,7 @@ exports.getstock = async (req, res) => {
 exports.getstocklevels = async (req, res) => {
   try {
     const productId = req.query.productId;
-    const stockLevels = await inventoryservice.getstocklevels(productId);
+    const stockLevels = await inventoryservice.getstocklevels(productId, req.organizationId); // Pass organizationId
     res.status(200).json(stockLevels);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -69,11 +72,11 @@ exports.updatestocklevel = async (req, res) => {
     console.log('Stock Level ID:', req.params.id);
     console.log('Update Data:', req.body);
     console.log('User ID from token:', req.userid);
-    
+
     const stockLevelId = req.params.id;
     const updateData = req.body;
     const updatedStockLevel = await inventoryservice.updatestocklevel(stockLevelId, updateData);
-    
+
     console.log('Stock level update successful');
     res.status(200).json({
       message: "Stock level updated successfully",
@@ -91,9 +94,10 @@ exports.getstocksummary = async (req, res) => {
       startDate: req.query.startDate,
       endDate: req.query.endDate,
       warehouseId: req.query.warehouseId,
-      productId: req.query.productId
+      productId: req.query.productId,
+      organizationId: req.organizationId // Add organizationId
     };
-    
+
     const summary = await inventoryservice.getstocksummary(filters);
     res.status(200).json(summary);
   } catch (error) {

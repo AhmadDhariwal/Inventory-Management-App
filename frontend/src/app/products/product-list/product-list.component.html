@@ -1,208 +1,99 @@
-<main class="product-list-container" role="main">
-  <div class="page-header">
+<main class="product-list-container">
+  <header class="page-header animate-fade-in">
     <div class="header-content">
       <div class="title-section">
-        <h1 id="page-title">Product Management</h1>
-        <p class="subtitle">Manage your product catalog and inventory items</p>
+        <h1>Product Management</h1>
+        <p class="subtitle">Registry of items, components, and unified catalog assets.</p>
       </div>
-      <nav class="breadcrumb" aria-label="Breadcrumb navigation">
-        <ol class="breadcrumb-list">
-          <li><a href="/dashboard" aria-label="Go to dashboard">Dashboard</a></li>
-          <li aria-current="page">Products</li>
-        </ol>
-      </nav>
-    </div>
-  </div>
-
-  <section class="content-section" aria-labelledby="page-title">
-    <div class="toolbar">
-      <div class="search-filters">
-        <div class="search-field">
-          <label for="search-input" class="sr-only">Search products</label>
-          <div class="input-wrapper">
-            <svg class="search-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-              <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
-            </svg>
-            <input
-              id="search-input"
-              type="search"
-              class="search-control"
-              placeholder="Search by name, SKU, category..."
-              [(ngModel)]="searchTerm"
-              (input)="onSearch()"
-              aria-label="Search products">
-          </div>
-        </div>
-        <div class="filter-controls">
-          <select class="filter-select" [(ngModel)]="selectedCategory" (change)="onFilter()" aria-label="Filter by category">
-            <option value="">All Categories</option>
-            <option *ngFor="let category of categories; trackBy: trackByCategory" [value]="category._id">
-              {{ category.name }}
-            </option>
-          </select>
-        </div>
-      </div>
+      
       <div class="action-buttons">
-        <button type="button" class="btn btn-outline" (click)="refreshList()" [attr.aria-label]="'Refresh products list'">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-            <path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z"/>
-            <path fill-rule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3zM3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9H3.1z"/>
-          </svg>
-          Refresh
-        </button>
-        <button type="button" class="btn btn-primary" (click)="addProduct()" [attr.aria-label]="'Create new product'">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-            <path d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2z"/>
-          </svg>
+        <button class="btn-primary" (click)="addProduct()">
+          <i class="fas fa-plus"></i>
           New Product
         </button>
+        <button class="btn-outline" (click)="refreshList()">
+          <i class="fas fa-sync-alt"></i>
+          Refresh
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="content-section animate-fade-in">
+    <div class="toolbar">
+      <div class="search-field">
+        <i class="fas fa-search search-icon"></i>
+        <input 
+          type="text" 
+          class="search-control" 
+          placeholder="Search by name, SKU, or category..."
+          [(ngModel)]="searchTerm"
+          (input)="onSearch()">
+      </div>
+
+      <div class="filter-controls">
+        <select class="filter-select" [(ngModel)]="selectedCategory" (change)="onFilter()">
+          <option value="">All Categories</option>
+          <option *ngFor="let category of categories" [value]="category._id">{{ category.name }}</option>
+        </select>
       </div>
     </div>
 
     <!-- Loading State -->
-    <div *ngIf="isLoading" class="loading-state" role="status" aria-live="polite">
-      <div class="loading-spinner">
-        <svg class="spinner" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" opacity="0.25"/>
-          <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
-        </svg>
-      </div>
-      <p>Loading products...</p>
+    <div *ngIf="isLoading" class="loading-state">
+      <i class="fas fa-circle-notch fa-spin"></i>
+      <p>Synchronizing Catalog...</p>
     </div>
 
     <!-- Empty State -->
     <div *ngIf="!isLoading && filteredProducts.length === 0" class="empty-state">
-      <div class="empty-icon">
-        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true">
-          <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
-          <line x1="8" y1="21" x2="16" y2="21"/>
-          <line x1="12" y1="17" x2="12" y2="21"/>
-        </svg>
-      </div>
-      <h2>No Products Found</h2>
-      <p>{{ searchTerm || selectedCategory ? 'No products match your current filters.' : 'Get started by creating your first product.' }}</p>
-      <button *ngIf="!searchTerm && !selectedCategory" class="btn btn-primary" (click)="addProduct()">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-          <path d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2z"/>
-        </svg>
-        Create First Product
-      </button>
+      <i class="fas fa-box-open"></i>
+      <h3>No matches found</h3>
+      <p>Try adjusting your search or category filters.</p>
     </div>
 
-    <!-- Data Table -->
+    <!-- Premium Table -->
     <div *ngIf="!isLoading && filteredProducts.length > 0" class="table-container">
       <div class="table-wrapper">
-        <table class="data-table" role="table" aria-label="Products list">
+        <table class="data-table">
           <thead>
-            <tr role="row">
-              <th scope="col" class="sortable" (click)="sortBy('sku')" [attr.aria-sort]="getSortDirection('sku')">
-                <span class="th-content">
-                  <span>SKU</span>
-                  <svg class="sort-icon" width="12" height="12" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
-                    <path d="M6 3l4 4H2l4-4z"/>
-                  </svg>
-                </span>
-              </th>
-              <th scope="col" class="sortable" (click)="sortBy('name')" [attr.aria-sort]="getSortDirection('name')">
-                <span class="th-content">
-                  <span>Product Name</span>
-                  <svg class="sort-icon" width="12" height="12" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
-                    <path d="M6 3l4 4H2l4-4z"/>
-                  </svg>
-                </span>
-              </th>
-              <th scope="col" class="sortable" (click)="sortBy('category')" [attr.aria-sort]="getSortDirection('category')">
-                <span class="th-content">
-                  <span>Category</span>
-                  <svg class="sort-icon" width="12" height="12" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
-                    <path d="M6 3l4 4H2l4-4z"/>
-                  </svg>
-                </span>
-              </th>
-              <th scope="col" class="sortable numeric" (click)="sortBy('cost')" [attr.aria-sort]="getSortDirection('cost')">
-                <span class="th-content">
-                  <span>Cost</span>
-                  <svg class="sort-icon" width="12" height="12" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
-                    <path d="M6 3l4 4H2l4-4z"/>
-                  </svg>
-                </span>
-              </th>
-              <th scope="col" class="sortable numeric" (click)="sortBy('price')" [attr.aria-sort]="getSortDirection('price')">
-                <span class="th-content">
-                  <span>Price</span>
-                  <svg class="sort-icon" width="12" height="12" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
-                    <path d="M6 3l4 4H2l4-4z"/>
-                  </svg>
-                </span>
-              </th>
-              <th scope="col">Stock Level</th>
-              <th scope="col">Status</th>
-              <th scope="col" class="actions-col">
-                <span class="sr-only">Actions</span>
-              </th>
+            <tr>
+              <th class="sortable" (click)="sortBy('sku')">SKU</th>
+              <th class="sortable" (click)="sortBy('name')">Asset Name</th>
+              <th class="sortable" (click)="sortBy('category')">Classification</th>
+              <th class="numeric sortable" (click)="sortBy('cost')">Unit Cost</th>
+              <th class="numeric sortable" (click)="sortBy('price')">Target Price</th>
+              <th>Status</th>
+              <th class="actions-col"></th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let product of filteredProducts; let i = index; trackBy: trackByProduct"
-                role="row"
-                class="table-row"
-                [attr.aria-rowindex]="i + 2">
-              <td [attr.data-label]="'SKU'">
-                <span class="sku-badge">{{ product.sku }}</span>
-              </td>
-              <td [attr.data-label]="'Product Name'">
+            <tr *ngFor="let product of filteredProducts">
+              <td><span class="sku-badge">{{ product.sku }}</span></td>
+              <td>
                 <div class="product-info">
-                  <span class="product-name">{{ product.name }}</span>
-                  <span class="product-description" *ngIf="product.description">{{ product.description }}</span>
+                  <span style="font-weight: 700">{{ product.name }}</span>
+                  <p style="font-size: 0.75rem; color: var(--text-muted); margin: 0">{{ product.description | slice:0:40 }}{{ (product.description?.length || 0) > 40 ? '...' : '' }}</p>
                 </div>
               </td>
-              <td [attr.data-label]="'Category'">
-                <span class="category-name">{{ product.category?.name || 'Uncategorized' }}</span>
-              </td>
-              <td class="numeric" [attr.data-label]="'Cost'">
-                <span class="amount">{{ product.cost | currency:'USD':'symbol':'1.2-2' }}</span>
-              </td>
-              <td class="numeric" [attr.data-label]="'Price'">
-                <span class="amount">{{ product.price | currency:'USD':'symbol':'1.2-2' }}</span>
-              </td>
-              <td class="numeric" [attr.data-label]="'Stock Level'">
-                <span class="stock-level">{{ getProductStockLevel(product._id) }}</span>
-              </td>
-              <td [attr.data-label]="'Status'">
+              <td>{{ product.category?.name || 'Unassigned' }}</td>
+              <td class="numeric">{{ product.cost | currency }}</td>
+              <td class="numeric">{{ product.price | currency }}</td>
+              <td>
                 <span class="status-badge" [ngClass]="product.status.toLowerCase()">
-                  {{ product.status || 'Active' }}
+                  {{ product.status }}
                 </span>
               </td>
               <td class="actions-cell">
                 <div class="action-menu">
-                  <button type="button"
-                          class="btn btn-ghost btn-sm"
-                          (click)="viewProduct(product._id)"
-                          [attr.aria-label]="'View details for ' + product.name">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-                      <path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/>
-                      <path d="M1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
-                    </svg>
-                    View
+                  <button class="btn-ghost" (click)="viewProduct(product._id)" title="View Details">
+                    <i class="fas fa-eye"></i>
                   </button>
-                  <button type="button"
-                          class="btn btn-ghost btn-sm"
-                          (click)="editProduct(product._id)"
-                          [attr.aria-label]="'Edit product ' + product.name">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-                      <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708L10.5 8.207l-3-3L12.146.146zM11.207 9l-3-3L2.5 11.707V14.5a.5.5 0 0 0 .5.5h2.793L11.207 9z"/>
-                    </svg>
-                    Edit
+                  <button class="btn-ghost" (click)="editProduct(product._id)" title="Edit Asset">
+                    <i class="fas fa-edit"></i>
                   </button>
-                  <button type="button"
-                          class="btn btn-ghost btn-sm btn-danger"
-                          (click)="deleteProduct(product._id, product.name)"
-                          [attr.aria-label]="'Delete product ' + product.name">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-                      <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
-                      <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4L4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
-                    </svg>
-                    Delete
+                  <button *ngIf="canDelete" class="btn-ghost btn-danger" (click)="deleteProduct(product._id, product.name)" title="Delete Asset">
+                    <i class="fas fa-trash-alt"></i>
                   </button>
                 </div>
               </td>
@@ -211,12 +102,11 @@
         </table>
       </div>
     </div>
-  </section>
+  </div>
 
-  <!-- Delete Confirmation Modal -->
   <app-confirm-modal
     [isVisible]="showDeleteModal"
-    title="Delete Product"
+    title="Confirm Deletion"
     [message]="getDeleteMessage()"
     confirmText="Delete"
     cancelText="Cancel"

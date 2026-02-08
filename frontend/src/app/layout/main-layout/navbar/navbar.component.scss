@@ -48,11 +48,38 @@
     }
   }
 
+  &__title-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
   &__title {
     font-weight: 600;
     font-size: 20px;
     color: var(--text);
     white-space: nowrap;
+  }
+
+  &__organization {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 500;
+
+    i {
+      font-size: 11px;
+      color: var(--accent);
+    }
+
+    span {
+      background: var(--hover);
+      padding: 2px 8px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+    }
   }
 
   &__search {

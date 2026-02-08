@@ -2,7 +2,7 @@ const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const inventoryschema = require("./src/models/model");
-const { connecttomongodb} = require('./connect');
+const { connecttomongodb } = require('./connect');
 const route = require("./src/routes/route");
 const inventoryroute = require("./src/routes/inventory.routes")
 const purchaseorderroutes = require("./src/routes/purchaseorder.routes");
@@ -16,10 +16,12 @@ const categoryroutes = require("./src/routes/category.routes");
 const businesssettingsroutes = require("./src/routes/businesssettings.routes");
 const settingsroutes = require("./src/routes/settings.routes");
 const activitylogroutes = require("./src/routes/activitylog.routes");
+const organizationroutes = require("./src/routes/organization.routes");
 const cors = require('cors');
 const userroute = require('./src/routes/user');
-const { verifytoken,restrictto } = require('./src/middleware/auth.middleware');
-  
+const { verifytoken, restrictto } = require('./src/middleware/auth.middleware');
+const { ensureOrganizationContext } = require('./src/middleware/organization.middleware');
+
 
 
 
@@ -36,31 +38,34 @@ app.use(cors({
 }));
 
 connecttomongodb('mongodb://localhost:27017/inventorymanagement')
-.then(() =>   console.log('MongoDB connected'))
-.catch(err => {
+  .then(() => console.log('MongoDB connected'))
+  .catch(err => {
     console.error('MongoDB connection error:', err);
     process.exit(1);
   });
 
-  app.use (express.json());
-app.use(express.urlencoded({extended :false}));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
+// Public routes
+app.use('/user', userroute);
+app.use('/api/organizations', organizationroutes);
 
-app.use('/items',verifytoken,restrictto(["admin","user"]), route);
-app.use('/user',userroute);
-app.use('/api/inventory',verifytoken ,inventoryroute);
-app.use("/api/suppliers", supplierroute);
-app.use("/api/purchaseorders", purchaseorderroutes);
-app.use("/api/salesorders", salesorderroutes);
-app.use("/api/reports", reportroutes);
-app.use("/api/dashboard", dashboardroutes);
-app.use("/api/products", productroutes);
-app.use("/api/categories", categoryroutes);
-app.use("/api/warehouses", warehouseroutes);
-app.use("/api/business-settings", businesssettingsroutes);
-app.use("/api/settings", settingsroutes);
-app.use("/api/activitylog", verifytoken, activitylogroutes);
+// Protected routes - require authentication and organization context
+app.use('/items', verifytoken, ensureOrganizationContext, restrictto(["admin", "user"]), route);
+app.use('/api/inventory', verifytoken, ensureOrganizationContext, inventoryroute);
+app.use("/api/suppliers", verifytoken, ensureOrganizationContext, supplierroute);
+app.use("/api/purchaseorders", verifytoken, ensureOrganizationContext, purchaseorderroutes);
+app.use("/api/salesorders", verifytoken, ensureOrganizationContext, salesorderroutes);
+app.use("/api/reports", verifytoken, ensureOrganizationContext, reportroutes);
+app.use("/api/dashboard", verifytoken, ensureOrganizationContext, dashboardroutes);
+app.use("/api/products", verifytoken, ensureOrganizationContext, productroutes);
+app.use("/api/categories", verifytoken, ensureOrganizationContext, categoryroutes);
+app.use("/api/warehouses", verifytoken, ensureOrganizationContext, warehouseroutes);
+app.use("/api/business-settings", verifytoken, ensureOrganizationContext, businesssettingsroutes);
+app.use("/api/settings", verifytoken, ensureOrganizationContext, settingsroutes);
+app.use("/api/activitylog", verifytoken, ensureOrganizationContext, activitylogroutes);
 
 
 // app.get('/', (req, res) => {

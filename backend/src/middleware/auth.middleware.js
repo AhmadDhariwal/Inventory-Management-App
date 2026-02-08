@@ -1,58 +1,60 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 
-async function verifytoken(req,res,next){
+async function verifytoken(req, res, next) {
+  const authHeader = req.headers.authorization;
 
-     const authHeader = req.headers.authorization;
-
-  if (!authHeader || !authHeader.startsWith('Bearer ') ) {
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({
       success: false,
       message: "Authentication token missing"
     });
   }
-    const token =  authHeader.split(" ")[1];
-        if (!token) {
-            return res.status(401).json({
-                success: false,
-                message: "Error!Token was not provided."
-            });
-        }
-    try{
-        const decoded = jwt.verify(token,"Hello");
-        req.user = { userid: decoded.userid, role: decoded.role };
-        req.userid = decoded.userid;
-        req.role = decoded.role;
-        next();
-    }catch(err){
-        return res.status(401).json({message:"Invalid token"});
-    
-    }
-};
 
-// async function restrictto(req, res, next) {
-//     if(!req.userid){
-//         return res.status(401).json({message:"Invalid token"});
-//     }
-    
-//     role = req.headers.role;
-//     if(!)
-//     next();
-// }
+  const token = authHeader.split(" ")[1];
+  if (!token) {
+    return res.status(401).json({
+      success: false,
+      message: "Error! Token was not provided."
+    });
+  }
 
-function restrictto(role = []){
-    return async function (req, res, next){
-        if(!req.userid){
-            return res.status(401).json({message:"Invalid token"});
-        }
-       
-        if( !role.includes(req.role)){
-            return res.status(401).json({message:"Unauthorized"});
-        }
-        next();
-    }
+  try {
+    const decoded = jwt.verify(token, "Hello");
+
+    // Attach user info to request - now includes organizationId
+    req.user = {
+      userid: decoded.userid,
+      role: decoded.role,
+      organizationId: decoded.organizationId // Added for multi-tenant support
+    };
+    req.userid = decoded.userid;
+    req.role = decoded.role;
+
+    next();
+  } catch (err) {
+    return res.status(401).json({ message: "Invalid token" });
+  }
 }
-async function user (req, res, next) {
+
+function restrictto(roles = []) {
+  return async function (req, res, next) {
+    if (!req.userid) {
+      return res.status(401).json({ message: "Invalid token" });
+    }
+
+    if (!roles.includes(req.role)) {
+      return res.status(403).json({
+        message: "Unauthorized. Insufficient permissions.",
+        requiredRoles: roles,
+        userRole: req.role
+      });
+    }
+    next();
+  }
+}
+
+async function user(req, res, next) {
   try {
     const authHeader = req.headers.authorization;
 
@@ -61,63 +63,23 @@ async function user (req, res, next) {
     }
 
     const token = authHeader.split(" ")[1];
-
     const decoded = jwt.verify(token, "Hello");
 
-    req.user = { userid: decoded.userid, role: decoded.role };
+    req.user = {
+      userid: decoded.userid,
+      role: decoded.role,
+      organizationId: decoded.organizationId
+    };
     req.userid = decoded.userid;
 
-   
     next();
   } catch (error) {
     return res.status(401).json({ message: "Invalid token" });
   }
-};
-
-module.exports = {
-    verifytoken,
-    restrictto,
-    user,
 }
 
-
-
-// try {
-    // const authHeader = req.headers.authorization;
-
-    // if (!authHeader) {
-    //   return res.status(401).json({
-    //     success: false,
-    //     message: "Authorization header missing",
-    //   });
-    // }
-
-    // const parts = authHeader.split(" ");
-
-    // if (parts.length !== 2 || parts[0] !== "Bearer") {
-    //   return res.status(401).json({
-    //     success: false,
-    //     message: "Invalid authorization format",
-    //   });
-    // }
-
-    // const token = parts[1]; try {
-    // const authHeader = req.headers.authorization;
-
-    // if (!authHeader) {
-    //   return res.status(401).json({
-    //     success: false,
-    //     message: "Authorization header missing",
-    //   });
-    // }
-
-    // const parts = authHeader.split(" ");
-
-    // if (parts.length !== 2 || parts[0] !== "Bearer") {
-    //   return res.status(401).json({
-    //     success: false,
-    //     message: "Invalid authorization format",
-    //   });
-    // }
-
-    // const token = parts[1];
+module.exports = {
+  verifytoken,
+  restrictto,
+  user,
+}

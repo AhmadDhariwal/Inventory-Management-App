@@ -18,13 +18,24 @@ export interface RegisterRequest {
   department: string;
   password: string;
   role?: string;
+  organizationName?: string; // For auto-creating organization on first signup
 }
 
 export interface AuthResponse {
+  success: boolean;
   message: string;
   token: string;
   role: string;
-  item: any;
+  item?: any;
+  data?: {
+    _id: string;
+    name: string;
+    email: string;
+    username: string;
+    role: string;
+    organizationId: string;
+    department?: string;
+  };
 }
 
 export interface User {
@@ -33,6 +44,9 @@ export interface User {
   email: string;
   username: string;
   role: string;
+  organizationId?: string;
+  managerId?: string;
+  department?: string;
 }
 
 @Injectable({
@@ -43,6 +57,7 @@ export class AuthService {
   private tokenKey = 'auth_token';
   private userKey = 'user_data';
   private roleKey = 'user_role';
+  private organizationKey = 'organization_id';
 
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(this.hasValidToken());
   private currentUserSubject = new BehaviorSubject<User | null>(this.getCurrentUser());
@@ -81,13 +96,24 @@ export class AuthService {
   }
 
   private setAuthData(response: AuthResponse): void {
-    if (response.token && response.item) {
+    if (response.token) {
       localStorage.setItem(this.tokenKey, response.token);
       localStorage.setItem(this.roleKey, response.role);
-      localStorage.setItem(this.userKey, JSON.stringify(response.item));
+      
+      // Handle both old (item) and new (data) response formats
+      const userData = response.data || response.item;
+      
+      if (userData) {
+        localStorage.setItem(this.userKey, JSON.stringify(userData));
+        
+        // Store organizationId separately for easy access
+        if (userData.organizationId) {
+          localStorage.setItem(this.organizationKey, userData.organizationId);
+        }
+      }
 
       this.isAuthenticatedSubject.next(true);
-      this.currentUserSubject.next(response.item);
+      this.currentUserSubject.next(userData);
     }
   }
 
@@ -100,6 +126,7 @@ export class AuthService {
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.roleKey);
     localStorage.removeItem(this.userKey);
+    localStorage.removeItem(this.organizationKey);
 
     this.isAuthenticatedSubject.next(false);
     this.currentUserSubject.next(null);
@@ -120,6 +147,10 @@ export class AuthService {
     return localStorage.getItem(this.roleKey);
   }
 
+  getOrganizationId(): string | null {
+    return localStorage.getItem(this.organizationKey);
+  }
+
   hasValidToken(): boolean {
     const token = this.getToken();
     if (!token) return false;
@@ -131,6 +162,12 @@ export class AuthService {
       if (payload.exp && payload.exp < currentTime) {
         this.logout();
         return false;
+      }
+
+      // Verify token has organizationId (for multi-tenant support)
+      if (!payload.organizationId) {
+        console.warn('Token missing organizationId - please re-login');
+        // Don't force logout yet for backward compatibility
       }
 
       return true;
@@ -146,12 +183,14 @@ export class AuthService {
 
   hasRole(role: string): boolean {
     const userRole = this.getUserRole();
-    return userRole === role;
+    return userRole ? userRole.toLowerCase() === role.toLowerCase() : false;
   }
 
   hasAnyRole(roles: string[]): boolean {
     const userRole = this.getUserRole();
-    return userRole ? roles.includes(userRole) : false;
+    if (!userRole) return false;
+    const lowerUserRole = userRole.toLowerCase();
+    return roles.some(r => r.toLowerCase() === lowerUserRole);
   }
 
   private checkTokenValidity(): void {

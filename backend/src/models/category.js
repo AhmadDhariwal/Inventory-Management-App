@@ -4,7 +4,6 @@ const categorySchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
-    unique: true,
     trim: true
   },
   description: {
@@ -14,9 +13,24 @@ const categorySchema = new mongoose.Schema({
   isActive: {
     type: Boolean,
     default: true
+  },
+  // Multi-tenant fields
+  organizationId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Organization',
+    required: true,
+    index: true
+  },
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'user',
+    required: true
   }
 }, {
   timestamps: true
 });
+
+// Compound index: category name unique within organization
+categorySchema.index({ organizationId: 1, name: 1 }, { unique: true });
 
 module.exports = mongoose.model('Category', categorySchema);

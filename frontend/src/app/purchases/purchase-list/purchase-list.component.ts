@@ -321,6 +321,20 @@ export class PurchaseListComponent implements OnInit {
       default: return 'status-pending';
     }
   }
+
+  // Helper methods for safe template access
+  getSupplierName(po: PurchaseOrder): string {
+    return po.supplier && po.supplier.name ? po.supplier.name : 'N/A';
+  }
+
+  getWarehouseName(po: PurchaseOrder): string {
+    return po.warehouse && po.warehouse.name ? po.warehouse.name : 'N/A';
+  }
+
+  getCreatedByName(po: PurchaseOrder): string {
+    // Check if createdBy exists and has a name property (it might be just an ID string if not populated)
+    return po.createdBy && (po.createdBy as any).name ? (po.createdBy as any).name : 'Unknown';
+  }
 }
 
 

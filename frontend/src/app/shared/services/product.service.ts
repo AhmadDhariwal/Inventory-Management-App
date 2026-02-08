@@ -68,6 +68,18 @@ export class ProductService {
     return this.http.get<any[]>(this.categoryUrl);
   }
 
+  createCategory(category: any): Observable<any> {
+    return this.http.post<any>(this.categoryUrl, category);
+  }
+
+  updateCategory(id: string, category: any): Observable<any> {
+    return this.http.put<any>(`${this.categoryUrl}/${id}`, category);
+  }
+
+  deleteCategory(id: string): Observable<any> {
+    return this.http.delete<any>(`${this.categoryUrl}/${id}`);
+  }
+
   getStockLevels(productId?: string): Observable<any[]> {
     let params = new HttpParams();
     if (productId) {

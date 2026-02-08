@@ -153,7 +153,8 @@
   color: #6b7280;
 }
 
-.email-link, .phone-link {
+.email-link,
+.phone-link {
   color: #3b82f6;
   text-decoration: none;
   transition: color 0.2s;
@@ -438,7 +439,8 @@
   .suppliers-table {
     font-size: 0.875rem;
 
-    th, td {
+    th,
+    td {
       padding: 0.75rem 1rem;
     }
   }
@@ -452,7 +454,7 @@
       width: 100%;
       justify-content: flex-start;
       padding: 0.5rem 0.75rem;
-      
+
       .btn-text {
         margin-left: 0.25rem;
       }

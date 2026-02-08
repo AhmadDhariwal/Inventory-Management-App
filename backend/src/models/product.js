@@ -3,39 +3,53 @@ const mongoose = require('mongoose');
 
 
 const productschema = new mongoose.Schema({
-     
-  name : {
-     type : String,
-     required : true ,
-  },
-  sku : {     //stock keeping unit 
-    type : String,
-    unique : true,
+
+  name: {
+    type: String,
     required: true,
   },
-  description : {
-    type : String,
+  sku: {     //stock keeping unit 
+    type: String,
+    required: true,
   },
-  category:{
-    type : mongoose.Schema.Types.ObjectId,
-    ref:"Category",
-    
+  description: {
+    type: String,
   },
-  cost :{
-    type : Number,
+  category: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Category",
+
+  },
+  cost: {
+    type: Number,
     required: true,
   },
   price: {
-    type : Number,
+    type: Number,
     required: true,
   },
   status: {
-    type : String,
-    enum : ["active","inactive"],
-    default : "active",
+    type: String,
+    enum: ["active", "inactive"],
+    default: "active",
+  },
+  // Multi-tenant fields
+  organizationId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Organization',
+    required: true,
+    index: true
+  },
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'user',
+    required: true
   }
-},{timestamps : true});
+}, { timestamps: true });
 
-const product = mongoose.model("product",productschema);
+// Compound index: SKU unique within organization (not globally)
+productschema.index({ organizationId: 1, sku: 1 }, { unique: true });
+
+const product = mongoose.model("product", productschema);
 
 module.exports = product;

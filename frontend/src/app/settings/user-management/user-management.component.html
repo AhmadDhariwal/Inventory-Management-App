@@ -1,0 +1,273 @@
+<div class="user-management">
+  <!-- Header -->
+  <div class="settings-header">
+    <div class="header-content">
+      <h1>User Management</h1>
+      <p>Manage users, assign managers, and control access. (Role: {{ currentUserRole }})</p>
+    </div>
+  </div>
+
+  <!-- Organization Stats -->
+  <div class="stats-grid" *ngIf="organizationStats">
+    <div class="stat-card">
+      <div class="stat-icon">
+        <i class="fas fa-users"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-label">Total Users</div>
+        <div class="stat-value">{{ organizationStats.totalUsers }}</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon active">
+        <i class="fas fa-user-check"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-label">Active Users</div>
+        <div class="stat-value">{{ organizationStats.activeUsers }}</div>
+      </div>
+    </div>
+
+    <div class="stat-card" *ngFor="let role of organizationStats.roleDistribution">
+      <div class="stat-icon" [ngClass]="'role-' + role._id">
+        <i class="fas fa-user-tag"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-label">{{ role._id | titlecase }}s</div>
+        <div class="stat-value">{{ role.count }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Alert Messages -->
+  <div class="alert alert-success" *ngIf="success">
+    <i class="fas fa-check-circle"></i>
+    <span>{{ success }}</span>
+  </div>
+
+  <div class="alert alert-error" *ngIf="error">
+    <i class="fas fa-exclamation-circle"></i>
+    <span>{{ error }}</span>
+  </div>
+
+  <!-- Users Table -->
+  <div class="settings-card">
+    <div class="card-header">
+      <h2>All Users</h2>
+      <div class="header-actions">
+        <button class="btn-primary" (click)="openAddUserModal()" *ngIf="isAdmin">
+          <i class="fas fa-plus"></i> Add User
+        </button>
+        <button class="btn-refresh" (click)="loadUsers()" [disabled]="loading">
+          <i class="fas fa-sync-alt" [class.spinning]="loading"></i>
+          Refresh
+        </button>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <table class="users-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Manager</th>
+            <th>Department</th>
+            <th>Last Login</th>
+            <th>Status</th>
+            <th *ngIf="isAdmin">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of users">
+            <td>
+              <div class="user-info">
+                <div class="user-avatar">
+                  <i class="fas fa-user"></i>
+                </div>
+                <div>
+                  <div class="user-name">{{ user.name }}</div>
+                  <div class="user-username">&#64;{{ user.username }}</div>
+                </div>
+              </div>
+            </td>
+            <td>{{ user.email }}</td>
+            <td>
+              <span [ngClass]="getRoleBadgeClass(user.role)">
+                {{ user.role | titlecase }}
+              </span>
+            </td>
+            <td>
+              <div class="manager-cell">
+                <span class="manager-name">{{ getManagerName(user.managerId) }}</span>
+                <button 
+                  *ngIf="isAdmin && user.role === 'user'" 
+                  class="btn-assign"
+                  (click)="openAssignModal(user._id)"
+                  title="Assign Manager"
+                >
+                  <i class="fas fa-user-plus"></i>
+                </button>
+              </div>
+            </td>
+            <td>{{ user.department || 'N/A' }}</td>
+            <td>
+              <span class="last-login" *ngIf="user.lastLogin">
+                {{ user.lastLogin | date:'MMM d, h:mm a' }}
+              </span>
+              <span class="text-muted" *ngIf="!user.lastLogin">Never</span>
+            </td>
+            <td>
+              <span [ngClass]="getStatusBadgeClass(user.isActive)">
+                {{ user.isActive ? 'Active' : 'Inactive' }}
+              </span>
+            </td>
+            <td *ngIf="isAdmin">
+              <div class="action-buttons">
+                <button 
+                  class="btn-action btn-toggle"
+                  (click)="toggleUserStatus(user._id)"
+                  [title]="user.isActive ? 'Deactivate' : 'Activate'"
+                >
+                  <i [class]="user.isActive ? 'fas fa-ban' : 'fas fa-check'"></i>
+                </button>
+                
+                <select 
+                  class="role-select"
+                  [value]="user.role"
+                  (change)="updateUserRole(user._id, $any($event.target).value)"
+                  [disabled]="loading"
+                >
+                  <option value="user">User</option>
+                  <option value="manager">Manager</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="empty-state" *ngIf="!loading && users.length === 0">
+        <i class="fas fa-users"></i>
+        <p>No users found</p>
+      </div>
+
+      <div class="loading-state" *ngIf="loading">
+        <i class="fas fa-spinner fa-spin"></i>
+        <p>Loading users...</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Assign Manager Modal -->
+<div class="modal-overlay" *ngIf="showAssignModal" (click)="closeAssignModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Assign Manager</h3>
+      <button class="btn-close" (click)="closeAssignModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="managerSelect">Select Manager</label>
+        <select 
+          id="managerSelect"
+          class="form-control"
+          [(ngModel)]="selectedManagerId"
+        >
+          <option value="">-- Select a Manager --</option>
+          <option *ngFor="let manager of managers" [value]="manager._id">
+            {{ manager.name }} ({{ manager.email }})
+          </option>
+        </select>
+      </div>
+
+      <div class="alert alert-info" *ngIf="managers.length === 0">
+        <i class="fas fa-info-circle"></i>
+        <span>No managers available. Please create a manager user first.</span>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="closeAssignModal()">
+        Cancel
+      </button>
+      <button 
+        class="btn btn-primary" 
+        (click)="assignManager()"
+        [disabled]="!selectedManagerId || loading"
+      >
+        <i class="fas fa-check"></i>
+        Assign Manager
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Add User Modal -->
+<div class="modal-overlay" *ngIf="showAddUserModal" (click)="closeAddUserModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Add New User</h3>
+      <button class="btn-close" (click)="closeAddUserModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Full Name *</label>
+          <input type="text" [(ngModel)]="newUser.name" class="form-control" placeholder="John Doe">
+        </div>
+        
+        <div class="form-group">
+          <label>Username *</label>
+          <input type="text" [(ngModel)]="newUser.username" class="form-control" placeholder="johndoe">
+        </div>
+
+        <div class="form-group full-width">
+          <label>Email Address *</label>
+          <input type="email" [(ngModel)]="newUser.email" class="form-control" placeholder="john@example.com">
+        </div>
+
+        <div class="form-group">
+          <label>Password *</label>
+          <input type="password" [(ngModel)]="newUser.password" class="form-control" placeholder="Strong password">
+        </div>
+
+        <div class="form-group">
+          <label>Role *</label>
+          <select [(ngModel)]="newUser.role" class="form-control">
+            <option value="user">User</option>
+            <option value="manager">Manager</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="text" [(ngModel)]="newUser.phone" class="form-control" placeholder="+1 234 567 890">
+        </div>
+
+        <div class="form-group">
+          <label>Department</label>
+          <input type="text" [(ngModel)]="newUser.department" class="form-control" placeholder="e.g. Sales, IT">
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="closeAddUserModal()">Cancel</button>
+      <button class="btn btn-primary" (click)="createUser()" [disabled]="loading">
+        <i class="fas fa-plus"></i> Create User
+      </button>
+    </div>
+  </div>
+</div>

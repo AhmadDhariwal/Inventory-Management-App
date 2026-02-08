@@ -24,7 +24,7 @@
 // //         }
 // //       }
 // //     ]);
-  
+
 // //     const totalStock = stockAggregation.reduce(
 // //       (sum, item) => sum + item.availableQty,
 // //       0
@@ -218,30 +218,59 @@ const PurchaseOrder = require('../models/purchaseorder');
 const SalesOrder = require('../models/salesorder');
 const StockMovement = require('../models/stockmovement');
 const StockLevel = require('../models/stocklevel');
+const User = require('../models/user');
+const { getOrganizationFilter, getOrganizationPipeline } = require('../utils/rbac.helpers');
 
-exports.getDashboardSummary = async () => {
+exports.getDashboardSummary = async (user, organizationId) => {
   try {
+    // 1. Setup Filters based on Role
+    let assignedUsers = [];
+    if (user.role === 'manager') {
+      const userDoc = await User.findById(user.userid);
+      assignedUsers = userDoc ? userDoc.assignedUsers : [];
+    }
+
+    // Filters for simple queries
+    const productFilter = { organizationId }; // Products are visible to all in org usually
+    const supplierFilter = { organizationId };
+    const purchaseOrderFilter = getOrganizationFilter(user, assignedUsers, 'createdBy');
+
+    // Pipelines for aggregations (already include organizationId match)
+    const purchasePipelineMatch = getOrganizationPipeline(user, assignedUsers, 'createdBy'); // Array of $match stages
+    const stockPipelineMatch = [{ $match: { organizationId } }]; // Stock is usually org-wide visible, or should we filter? 
+    // Requirement: "User: Can work in Stock". "Manager: Can only see: Their own data". 
+    // Stock levels are physical reality. Usually visible to all who have access to warehouse. 
+    // Let's keep Stock Levels org-wide for now, but Purchase/Sales data STRICT.
+
+    // 2. Execute Queries
+
     // Get basic counts
-    const totalProducts = await Product.countDocuments();
-    const totalSuppliers = await Supplier.countDocuments();
-    
+    const totalProducts = await Product.countDocuments(productFilter);
+    const totalSuppliers = await Supplier.countDocuments(supplierFilter);
+
     // Get total purchase amount (only approved/received orders)
-    const purchaseAmount = await PurchaseOrder.aggregate([
-      { 
-        $match: { 
-          status: { $in: ["APPROVED", "RECEIVED"] } 
-        } 
+    // We need to merge our RBAC pipeline with the status filter
+    const purchaseAmountPipeline = [
+      ...purchasePipelineMatch,
+      {
+        $match: {
+          status: { $in: ["APPROVED", "RECEIVED"] }
+        }
       },
       { $group: { _id: null, total: { $sum: "$totalamount" } } }
-    ]);
-    
-    // Get total stock quantity
+    ];
+
+    const purchaseAmount = await PurchaseOrder.aggregate(purchaseAmountPipeline);
+
+    // Get total stock quantity (Org wide)
     const stockQty = await StockLevel.aggregate([
+      ...stockPipelineMatch,
       { $group: { _id: null, qty: { $sum: "$quantity" } } }
     ]);
 
-    // Get low stock items
+    // Get low stock items (Org wide)
     const lowStockItems = await StockLevel.aggregate([
+      ...stockPipelineMatch,
       {
         $lookup: {
           from: 'products',
@@ -260,7 +289,7 @@ exports.getDashboardSummary = async () => {
       },
       {
         $match: {
-          $expr: { 
+          $expr: {
             $and: [
               { $gt: ["$minStock", 0] },
               { $lte: ["$quantity", "$minStock"] }
@@ -286,7 +315,14 @@ exports.getDashboardSummary = async () => {
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
 
+    // Stock movements usually viewed by all or restricted? 
+    // Let's restrict stock movements to 'user' field if Manager/User?
+    // "Manager: Can only see: ... Their assigned users' data".
+    // So if a user moved stock, manager sees it.
+    const movementPipelineMatch = getOrganizationPipeline(user, assignedUsers, 'user');
+
     const stockInToday = await StockMovement.aggregate([
+      ...movementPipelineMatch,
       {
         $match: {
           type: 'IN',
@@ -302,6 +338,7 @@ exports.getDashboardSummary = async () => {
     ]);
 
     const stockOutToday = await StockMovement.aggregate([
+      ...movementPipelineMatch,
       {
         $match: {
           type: 'OUT',
@@ -317,11 +354,14 @@ exports.getDashboardSummary = async () => {
     ]);
 
     // Get pending and approved purchases
-    const pendingPurchases = await PurchaseOrder.countDocuments({ 
+    // Must combine filters
+    const pendingPurchases = await PurchaseOrder.countDocuments({
+      ...purchaseOrderFilter,
       status: 'PENDING'
     });
-    
-    const approvedPurchases = await PurchaseOrder.countDocuments({ 
+
+    const approvedPurchases = await PurchaseOrder.countDocuments({
+      ...purchaseOrderFilter,
       status: 'APPROVED'
     });
 
@@ -368,13 +408,21 @@ exports.getDashboardSummary = async () => {
 };
 
 // Stock Trend API
-exports.getStockTrend = async (days = 30) => {
+exports.getStockTrend = async (days = 30, user, organizationId) => {
   try {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
     startDate.setHours(0, 0, 0, 0);
 
+    let assignedUsers = [];
+    if (user.role === 'manager') {
+      const userDoc = await User.findById(user.userid);
+      assignedUsers = userDoc ? userDoc.assignedUsers : [];
+    }
+    const movementPipelineMatch = getOrganizationPipeline(user, assignedUsers, 'user');
+
     const stockTrend = await StockMovement.aggregate([
+      ...movementPipelineMatch,
       {
         $match: {
           createdAt: { $gte: startDate }
@@ -434,13 +482,21 @@ exports.getStockTrend = async (days = 30) => {
 };
 
 // Purchase Trend API
-exports.getPurchaseTrend = async (days = 30) => {
+exports.getPurchaseTrend = async (days = 30, user, organizationId) => {
   try {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
     startDate.setHours(0, 0, 0, 0);
 
+    let assignedUsers = [];
+    if (user.role === 'manager') {
+      const userDoc = await User.findById(user.userid);
+      assignedUsers = userDoc ? userDoc.assignedUsers : [];
+    }
+    const purchasePipelineMatch = getOrganizationPipeline(user, assignedUsers, 'createdBy');
+
     const purchaseTrend = await PurchaseOrder.aggregate([
+      ...purchasePipelineMatch,
       {
         $match: {
           createdAt: { $gte: startDate }
@@ -469,13 +525,21 @@ exports.getPurchaseTrend = async (days = 30) => {
 };
 
 // Sales Trend API
-exports.getSalesTrend = async (days = 30) => {
+exports.getSalesTrend = async (days = 30, user, organizationId) => {
   try {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
     startDate.setHours(0, 0, 0, 0);
 
+    let assignedUsers = [];
+    if (user.role === 'manager') {
+      const userDoc = await User.findById(user.userid);
+      assignedUsers = userDoc ? userDoc.assignedUsers : [];
+    }
+    const salesPipelineMatch = getOrganizationPipeline(user, assignedUsers, 'user');
+
     const salesTrend = await SalesOrder.aggregate([
+      ...salesPipelineMatch,
       {
         $match: {
           createdAt: { $gte: startDate }

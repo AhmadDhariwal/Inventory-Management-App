@@ -603,13 +603,33 @@ body {
                   animation: barGrow 1s ease-out;
                   animation-delay: calc(var(--i) * 0.1s);
 
-                  &:nth-child(1) { --i: 0; }
-                  &:nth-child(2) { --i: 1; }
-                  &:nth-child(3) { --i: 2; }
-                  &:nth-child(4) { --i: 3; }
-                  &:nth-child(5) { --i: 4; }
-                  &:nth-child(6) { --i: 5; }
-                  &:nth-child(7) { --i: 6; }
+                  &:nth-child(1) {
+                    --i: 0;
+                  }
+
+                  &:nth-child(2) {
+                    --i: 1;
+                  }
+
+                  &:nth-child(3) {
+                    --i: 2;
+                  }
+
+                  &:nth-child(4) {
+                    --i: 3;
+                  }
+
+                  &:nth-child(5) {
+                    --i: 4;
+                  }
+
+                  &:nth-child(6) {
+                    --i: 5;
+                  }
+
+                  &:nth-child(7) {
+                    --i: 6;
+                  }
                 }
               }
             }
@@ -1086,10 +1106,10 @@ body {
 
   .pricing-card {
     background: var(--white);
-   // border: 2px solid var(--gray-100);
-   border: solid black;
-   // border-radius: var(--border-radius-lg);
-   border-radius: 20px;
+    // border: 2px solid var(--gray-100);
+    border: solid black;
+    // border-radius: var(--border-radius-lg);
+    border-radius: 20px;
     padding: 48px;
     text-align: center;
     position: relative;
@@ -1380,7 +1400,7 @@ body {
       gap: 24px;
       margin-bottom: 40px;
       flex-wrap: wrap;
-     // border: solid black;
+      // border: solid black;
     }
 
     .cta-features {
@@ -1545,6 +1565,7 @@ body {
     opacity: 0;
     transform: translateY(30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -1556,6 +1577,7 @@ body {
     opacity: 0;
     transform: translateX(30px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -1563,27 +1585,36 @@ body {
 }
 
 @keyframes float {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0px);
   }
+
   50% {
     transform: translateY(-15px);
   }
 }
 
 @keyframes backgroundFloat {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.8;
   }
 }
 
 @keyframes pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 0.3;
   }
+
   50% {
     opacity: 1;
   }
@@ -1593,6 +1624,7 @@ body {
   from {
     height: 0;
   }
+
   to {
     height: var(--height, 100%);
   }

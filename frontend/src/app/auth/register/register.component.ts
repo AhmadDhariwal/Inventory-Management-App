@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService, RegisterRequest } from '../../shared/services/auth.service';
 
@@ -37,13 +37,19 @@ export class RegisterComponent implements OnInit {
 
   private initializeForm(): void {
     this.registerForm = this.fb.group({
+      // Organization fields
+      companyName: ['', [Validators.required, Validators.minLength(2)]],
+      
+      // Personal information
       firstName: ['', [Validators.required, Validators.minLength(2)]],
       lastName: ['', [Validators.required, Validators.minLength(2)]],
-      email: ['', [Validators.required, Validators.email]],
+      email: ['', [Validators.required, Validators.email, this.emailValidator]],
       username: ['', [Validators.required, Validators.minLength(3), Validators.pattern(/^[a-zA-Z0-9_]+$/)]],
       phone: ['', [Validators.required, Validators.pattern(/^[+]?[0-9\s\-\(\)]{10,}$/)]],
       department: ['', [Validators.required]],
-      password: ['', [Validators.required, Validators.minLength(8), this.passwordValidator]],
+      
+      // Security
+      password: ['', [Validators.required, Validators.minLength(8), this.passwordStrengthValidator]],
       confirmPassword: ['', [Validators.required]],
       acceptTerms: [false, [Validators.requiredTrue]]
     }, { validators: this.passwordMatchValidator });
@@ -55,7 +61,21 @@ export class RegisterComponent implements OnInit {
   }
 
   // Custom validators
-  private passwordValidator(control: any) {
+  private emailValidator(control: AbstractControl): ValidationErrors | null {
+    const email = control.value;
+    if (!email) return null;
+
+    // RFC 5322 compliant email validation
+    const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+    
+    if (!emailRegex.test(email)) {
+      return { invalidEmail: true };
+    }
+
+    return null;
+  }
+
+  private passwordStrengthValidator(control: AbstractControl): ValidationErrors | null {
     const password = control.value;
     if (!password) return null;
 
@@ -70,7 +90,7 @@ export class RegisterComponent implements OnInit {
     return { passwordStrength: true };
   }
 
-  private passwordMatchValidator(form: FormGroup) {
+  private passwordMatchValidator(form: FormGroup): ValidationErrors | null {
     const password = form.get('password');
     const confirmPassword = form.get('confirmPassword');
 
@@ -104,7 +124,7 @@ export class RegisterComponent implements OnInit {
     if (/[a-z]/.test(password)) strength++;
     if (/[A-Z]/.test(password)) strength++;
     if (/\d/.test(password)) strength++;
-    if (/[^\w\s]/.test(password)) strength++;
+    if (/[^a-zA-Z0-9]/.test(password)) strength++; // Special characters
     return strength;
   }
 
@@ -131,6 +151,8 @@ export class RegisterComponent implements OnInit {
     this.loading = true;
 
     const formValue = this.registerForm.value;
+    
+    // Prepare user data with organization info
     const userData: RegisterRequest = {
       name: `${formValue.firstName} ${formValue.lastName}`,
       email: formValue.email,
@@ -138,18 +160,25 @@ export class RegisterComponent implements OnInit {
       phone: formValue.phone,
       department: formValue.department,
       password: formValue.password,
-      role: 'user' // Default role
+      role: 'admin', // First user becomes admin of their organization
+      // Organization will be created automatically on backend
+      organizationName: formValue.companyName
     };
 
     this.authService.register(userData).subscribe({
       next: (response) => {
         this.loading = false;
         // Redirect to dashboard after successful registration
-        this.router.navigate(['/app/dashboard']);
+        this.router.navigate(['/dashboard'], {
+          queryParams: { message: 'Account created successfully! Welcome to your organization.' }
+        });
       },
       error: (err) => {
         this.loading = false;
         this.error = err?.error || 'Registration failed. Please try again.';
+        
+        // Scroll to top to show error
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     });
   }

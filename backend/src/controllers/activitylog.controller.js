@@ -2,11 +2,11 @@ const ActivityLog = require("../models/activitylog");
 
 exports.getLogs = async (req, res) => {
   try {
-    const { 
-      page = 1, 
-      limit = 10, 
-      search = "", 
-      action = "", 
+    const {
+      page = 1,
+      limit = 10,
+      search = "",
+      action = "",
       module = "",
       startDate = "",
       endDate = ""
@@ -14,22 +14,22 @@ exports.getLogs = async (req, res) => {
 
     // Build search query
     const searchQuery = {};
-    
+
     if (search) {
       searchQuery.$or = [
         { entityName: { $regex: search, $options: "i" } },
         { description: { $regex: search, $options: "i" } }
       ];
     }
-    
+
     if (action) {
       searchQuery.action = action;
     }
-    
+
     if (module) {
       searchQuery.module = { $regex: module, $options: "i" };
     }
-    
+
     if (startDate || endDate) {
       searchQuery.createdAt = {};
       if (startDate) searchQuery.createdAt.$gte = new Date(startDate);
@@ -74,9 +74,9 @@ exports.createLog = async (req, res) => {
     }
 
     if (!action || !module) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Action and module are required' 
+      return res.status(400).json({
+        success: false,
+        message: 'Action and module are required'
       });
     }
 
@@ -87,7 +87,8 @@ exports.createLog = async (req, res) => {
       entityId,
       entityName,
       description,
-      ipAddress
+      ipAddress,
+      organizationId: req.organizationId // Include organization context
     });
 
     await log.save();
@@ -114,7 +115,7 @@ exports.getLogStats = async (req, res) => {
         }
       }
     ]);
-    
+
     const moduleStats = await ActivityLog.aggregate([
       {
         $group: {

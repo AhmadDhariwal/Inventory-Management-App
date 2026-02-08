@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { ActivityLogsService } from './activity-logs.service';
+import { RegisterRequest, AuthResponse } from './auth.service';
 
 export interface UserProfile {
   _id: string;
@@ -12,6 +13,10 @@ export interface UserProfile {
   role: string;
   phone?: string;
   department?: string;
+  organizationId?: any;
+  managerId?: any;
+  assignedUsers?: string[];
+  createdBy?: any;
   createdAt: string;
   updatedAt: string;
   isActive?: boolean;
@@ -24,6 +29,8 @@ export interface UserListItem {
   username: string;
   role: string;
   department?: string;
+  organizationId?: string;
+  managerId?: any;
   isActive: boolean;
   createdAt: string;
   lastLogin?: string;
@@ -248,5 +255,48 @@ export class UserService {
 
   deleteUser(userId: string): Observable<{success: boolean, message: string}> {
     return this.http.delete<{success: boolean, message: string}>(`${this.baseUrl}/${userId}`);
+  }
+
+  // Manager Assignment (Admin only)
+  assignUserToManager(userId: string, managerId: string): Observable<{success: boolean, message: string, data: UserProfile}> {
+    return this.http.post<{success: boolean, message: string, data: UserProfile}>(`${this.baseUrl}/assign-manager`, {
+      userId,
+      managerId
+    }).pipe(
+      tap((result) => {
+        if (result.success) {
+          this.activityService.createLog({
+            action: 'UPDATE',
+            module: 'User Management',
+            entityName: 'User Assignment',
+            description: `Assigned user to manager`
+          }).subscribe();
+        }
+      })
+    );
+  }
+
+  // Get users assigned to a manager
+  getManagerUsers(managerId?: string): Observable<{success: boolean, data: UserListItem[], count: number}> {
+    const url = managerId 
+      ? `${this.baseUrl}/manager-users/${managerId}` 
+      : `${this.baseUrl}/manager-users`;
+    return this.http.get<{success: boolean, data: UserListItem[], count: number}>(url);
+  }
+
+  // Create new user (with role validation)
+  createUser(userData: RegisterRequest): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.baseUrl}/create`, userData).pipe(
+      tap((result) => {
+        if (result.success) {
+          this.activityService.createLog({
+            action: 'CREATE',
+            module: 'User Management',
+            entityName: 'User',
+            description: `Created new user: ${userData.username}`
+          }).subscribe();
+        }
+      })
+    );
   }
 }

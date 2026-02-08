@@ -6,6 +6,7 @@ import { ProductService } from '../../shared/services/product.service';
 import { Router } from '@angular/router';
 import { Product } from '../../shared/models/inventory/product.model';
 import { ConfirmModalComponent } from '../../shared/components/confirm-dialog/confirm-dialog.component';
+import { AuthService } from '../../shared/services/auth.service';
 
 @Component({
   selector: 'app-product-list',
@@ -36,9 +37,19 @@ export class ProductListComponent implements OnInit {
 
   constructor(
     private productService: ProductService,
+    private authService: AuthService,
     private router: Router,
     private route: ActivatedRoute
   ) {}
+
+  get isAdmin(): boolean {
+    return this.authService.getUserRole()?.toLowerCase() === 'admin';
+  }
+
+  get canDelete(): boolean {
+    const role = this.authService.getUserRole()?.toLowerCase() || '';
+    return role === 'admin' || role === 'manager';
+  }
 
   ngOnInit(): void {
     this.loadProducts();
