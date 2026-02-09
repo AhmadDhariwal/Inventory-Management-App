@@ -52,7 +52,7 @@ export class SupplierFormComponent implements OnInit {
       phone: ['', [Validators.maxLength(20)]],
       address: ['', [Validators.maxLength(500)]],
       paymentterms: ['CASH', [Validators.required]],
-      isactive: [true]
+      isActive: [true]
     });
   }
 

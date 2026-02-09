@@ -1,0 +1,174 @@
+<div class="container-fluid fade-in">
+  <div class="header-section">
+    <h2>Warehouse Management</h2>
+    <p>Efficiently manage your physical storage locations and distribution centers.</p>
+  </div>
+
+  <!-- Alerts -->
+  <div *ngIf="error" class="alert alert-error">
+    <i class="fas fa-exclamation-circle"></i>
+    {{ error }}
+  </div>
+
+  <div *ngIf="success" class="alert alert-success">
+    <i class="fas fa-check-circle"></i>
+    {{ success }}
+  </div>
+
+  <div class="row">
+    <!-- ================= ADD / EDIT WAREHOUSE FORM ================= -->
+    <div class="col-lg-4 mb-4">
+      <div class="card side-form shadow-lg">
+        <div class="card-header gradient-header">
+          <h5 class="mb-0">
+            {{ isEditing ? 'Edit Warehouse' : 'Create Warehouse' }}
+          </h5>
+        </div>
+
+        <div class="card-body">
+          <form (ngSubmit)="saveWarehouse()">
+            <div class="form-group">
+              <label>
+                Warehouse Name <span class="text-danger">*</span>
+              </label>
+              <input
+                type="text"
+                class="form-control"
+                [(ngModel)]="newWarehouseName"
+                name="name"
+                required
+                placeholder="e.g., Central Distribution Center"
+              />
+            </div>
+
+            <div class="form-group">
+              <label>Full Address <span class="text-danger">*</span></label>
+              <textarea
+                class="form-control"
+                [(ngModel)]="newWarehouseAddress"
+                name="address"
+                rows="4"
+                required
+                placeholder="Street address, city, state, zip code..."
+              ></textarea>
+            </div>
+
+            <div class="d-flex gap-2 mt-4">
+              <button
+                type="submit"
+                class="btn btn-primary flex-grow-1"
+                [disabled]="isLoading || !newWarehouseName || !newWarehouseAddress"
+              >
+                <span
+                  *ngIf="isLoading"
+                  class="spinner-border spinner-border-sm me-1"
+                ></span>
+                <i
+                  class="fas"
+                  [ngClass]="isEditing ? 'fa-save' : 'fa-plus-circle'"
+                ></i>
+                {{ isEditing ? 'Update Details' : 'Add Warehouse' }}
+              </button>
+
+              <button
+                *ngIf="isEditing"
+                type="button"
+                class="btn btn-secondary"
+                (click)="cancelEdit()"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= WAREHOUSE LIST TABLE ================= -->
+    <div class="col-lg-8">
+      <div class="card shadow-md">
+        <div class="card-header">
+          <h5 class="mb-0">Storage Locations</h5>
+        </div>
+
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table-enterprise">
+              <thead>
+                <tr>
+                  <th>Warehouse Identity</th>
+                  <th>Location / Address</th>
+                  <th>Onboarded At</th>
+                  <th class="text-end">Actions</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <!-- WAREHOUSE ROWS -->
+                <tr *ngFor="let wh of warehouses">
+                  <td>
+                    <div class="warehouse-name">{{ wh.name }}</div>
+                  </td>
+
+                  <td>
+                    <div class="warehouse-desc">
+                      {{ wh.address }}
+                    </div>
+                  </td>
+
+                  <td>
+                    <span class="date-pill">
+                      {{ wh.createdAt | date: 'mediumDate' }}
+                    </span>
+                  </td>
+
+                  <td class="text-end">
+                    <button
+                      class="btn btn-icon edit me-2"
+                      (click)="editWarehouse(wh)"
+                      [disabled]="isLoading"
+                      title="Edit Warehouse"
+                    >
+                      <i class="fas fa-pencil-alt"></i>
+                    </button>
+
+                    <button
+                      class="btn btn-icon delete"
+                      (click)="deleteWarehouse(wh._id!)"
+                      [disabled]="isLoading"
+                      title="Deactivate Warehouse"
+                    >
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+
+                <!-- EMPTY STATE -->
+                <tr *ngIf="warehouses.length === 0 && !isLoading">
+                  <td colspan="4" class="text-center py-5 text-muted">
+                    <i
+                      class="fas fa-warehouse mb-3"
+                      style="font-size: 2rem; display: block; opacity: 0.3;"
+                    ></i>
+                    No warehouses found. Start by creating one on the left.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-confirm-modal
+  [isVisible]="showDeleteModal"
+  title="Deactivate Warehouse"
+  [message]="deleteModalMessage"
+  confirmText="Deactivate"
+  cancelText="Cancel"
+  type="warning"
+  (confirm)="confirmDelete()"
+  (cancel)="cancelDelete()"
+></app-confirm-modal>

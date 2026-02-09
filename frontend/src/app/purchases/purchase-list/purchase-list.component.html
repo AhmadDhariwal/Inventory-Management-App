@@ -105,7 +105,7 @@
                   <button *ngIf="po.status === 'PENDING'" class="btn-ghost" (click)="approvePurchaseOrder(po)" title="Approve Request" style="color: var(--status-success)">
                     <i class="fas fa-check-circle"></i>
                   </button>
-                  <button *ngIf="po.status === 'APPROVED'" class="btn-ghost" (click)="receivePurchaseOrder(po)" title="Confirm Inbound" style="color: var(--brand-primary)">
+                  <button *ngIf="po.status === 'APPROVED'" class="btn-ghost" (click)="receivePurchaseOrder(po)" title="Confirm Outbound" style="color: var(--brand-primary)">
                     <i class="fas fa-box"></i>
                   </button>
                   <button *ngIf="po.status === 'PENDING'" class="btn-ghost btn-danger" (click)="deletePurchaseOrder(po)" title="Void Request">

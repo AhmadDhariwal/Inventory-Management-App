@@ -106,7 +106,7 @@ async function handleusersignup(req, res) {
         organizationId: createduser.organizationId
       },
       "Hello",
-      { expiresIn: '1h' }
+      { expiresIn: '24h' }
     );
 
     res.status(201).json({
@@ -247,7 +247,7 @@ async function handleuserlogin(req, res) {
         organizationId: logineduser.organizationId
       },
       "Hello",
-      { expiresIn: '1h' }
+      { expiresIn: '24h' }
     );
 
     res.status(200).json({

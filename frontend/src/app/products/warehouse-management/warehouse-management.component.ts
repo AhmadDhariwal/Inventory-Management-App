@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { WarehouseService } from '../../shared/services/warehouse.service';
 import { Warehouse } from '../../shared/models/inventory/warehouse.model';
+import { ConfirmModalComponent } from '../../shared/components/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-warehouse-management',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ConfirmModalComponent],
   templateUrl: './warehouse-management.component.html',
   styleUrls: ['./warehouse-management.component.scss']
 })
@@ -20,6 +21,11 @@ export class WarehouseManagementComponent implements OnInit {
   success = '';
   isEditing = false;
   editWarehouseId = '';
+  
+  // Modal state
+  showDeleteModal = false;
+  warehouseToDeleteId: string | null = null;
+  deleteModalMessage = 'Are you sure you want to deactivate this warehouse?';
 
   constructor(private warehouseService: WarehouseService) {}
 
@@ -111,7 +117,16 @@ export class WarehouseManagementComponent implements OnInit {
   }
 
   deleteWarehouse(id: string): void {
-    if (!confirm('Are you sure you want to deactivate this warehouse?')) return;
+    this.warehouseToDeleteId = id;
+    this.deleteModalMessage = 'Are you sure you want to deactivate this warehouse? This action cannot be undone.';
+    this.showDeleteModal = true;
+  }
+
+  confirmDelete(): void {
+    if (!this.warehouseToDeleteId) return;
+    
+    const id = this.warehouseToDeleteId;
+    this.showDeleteModal = false;
 
     this.isLoading = true;
     this.warehouseService.deleteWarehouse(id).subscribe({
@@ -127,5 +142,10 @@ export class WarehouseManagementComponent implements OnInit {
         this.isLoading = false;
       }
     });
+  }
+
+  cancelDelete(): void {
+    this.showDeleteModal = false;
+    this.warehouseToDeleteId = null;
   }
 }

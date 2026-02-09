@@ -101,8 +101,13 @@ export class SupplierListComponent implements OnInit {
 
   toggleSupplierStatus(supplier: Supplier): void {
     this.supplierService.toggleSupplierStatus(supplier._id).subscribe({
-      next: () => {
-        this.loadSuppliers();
+      next: (updatedSupplier) => {
+        // Update the local supplier object with the response
+        const index = this.suppliers.findIndex(s => s._id === updatedSupplier._id);
+        if (index !== -1) {
+           this.suppliers[index] = updatedSupplier;
+           this.filterSuppliers(); // Re-apply filters to update the view
+        }
       },
       error: (error) => {
         console.error('Error toggling supplier status:', error);

@@ -9,6 +9,7 @@
     <a routerLink="/products" routerLinkActive="active" (click)="close.emit()">Products</a>
     
     <!-- Admin & Manager Only -->
+    <a *ngIf="hasRole(['admin', 'manager'])" routerLink="/products/warehouses" routerLinkActive="active" (click)="close.emit()">Warehouses</a>
     <a *ngIf="hasRole(['admin', 'manager'])" routerLink="/products/categories" routerLinkActive="active" (click)="close.emit()">Categories</a>
     <a *ngIf="hasRole(['admin', 'manager'])" routerLink="/suppliers" routerLinkActive="active" (click)="close.emit()">Suppliers</a>
     

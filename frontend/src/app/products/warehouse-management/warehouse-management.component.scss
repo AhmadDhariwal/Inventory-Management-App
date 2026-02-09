@@ -1,0 +1,295 @@
+/* International Standard Enterprise Warehouse Management Styles */
+
+// Color System (HSL) - Reusing the same structure for consistency
+:root {
+    --primary-h: 217;
+    --primary-s: 91%;
+    --primary-l: 60%;
+
+    --primary: hsl(var(--primary-h), var(--primary-s), var(--primary-l));
+    --primary-dark: hsl(var(--primary-h), var(--primary-s), 45%);
+    --primary-light: hsl(var(--primary-h), var(--primary-s), 95%);
+
+    --surface-100: hsl(210, 40%, 98%);
+    --surface-200: hsl(210, 40%, 96%);
+    --surface-300: hsl(210, 40%, 94%);
+
+    --text-main: hsl(215, 25%, 27%);
+    --text-muted: hsl(215, 16%, 47%);
+
+    --success: hsl(142, 70%, 45%);
+    --danger: hsl(0, 84%, 60%);
+    --warning: hsl(38, 92%, 50%);
+
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+.container-fluid {
+    padding: 2.5rem;
+    background-color: var(--surface-100);
+    min-height: calc(100vh - 64px);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.header-section {
+    margin-bottom: 2.5rem;
+
+    h2 {
+        color: var(--text-main);
+        font-size: 1.875rem;
+        font-weight: 700;
+        letter-spacing: -0.025em;
+        margin-bottom: 0.5rem;
+    }
+
+    p {
+        color: var(--text-muted);
+        font-size: 1rem;
+    }
+}
+
+.card {
+    background: #ffffff;
+    border: 1px solid hsl(214, 32%, 91%);
+    border-radius: 16px;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+
+    &.side-form {
+        position: sticky;
+        top: 2rem;
+    }
+
+    &:hover {
+        box-shadow: var(--shadow-md);
+    }
+}
+
+.card-header {
+    padding: 1.5rem;
+    background: white;
+    border-bottom: 1px solid hsl(214, 32%, 91%);
+
+    h5 {
+        margin: 0;
+        font-weight: 600;
+        color: var(--text-main);
+        font-size: 1.125rem;
+    }
+
+    &.gradient-header {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        border: none;
+
+        h5 {
+            color: white;
+        }
+    }
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 1.25rem;
+
+    label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--text-main);
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        font-size: 0.875rem;
+        border-radius: 10px;
+        border: 1px solid hsl(214, 32%, 91%);
+        background: var(--surface-200);
+        transition: all 0.2s;
+
+        &:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 4px hsla(var(--primary-h), var(--primary-s), var(--primary-l), 0.1);
+        }
+    }
+
+    textarea.form-control {
+        min-height: 100px;
+        resize: vertical;
+    }
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    gap: 0.5rem;
+    border: none;
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: white;
+
+    &:hover:not(:disabled) {
+        background: var(--primary-dark);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px hsla(var(--primary-h), var(--primary-s), var(--primary-l), 0.3);
+    }
+}
+
+.btn-secondary {
+    background: var(--surface-300);
+    color: var(--text-main);
+
+    &:hover:not(:disabled) {
+        background: hsl(210, 40%, 90%);
+    }
+}
+
+.btn-icon {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border-radius: 8px;
+    background: var(--surface-200);
+    color: var(--text-muted);
+
+    &:hover {
+        background: var(--surface-300);
+        color: var(--text-main);
+    }
+
+    &.delete:hover {
+        background: hsla(0, 84%, 60%, 0.1);
+        color: var(--danger);
+    }
+
+    &.edit:hover {
+        background: hsla(var(--primary-h), var(--primary-s), var(--primary-l), 0.1);
+        color: var(--primary);
+    }
+}
+
+.table-enterprise {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+
+    th {
+        padding: 1rem 1.5rem;
+        text-align: left;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-muted);
+        border-bottom: 2px solid var(--surface-300);
+    }
+
+    td {
+        padding: 1.25rem 1.5rem;
+        vertical-align: middle;
+        color: var(--text-main);
+        border-bottom: 1px solid var(--surface-200);
+        font-size: 0.875rem;
+
+        .warehouse-name {
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .warehouse-desc {
+            color: var(--text-muted);
+        }
+
+        .date-pill {
+            display: inline-flex;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            background: var(--surface-200);
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+    }
+
+    tbody tr {
+        transition: background 0.2s;
+
+        &:hover {
+            background: hsla(var(--primary-h), 100%, 98%, 1);
+        }
+    }
+}
+
+.alert {
+    padding: 1rem 1.25rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+
+    &.alert-success {
+        background: hsla(142, 70%, 95%, 1);
+        color: hsl(142, 70%, 25%);
+        border: 1px solid hsla(142, 70%, 85%, 1);
+    }
+
+    &.alert-error {
+        background: hsla(0, 84%, 97%, 1);
+        color: hsl(0, 84%, 30%);
+        border: 1px solid hsla(0, 84%, 90%, 1);
+    }
+}
+
+// Transitions
+.fade-in {
+    animation: fadeIn 0.4s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+// Media Queries
+@media (max-width: 992px) {
+    .container-fluid {
+        padding: 1.5rem;
+    }
+
+    .side-form {
+        position: static !important;
+        margin-bottom: 2rem;
+    }
+}

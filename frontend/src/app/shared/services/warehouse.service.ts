@@ -9,7 +9,7 @@ import { ActivityLogsService } from './activity-logs.service';
   providedIn: 'root'
 })
 export class WarehouseService {
-  private baseUrl = 'http://localhost:3000/api/warehouse';
+  private baseUrl = 'http://localhost:3000/api/warehouses';
 
   constructor(
     private http: HttpClient,

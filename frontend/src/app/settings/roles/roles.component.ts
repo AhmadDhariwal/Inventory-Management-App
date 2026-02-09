@@ -86,7 +86,7 @@ export class RolesComponent implements OnInit, OnDestroy {
             username: user.username || '',
             role: user.role || 'user',
             department: user.department || '',
-            isActive: user.isactive || '',
+            isActive: user.isActive || false,
             createdAt: user.createdAt || new Date().toISOString(),
             lastLogin: user.lastLogin || ''
           }));

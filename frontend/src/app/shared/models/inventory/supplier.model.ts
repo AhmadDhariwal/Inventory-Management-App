@@ -6,7 +6,7 @@ export interface Supplier {
   phone?: string;
   address?: string;
   paymentterms: 'CASH' | 'NET_15' | 'NET_30' | 'NET_60';
-  isactive: boolean;
+  isActive: boolean;
   createdAt?: string;
   updatedAt?: string;
 }

@@ -28,7 +28,8 @@ export class NotificationService {
   constructor() {
     this.socket = io('http://localhost:3000', {
       withCredentials: true,
-      autoConnect: false
+      autoConnect: false,
+      transports: ['websocket']
     });
 
     this.setupListeners();

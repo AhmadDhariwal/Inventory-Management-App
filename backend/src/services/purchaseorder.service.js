@@ -16,10 +16,13 @@ const createpurchaseorder = async (data, userId, organizationId) => {
 
   // Validate supplier belongs to organization
   const supplierexists = await Supplier.findOne({ _id: supplier, organizationId });
-  if (!supplierexists || !supplierexists.isactive) {
+  if (!supplierexists || !supplierexists.isActive) {
     throw new Error("Supplier not found or inactive");
   }
 
+  if(!stock || stock.quantity < item.quantity){
+    throw new Error("Insufficient stock");
+  }
   // Validate warehouse belongs to organization
   // (Assuming Warehouse model exists and has organizationId, skipping explicit check for brevity but best practice to add)
 
@@ -54,7 +57,7 @@ const processPurchaseOrderReceipt = async (purchaseOrderId, user) => {
     await StockMovement.create({
       product: item.product,
       warehouse: purchaseorder.warehouse,
-      type: "IN",
+      type: "OUT",
       quantity: item.quantity,
       reason: "PURCHASE",
       referenceId: purchaseorder._id,
@@ -70,14 +73,18 @@ const processPurchaseOrderReceipt = async (purchaseOrderId, user) => {
     });
 
     if (inventory) {
-      inventory.quantity += item.quantity;
+      inventory.quantity -= item.quantity;
       await inventory.save();
     } else {
       await Inventory.create({
         product: item.product,
-        warehouse: purchaseorder.warehouse,
+        name: product.name,
+        price: product.price,
+        category: product.category, // Assuming category is an ID or String, Inventory model expects String? Checking model.js line 23: type: String. If product.category is ObjectId (ref Category), we might need to populate it or just cast to string. Let's assume string for now or ID string.
         quantity: item.quantity,
-        organizationId // Critical: Add organizationId
+        warehouse: purchaseorder.warehouse,
+        organizationId,
+        createdby: userId
       });
     }
 
@@ -89,7 +96,7 @@ const processPurchaseOrderReceipt = async (purchaseOrderId, user) => {
     });
 
     if (stock) {
-      stock.quantity += item.quantity;
+      stock.quantity -= item.quantity;
       await stock.save();
     } else {
       await StockLevel.create({

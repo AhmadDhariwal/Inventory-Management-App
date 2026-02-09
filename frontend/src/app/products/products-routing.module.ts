@@ -4,6 +4,7 @@ import { ProductListComponent } from './product-list/product-list.component';
 import { ProductFormComponent } from './product-form/product-form.component';
 import { ProductDetailsComponent } from './product-details/product-details.component';
 import { CategoryManagementComponent } from './category-management/category-management.component';
+import { WarehouseManagementComponent } from './warehouse-management/warehouse-management.component';
 
 const routes: Routes = [
   {
@@ -13,6 +14,11 @@ const routes: Routes = [
   {
     path: 'categories',
     component: CategoryManagementComponent,
+    data: { roles: ['admin', 'manager'] }
+  },
+  {
+    path: 'warehouses',
+    component: WarehouseManagementComponent,
     data: { roles: ['admin', 'manager'] }
   },
   {

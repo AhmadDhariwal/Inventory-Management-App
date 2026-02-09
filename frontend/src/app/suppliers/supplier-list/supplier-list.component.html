@@ -72,8 +72,8 @@
               <span class="payment-terms">{{ getPaymentTermsLabel(supplier.paymentterms) }}</span>
             </td>
             <td>
-              <span class="status-badge" [class.active]="supplier.isactive" [class.inactive]="!supplier.isactive">
-                {{ supplier.isactive ? 'Active' : 'Inactive' }}
+              <span class="status-badge" [class.active]="supplier.isActive" [class.inactive]="!supplier.isActive">
+                {{ supplier.isActive ? 'Active' : 'Inactive' }}
               </span>
             </td>
             <td>
@@ -94,12 +94,12 @@
                 </button>
                 <button
                   class="btn btn-sm"
-                  [class.btn-warning]="supplier.isactive"
-                  [class.btn-success]="!supplier.isactive"
+                  [class.btn-warning]="supplier.isActive"
+                  [class.btn-success]="!supplier.isActive"
                   (click)="toggleSupplierStatus(supplier)"
-                  [title]="supplier.isactive ? 'Deactivate this supplier' : 'Activate this supplier'">
-                  <i class="fas" [class.fa-pause]="supplier.isactive" [class.fa-play]="!supplier.isactive"></i>
-                  <span class="btn-text">{{ supplier.isactive ? 'Deactivate' : 'Activate' }}</span>
+                  [title]="supplier.isActive ? 'Deactivate this supplier' : 'Activate this supplier'">
+                  <i class="fas" [class.fa-pause]="supplier.isActive" [class.fa-play]="!supplier.isActive"></i>
+                  <span class="btn-text">{{ supplier.isActive ? 'Deactivate' : 'Activate' }}</span>
                 </button>
                 <button
                   class="btn btn-sm btn-danger"

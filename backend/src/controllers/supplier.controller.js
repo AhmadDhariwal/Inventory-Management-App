@@ -2,7 +2,12 @@ const Supplier = require("../models/supplier");
 
 exports.createsupplier = async (req, res) => {
   try {
-    const supplier = await Supplier.create(req.body);
+    const supplierData = {
+      ...req.body,
+      createdBy: req.user.userid,
+      organizationId: req.user.organizationId
+    };
+    const supplier = await Supplier.create(supplierData);
     res.status(201).json({
       success: true,
       message: "Supplier created successfully",

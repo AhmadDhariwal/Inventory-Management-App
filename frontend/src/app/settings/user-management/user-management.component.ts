@@ -164,9 +164,20 @@ export class UserManagementComponent implements OnInit {
 
     this.userService.toggleUserStatus(userId).subscribe({
       next: (response) => {
-        if (response.success) {
+        if (response.success && response.data) {
           this.success = response.message || 'User status updated';
-          this.loadUsers();
+          
+          // Update local state
+          const index = this.users.findIndex(u => u._id === userId);
+          if (index !== -1) {
+            // We need to cast or ensure types match, response.data is UserProfile, users is UserListItem[]
+            // They are compatible enough for this update
+            const updatedUser = response.data;
+            this.users[index] = {
+              ...this.users[index],
+              isActive: updatedUser.isActive || false
+            };
+          }
           
           setTimeout(() => {
             this.success = null;

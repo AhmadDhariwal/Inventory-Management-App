@@ -225,7 +225,7 @@ exports.getDashboardSummary = async (user, organizationId) => {
   try {
     // 1. Setup Filters based on Role
     let assignedUsers = [];
-    if (user.role === 'manager') {
+    if (user.role === 'manager' || user.role === 'user') {
       const userDoc = await User.findById(user.userid);
       assignedUsers = userDoc ? userDoc.assignedUsers : [];
     }
