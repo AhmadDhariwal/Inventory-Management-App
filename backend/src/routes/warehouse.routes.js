@@ -1,14 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const warehouse = require("../models/warehouse");
+const warehouseController = require("../controllers/warehouse.controller");
 
-router.get("/", async (req, res) => {
-  try {
-    const warehouses = await warehouse.find({ isActive: true }).select("_id name address");
-    res.json(warehouses);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+router.get("/", warehouseController.getWarehouses);
+router.post("/", warehouseController.createWarehouse);
+router.put("/:id", warehouseController.updateWarehouse);
+router.delete("/:id", warehouseController.deleteWarehouse);
 
 module.exports = router;

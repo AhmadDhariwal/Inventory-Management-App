@@ -33,17 +33,15 @@ const app = express();
 const server = http.createServer(app);
 const port = 3000;
 
-const allowedOrigins = ['http://localhost:4200',
-  'http://localhost:59297'
-];
+//const allowedOrigins = ['*'];
 
 app.use(cors({
-  origin: allowedOrigins,
+  origin: '*',
   credentials: true
 }));
 
 // Initialize Socket.io
-socketUtils.init(server, allowedOrigins);
+socketUtils.init(server, '*');
 
 connecttomongodb('mongodb://localhost:27017/inventorymanagement')
   .then(() => console.log('MongoDB connected'))
