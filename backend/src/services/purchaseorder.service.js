@@ -20,9 +20,11 @@ const createpurchaseorder = async (data, userId, organizationId) => {
     throw new Error("Supplier not found or inactive");
   }
 
-  if(!stock || stock.quantity < item.quantity){
+  if (!StockLevel || StockLevel.quantity < data.quantity) {
     throw new Error("Insufficient stock");
   }
+
+
   // Validate warehouse belongs to organization
   // (Assuming Warehouse model exists and has organizationId, skipping explicit check for brevity but best practice to add)
 

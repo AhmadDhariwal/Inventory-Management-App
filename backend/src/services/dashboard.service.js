@@ -223,24 +223,21 @@ const { getOrganizationFilter, getOrganizationPipeline } = require('../utils/rba
 
 exports.getDashboardSummary = async (user, organizationId) => {
   try {
-    // 1. Setup Filters based on Role
+    // Ensure organizationId is in user object for RBAC helpers
+    user.organizationId = organizationId;
+
     let assignedUsers = [];
     if (user.role === 'manager' || user.role === 'user') {
       const userDoc = await User.findById(user.userid);
-      assignedUsers = userDoc ? userDoc.assignedUsers : [];
+      assignedUsers = userDoc?.assignedUsers || [];
     }
 
-    // Filters for simple queries
-    const productFilter = { organizationId }; // Products are visible to all in org usually
+    const productFilter = { organizationId };
     const supplierFilter = { organizationId };
     const purchaseOrderFilter = getOrganizationFilter(user, assignedUsers, 'createdBy');
-
-    // Pipelines for aggregations (already include organizationId match)
-    const purchasePipelineMatch = getOrganizationPipeline(user, assignedUsers, 'createdBy'); // Array of $match stages
-    const stockPipelineMatch = [{ $match: { organizationId } }]; // Stock is usually org-wide visible, or should we filter? 
-    // Requirement: "User: Can work in Stock". "Manager: Can only see: Their own data". 
-    // Stock levels are physical reality. Usually visible to all who have access to warehouse. 
-    // Let's keep Stock Levels org-wide for now, but Purchase/Sales data STRICT.
+    const purchasePipelineMatch = getOrganizationPipeline(user, assignedUsers, 'createdBy');
+    const stockPipelineMatch = [{ $match: { organizationId } }];
+    const movementPipelineMatch = getOrganizationPipeline(user, assignedUsers, 'user');
 
     // 2. Execute Queries
 
@@ -309,17 +306,10 @@ exports.getDashboardSummary = async (user, organizationId) => {
       }
     ]);
 
-    // Get today's stock movements
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
-
-    // Stock movements usually viewed by all or restricted? 
-    // Let's restrict stock movements to 'user' field if Manager/User?
-    // "Manager: Can only see: ... Their assigned users' data".
-    // So if a user moved stock, manager sees it.
-    const movementPipelineMatch = getOrganizationPipeline(user, assignedUsers, 'user');
 
     const stockInToday = await StockMovement.aggregate([
       ...movementPipelineMatch,
@@ -353,8 +343,6 @@ exports.getDashboardSummary = async (user, organizationId) => {
       }
     ]);
 
-    // Get pending and approved purchases
-    // Must combine filters
     const pendingPurchases = await PurchaseOrder.countDocuments({
       ...purchaseOrderFilter,
       status: 'PENDING'
@@ -384,32 +372,15 @@ exports.getDashboardSummary = async (user, organizationId) => {
       }
     };
   } catch (error) {
-    console.error('Dashboard service error:', error);
-    // Return default values on error
-    return {
-      kpis: {
-        totalProducts: 0,
-        totalSuppliers: 0,
-        totalStockQty: 0,
-        totalPurchaseAmount: 0
-      },
-      alerts: {
-        lowStockCount: 0,
-        lowStockItems: []
-      },
-      widgets: {
-        pendingPurchases: 0,
-        approvedPurchases: 0,
-        stockInToday: 0,
-        stockOutToday: 0
-      }
-    };
+    throw error;
   }
 };
 
 // Stock Trend API
 exports.getStockTrend = async (days = 30, user, organizationId) => {
   try {
+    user.organizationId = organizationId;
+
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
     startDate.setHours(0, 0, 0, 0);
@@ -417,7 +388,7 @@ exports.getStockTrend = async (days = 30, user, organizationId) => {
     let assignedUsers = [];
     if (user.role === 'manager') {
       const userDoc = await User.findById(user.userid);
-      assignedUsers = userDoc ? userDoc.assignedUsers : [];
+      assignedUsers = userDoc?.assignedUsers || [];
     }
     const movementPipelineMatch = getOrganizationPipeline(user, assignedUsers, 'user');
 
@@ -476,14 +447,15 @@ exports.getStockTrend = async (days = 30, user, organizationId) => {
 
     return stockTrend;
   } catch (error) {
-    console.error('Stock trend error:', error);
-    return [];
+    throw error;
   }
 };
 
 // Purchase Trend API
 exports.getPurchaseTrend = async (days = 30, user, organizationId) => {
   try {
+    user.organizationId = organizationId;
+
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
     startDate.setHours(0, 0, 0, 0);
@@ -491,7 +463,7 @@ exports.getPurchaseTrend = async (days = 30, user, organizationId) => {
     let assignedUsers = [];
     if (user.role === 'manager') {
       const userDoc = await User.findById(user.userid);
-      assignedUsers = userDoc ? userDoc.assignedUsers : [];
+      assignedUsers = userDoc?.assignedUsers || [];
     }
     const purchasePipelineMatch = getOrganizationPipeline(user, assignedUsers, 'createdBy');
 
@@ -519,14 +491,15 @@ exports.getPurchaseTrend = async (days = 30, user, organizationId) => {
 
     return purchaseTrend;
   } catch (error) {
-    console.error('Purchase trend error:', error);
-    return [];
+    throw error;
   }
 };
 
 // Sales Trend API
 exports.getSalesTrend = async (days = 30, user, organizationId) => {
   try {
+    user.organizationId = organizationId;
+
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
     startDate.setHours(0, 0, 0, 0);
@@ -534,7 +507,7 @@ exports.getSalesTrend = async (days = 30, user, organizationId) => {
     let assignedUsers = [];
     if (user.role === 'manager') {
       const userDoc = await User.findById(user.userid);
-      assignedUsers = userDoc ? userDoc.assignedUsers : [];
+      assignedUsers = userDoc?.assignedUsers || [];
     }
     const salesPipelineMatch = getOrganizationPipeline(user, assignedUsers, 'user');
 
@@ -562,7 +535,6 @@ exports.getSalesTrend = async (days = 30, user, organizationId) => {
 
     return salesTrend;
   } catch (error) {
-    console.error('Sales trend error:', error);
-    return [];
+    throw error;
   }
 };
