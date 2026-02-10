@@ -38,7 +38,7 @@ export class RegisterComponent implements OnInit {
   private initializeForm(): void {
     this.registerForm = this.fb.group({
       // Organization fields
-      companyName: ['', [Validators.required, Validators.minLength(2)]],
+      organizationName: ['', [Validators.required, Validators.minLength(2)]],
       
       // Personal information
       firstName: ['', [Validators.required, Validators.minLength(2)]],
@@ -162,7 +162,7 @@ export class RegisterComponent implements OnInit {
       password: formValue.password,
       role: 'admin', // First user becomes admin of their organization
       // Organization will be created automatically on backend
-      organizationName: formValue.companyName
+      organizationName: formValue.organizationName
     };
 
     this.authService.register(userData).subscribe({

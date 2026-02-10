@@ -4,6 +4,7 @@ const StockLevel = require("../models/stocklevel");
 const User = require("../models/user");
 const Warehouse = require("../models/warehouse");
 const PurchaseOrder = require("../models/purchaseorder");
+const mongoose = require("mongoose");
 
 
 const getstockreport = async () => {
@@ -123,32 +124,30 @@ const getpurchasereport = async () => {
 
 //   return levels;
 // };
-const getstocklevelsreport = async () => {
-  // Get stock levels directly from StockLevel collection
-  const stockLevels = await StockLevel.find()
+const getstocklevelsreport = async (organizationId) => {
+  const query = organizationId ? { organizationId } : {};
+  const stockLevels = await StockLevel.find(query)
     .populate('product', 'name sku cost price category')
     .populate('warehouse', 'name')
-    .populate('product.category', 'name')
     .lean();
 
-  const result = stockLevels.map(level => ({
+  return stockLevels.map(level => ({
+    _id: level._id,
     productId: level.product?._id,
     warehouseId: level.warehouse?._id,
     productName: level.product?.name || 'N/A',
     sku: level.product?.sku || 'N/A',
     cost: level.product?.cost || 0,
     price: level.product?.price || 0,
-    category: level.product?.category?.name || 'Uncategorized',
     warehouseName: level.warehouse?.name || 'N/A',
+    quantity: level.quantity || 0,
     availableQty: level.quantity || 0,
     reservedQty: level.reservedQuantity || 0,
     minStock: level.minStock || 0,
     reorderLevel: level.reorderLevel || 0,
-    totalValue: (level.quantity || 0) * (level.product?.cost || 0),
+    totalValue: (level.quantity || 0) * (level.product?.cost || level.product?.price || 0),
     status: (level.quantity || 0) <= (level.minStock || 0) ? 'LOW' : 'OK'
   }));
-
-  return result;
 };
 // const getlowstockreport = async () => {
 //   const lowStock = await StockMovement.aggregate([
@@ -228,16 +227,25 @@ const getstocklevelsreport = async () => {
 
 //   return lowStock;
 // };
-const getlowstockreport = async () => {
-  // Get stock levels where quantity is less than or equal to minStock
-  const lowStock = await StockLevel.find({
-    $expr: { $lte: ["$quantity", "$minStock"] }
-  })
+const getlowstockreport = async (organizationId) => {
+  const query = {
+    $expr: { $and: [
+      { $gt: ["$minStock", 0] },
+      { $lte: ["$quantity", "$minStock"] }
+    ]}
+  };
+
+  if (organizationId) {
+    query.organizationId = organizationId;
+  }
+
+  const lowStock = await StockLevel.find(query)
     .populate('product', 'name sku')
     .populate('warehouse', 'name')
     .lean();
 
-  const result = lowStock.map(level => ({
+  return lowStock.map(level => ({
+    _id: level._id,
     productId: level.product?._id,
     warehouseId: level.warehouse?._id,
     productName: level.product?.name || 'N/A',
@@ -248,15 +256,17 @@ const getlowstockreport = async () => {
     reorderLevel: level.reorderLevel || 0,
     status: level.quantity <= (level.minStock || 0) * 0.5 ? 'CRITICAL' : 'LOW'
   }));
-
-  return result;
 };
 
-const getstocksummary = async () => {
-  const totalProducts = await Product.countDocuments();
-  const warehouses = await Warehouse.countDocuments({ isActive: true });
+const getstocksummary = async (organizationId) => {
+  const query = organizationId ? { organizationId: new mongoose.Types.ObjectId(organizationId) } : {};
+  const totalProducts = await Product.countDocuments(organizationId ? { organizationId } : {});
+  const warehouses = await Warehouse.countDocuments(organizationId ? { organizationId, isActive: true } : { isActive: true });
 
   const stockAggregation = await StockMovement.aggregate([
+    {
+      $match: query
+    },
     {
       $group: {
         _id: "$product",
@@ -279,7 +289,7 @@ const getstocksummary = async () => {
   );
 
   // Use the existing low stock report function
-  const lowStockReport = await getlowstockreport();
+  const lowStockReport = await getlowstockreport(organizationId);
   const lowStockItems = lowStockReport.length;
 
   const inventoryValue = totalStock * 100; // approximate value
@@ -303,10 +313,10 @@ const exportStockMovementsCSV = async (filters = {}) => {
     .lean();
 
   const csvHeader = "Date,Product,SKU,Warehouse,Type,Quantity,Reason,User\n";
-  const csvRows = movements.map(m => 
+  const csvRows = movements.map(m =>
     `${new Date(m.createdAt).toLocaleDateString()},${m.product?.name || 'N/A'},${m.product?.sku || 'N/A'},${m.warehouse?.name || 'N/A'},${m.type},${m.quantity},${m.reason || 'N/A'},${m.user?.name || 'N/A'}`
   ).join('\n');
-  
+
   return csvHeader + csvRows;
 };
 
@@ -320,36 +330,36 @@ const exportStockMovementsExcel = async (filters = {}) => {
 
   // Simple Excel format (CSV with .xlsx extension)
   const csvHeader = "Date,Product,SKU,Warehouse,Type,Quantity,Reason,User\n";
-  const csvRows = movements.map(m => 
+  const csvRows = movements.map(m =>
     `${new Date(m.createdAt).toLocaleDateString()},${m.product?.name || 'N/A'},${m.product?.sku || 'N/A'},${m.warehouse?.name || 'N/A'},${m.type},${m.quantity},${m.reason || 'N/A'},${m.user?.name || 'N/A'}`
   ).join('\n');
-  
+
   return Buffer.from(csvHeader + csvRows);
 };
 
 const exportStockSummaryCSV = async (filters = {}) => {
   const summary = await getstocksummary();
-  
+
   const csvContent = `Metric,Value
 Total Products,${summary.totalProducts}
 Total Stock,${summary.totalStock}
 Low Stock Items,${summary.lowStockItems}
 Warehouses,${summary.warehouses}
 Inventory Value,${summary.inventoryValue}`;
-  
+
   return csvContent;
 };
 
 const exportStockSummaryExcel = async (filters = {}) => {
   const summary = await getstocksummary();
-  
+
   const csvContent = `Metric,Value
 Total Products,${summary.totalProducts}
 Total Stock,${summary.totalStock}
 Low Stock Items,${summary.lowStockItems}
 Warehouses,${summary.warehouses}
 Inventory Value,${summary.inventoryValue}`;
-  
+
   return Buffer.from(csvContent);
 };
 
@@ -365,7 +375,7 @@ const exportPurchaseOrdersCSV = async (filters = {}) => {
     const items = order.items.map(item => `${item.product?.name}(${item.quantity})`).join('; ');
     return `${new Date(order.createdAt).toLocaleDateString()},${order.reference},${order.supplier?.name || 'N/A'},${order.status},${order.totalAmount},"${items}"`;
   }).join('\n');
-  
+
   return csvHeader + csvRows;
 };
 
@@ -381,7 +391,7 @@ const exportPurchaseOrdersExcel = async (filters = {}) => {
     const items = order.items.map(item => `${item.product?.name}(${item.quantity})`).join('; ');
     return `${new Date(order.createdAt).toLocaleDateString()},${order.reference},${order.supplier?.name || 'N/A'},${order.status},${order.totalAmount},"${items}"`;
   }).join('\n');
-  
+
   return Buffer.from(csvHeader + csvRows);
 };
 
@@ -445,11 +455,11 @@ const getproductreport = async (category) => {
   const warehouses = await Warehouse.find({ isActive: true }).select('name').lean();
 
   const result = [];
-  
+
   products.forEach(product => {
     const productId = product._id.toString();
     const productStocks = stockMap.get(productId);
-    
+
     if (productStocks && productStocks.length > 0) {
       // Product has stock movements
       productStocks.forEach(stock => {

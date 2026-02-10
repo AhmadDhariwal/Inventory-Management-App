@@ -7,9 +7,9 @@
     </button>
     <div class="navbar__title-wrapper">
       <div class="navbar__title">{{ pageTitle }}</div>
-      <div class="navbar__organization" *ngIf="organization">
+      <div class="navbar__organization" *ngIf="configService.settings$ | async as settings">
         <i class="fas fa-building"></i>
-        <span>{{ organization.name }}</span>
+        <span>{{ settings.organizationName }}</span>
       </div>
     </div>
   </div>

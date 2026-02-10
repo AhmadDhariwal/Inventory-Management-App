@@ -221,6 +221,52 @@
             </button>
           </div>
 
+          <!-- 2FA Setup Instructions -->
+          <div *ngIf="twoFactorStep === 'SETUP'" class="two-factor-setup-card">
+            <div class="setup-header">
+              <h4><i class="fas fa-shield-alt"></i> Secure Your Account</h4>
+              <p>Scan the QR code below using an authenticator app (like Google Authenticator, Authy, or Microsoft Authenticator) to get your 6-digit backup codes.</p>
+            </div>
+            
+            <div class="setup-content">
+              <div class="qr-code-wrapper" *ngIf="twoFactorQrUrl">
+                <img [src]="twoFactorQrUrl" alt="2FA QR Code" class="qr-code-img" />
+              </div>
+              
+              <div class="manual-config">
+                <span class="config-label">Manual Configuration Code</span>
+                <div class="secret-key-display">
+                  <code>{{ twoFactorSecret }}</code>
+                </div>
+              </div>
+            </div>
+
+            <div class="setup-verification">
+              <label class="verification-label">Confirm Activation</label>
+              <div class="verification-input-group">
+                <input 
+                  type="text" 
+                  class="form-input" 
+                  placeholder="Enter 6-digit code" 
+                  maxlength="6"
+                  [(ngModel)]="twoFactorVerifyCode"
+                />
+                <button 
+                  type="button" 
+                  class="btn btn-primary btn-verify" 
+                  (click)="confirm2FA()"
+                  [disabled]="twoFactorVerifyCode.length !== 6 || isLoading">
+                  Verify & Activate
+                </button>
+              </div>
+            </div>
+
+            <div class="setup-info">
+              <i class="fas fa-info-circle"></i>
+              <p>Once activated, you will be required to enter a code from your mobile app every time you sign in to your account.</p>
+            </div>
+          </div>
+
           <div class="security-item">
             <div class="security-info">
               <h3 class="security-title">Active Sessions</h3>

@@ -22,6 +22,8 @@ const cors = require('cors');
 const userroute = require('./src/routes/user');
 const { verifytoken, restrictto } = require('./src/middleware/auth.middleware');
 const { ensureOrganizationContext } = require('./src/middleware/organization.middleware');
+const { checkMaintenanceMode } = require('./src/middleware/maintenance.middleware');
+const { enforceSecurityPolicies } = require('./src/middleware/security.middleware');
 
 
 
@@ -58,21 +60,21 @@ app.use(cookieParser());
 app.use('/user', userroute);
 app.use('/api/organizations', organizationroutes);
 
-// Protected routes - require authentication and organization context
-app.use('/items', verifytoken, ensureOrganizationContext, restrictto(["admin", "user"]), route);
-app.use('/api/inventory', verifytoken, ensureOrganizationContext, inventoryroute);
-app.use("/api/suppliers", verifytoken, ensureOrganizationContext, supplierroute);
-app.use("/api/purchaseorders", verifytoken, ensureOrganizationContext, purchaseorderroutes);
-app.use("/api/salesorders", verifytoken, ensureOrganizationContext, salesorderroutes);
-app.use("/api/reports", verifytoken, ensureOrganizationContext, reportroutes);
-app.use("/api/dashboard", verifytoken, ensureOrganizationContext, dashboardroutes);
-app.use("/api/products", verifytoken, ensureOrganizationContext, productroutes);
-app.use("/api/categories", verifytoken, ensureOrganizationContext, categoryroutes);
-app.use("/api/warehouses", verifytoken, ensureOrganizationContext, warehouseroutes);
-app.use("/api/business-settings", verifytoken, ensureOrganizationContext, businesssettingsroutes);
-app.use("/api/settings", verifytoken, ensureOrganizationContext, settingsroutes);
-app.use("/api/activitylog", verifytoken, ensureOrganizationContext, activitylogroutes);
-app.use("/api/forecasting", verifytoken, ensureOrganizationContext, forecastingroutes);
+// Protected routes - require authentication, organization context, and maintenance check
+app.use('/items', verifytoken, ensureOrganizationContext, enforceSecurityPolicies, checkMaintenanceMode, restrictto(["admin", "user"]), route);
+app.use('/api/inventory', verifytoken, ensureOrganizationContext, enforceSecurityPolicies, checkMaintenanceMode, inventoryroute);
+app.use("/api/suppliers", verifytoken, ensureOrganizationContext, enforceSecurityPolicies, checkMaintenanceMode, supplierroute);
+app.use("/api/purchaseorders", verifytoken, ensureOrganizationContext, enforceSecurityPolicies, checkMaintenanceMode, purchaseorderroutes);
+app.use("/api/salesorders", verifytoken, ensureOrganizationContext, enforceSecurityPolicies, checkMaintenanceMode, salesorderroutes);
+app.use("/api/reports", verifytoken, ensureOrganizationContext, enforceSecurityPolicies, checkMaintenanceMode, reportroutes);
+app.use("/api/dashboard", verifytoken, ensureOrganizationContext, enforceSecurityPolicies, checkMaintenanceMode, dashboardroutes);
+app.use("/api/products", verifytoken, ensureOrganizationContext, enforceSecurityPolicies, checkMaintenanceMode, productroutes);
+app.use("/api/categories", verifytoken, ensureOrganizationContext, enforceSecurityPolicies, checkMaintenanceMode, categoryroutes);
+app.use("/api/warehouses", verifytoken, ensureOrganizationContext, enforceSecurityPolicies, checkMaintenanceMode, warehouseroutes);
+app.use("/api/business-settings", verifytoken, ensureOrganizationContext, enforceSecurityPolicies, businesssettingsroutes); // Settings can be updated even in maintenance mode
+app.use("/api/settings", verifytoken, ensureOrganizationContext, enforceSecurityPolicies, settingsroutes);
+app.use("/api/activitylog", verifytoken, ensureOrganizationContext, enforceSecurityPolicies, checkMaintenanceMode, activitylogroutes);
+app.use("/api/forecasting", verifytoken, ensureOrganizationContext, enforceSecurityPolicies, checkMaintenanceMode, forecastingroutes);
 
 
 // app.get('/', (req, res) => {

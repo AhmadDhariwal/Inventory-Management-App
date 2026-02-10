@@ -67,7 +67,7 @@ export class ActivityLogsComponent implements OnInit, OnDestroy {
   displayedColumns: string[] = ['user', 'action', 'module', 'entityName', 'description', 'createdAt', 'actions'];
   
   // Filter options
-  actionOptions = ['CREATE', 'UPDATE', 'DELETE', 'LOGIN', 'LOGOUT'];
+  actionOptions = ['CREATE', 'UPDATE', 'DELETE', 'LOGIN', 'LOGOUT', 'APPROVE', 'REJECT', 'RECEIVE', 'DISPATCH'];
   moduleOptions: string[] = [];
   userOptions: UserListItem[] = [];
   isAdmin = false;
@@ -118,7 +118,7 @@ export class ActivityLogsComponent implements OnInit, OnDestroy {
     // Debounce search input
     this.filterForm.get('search')?.valueChanges
       .pipe(
-        debounceTime(300),
+        debounceTime(500),
         distinctUntilChanged(),
         takeUntil(this.destroy$)
       )
@@ -256,7 +256,11 @@ export class ActivityLogsComponent implements OnInit, OnDestroy {
       'UPDATE': 'accent',
       'DELETE': 'warn',
       'LOGIN': 'primary',
-      'LOGOUT': 'basic'
+      'LOGOUT': 'basic',
+      'APPROVE': 'success',
+      'REJECT': 'warn',
+      'RECEIVE': 'primary',
+      'DISPATCH': 'accent'
     };
     return colors[action] || 'basic';
   }

@@ -24,7 +24,7 @@
 
     <div class="kpi-card">
       <span class="kpi-card__label">Stock Value</span>
-      <strong class="kpi-card__value">{{ totalValue | currency:'USD':'symbol':'1.0-0' }}</strong>
+      <strong class="kpi-card__value">{{ totalValue | appCurrency }}</strong>
       <span class="kpi-card__meta">Based on latest cost</span>
     </div>
 

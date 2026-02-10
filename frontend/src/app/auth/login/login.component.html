@@ -29,8 +29,8 @@
         <button type="button" class="alert__close">&times;</button>
       </div>
 
-      <!-- Form -->
-      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
+      <!-- Phase 1: Standard Login -->
+      <form *ngIf="!requires2FA" [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
         <!-- Username -->
         <div class="form-group">
           <label for="username" class="form-label">Username or Email</label>
@@ -137,6 +137,49 @@
             GitHub
           </button>
         </div>
+      </form>
+
+      <!-- Phase 2: 2FA Verification -->
+      <form *ngIf="requires2FA" [formGroup]="otpForm" (ngSubmit)="onOTPSubmit()" class="auth-form">
+        <div class="auth-info">
+          <p>Please enter the 6-digit verification code from your authenticator app.</p>
+        </div>
+
+        <div class="form-group">
+          <label for="code" class="form-label">Verification Code</label>
+          <div class="input-wrapper">
+            <svg class="input-icon" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zM3 7a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/>
+            </svg>
+            <input
+              id="code"
+              type="text"
+              formControlName="code"
+              placeholder="000000"
+              class="form-input otp-input"
+              maxlength="6"
+              inputmode="numeric"
+              autocomplete="one-time-code"
+            />
+          </div>
+          <div *ngIf="otpForm.get('code')?.touched && otpForm.get('code')?.invalid" class="form-error">
+            <span *ngIf="otpForm.get('code')?.errors?.['required']">Verification code is required</span>
+            <span *ngIf="otpForm.get('code')?.errors?.['pattern']">Must be a 6-digit number</span>
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          class="btn btn--primary btn--full"
+          [disabled]="loading || otpForm.invalid"
+        >
+          <span *ngIf="!loading">Verify Code</span>
+          <span *ngIf="loading">Verifying...</span>
+        </button>
+
+        <button type="button" class="btn btn--link btn--full" (click)="requires2FA = false">
+          Back to Login
+        </button>
       </form>
 
       <!-- Footer -->

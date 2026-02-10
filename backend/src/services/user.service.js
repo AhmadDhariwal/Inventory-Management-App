@@ -2,6 +2,7 @@ const User = require('../models/user');
 const jwt = require("jsonwebtoken");
 const bcrypt = require('bcrypt');
 const { validateRoleAssignment } = require('../utils/rbac.helpers');
+const { generateSecret, generateSync, generateURI, verifySync } = require('otplib');
 
 /**
  * User signup with organization context
@@ -152,14 +153,26 @@ async function allusers(req, res) {
     let query = { organizationId: req.organizationId };
 
     // Role-based filtering
-    if (req.userRole === 'manager') {
+    if (req.userRole === 'admin') {
+      // Admins see only users they created + themselves
+      query = {
+        $and: [
+          { organizationId: req.organizationId },
+          {
+            $or: [
+              { createdBy: req.user.userid },
+              { _id: req.user.userid }
+            ]
+          }
+        ]
+      };
+    } else if (req.userRole === 'manager') {
       // Managers see their assigned users + themselves
       query._id = { $in: [...req.assignedUsers, req.user.userid] };
     } else if (req.userRole === 'user') {
       // Users see only themselves
       query._id = req.user.userid;
     }
-    // Admins see all users in organization (no additional filter)
 
     const users = await User.find(query)
       .select('-password')
@@ -236,19 +249,32 @@ async function handleuserlogin(req, res) {
       action: 'LOGIN',
       module: 'AUTH',
       description: `User ${logineduser.username} logged in`,
-      ip: req.ip || req.connection.remoteAddress
+      ip: req.ip || req.connection.remoteAddress,
+      organizationId: logineduser.organizationId
     });
 
     // Generate token with organization context
-    const token = jwt.sign(
-      {
-        userid: logineduser._id,
-        role: logineduser.role,
-        organizationId: logineduser.organizationId
-      },
-      "Hello",
-      { expiresIn: '24h' }
-    );
+    const tokenPayload = {
+      userid: logineduser._id,
+      role: logineduser.role,
+      organizationId: logineduser.organizationId
+    };
+
+    // Check if 2FA is enabled
+    if (logineduser.twoFactorEnabled) {
+      // For development/troubleshooting: log the current code to console
+      const debugCode = generateSync({ secret: logineduser.twoFactorSecret });
+      console.log(`\n[2FA DEBUG] Current OTP for user ${logineduser.username}: ${debugCode}\n`);
+
+      return res.status(200).json({
+        success: true,
+        requires2FA: true,
+        userId: logineduser._id,
+        message: "Two-factor authentication required. (Debug: check server console for code)"
+      });
+    }
+
+    const token = jwt.sign(tokenPayload, "Hello", { expiresIn: '24h' });
 
     res.status(200).json({
       success: true,
@@ -267,6 +293,100 @@ async function handleuserlogin(req, res) {
     });
   } catch (err) {
     console.error("Login error:", err);
+    res.status(500).json({
+      success: false,
+      error: "Server error"
+    });
+  }
+}
+
+/**
+ * Verify 2FA OTP and return token
+ */
+async function verify2FA(req, res) {
+  try {
+    const { userId, code } = req.body;
+
+    if (!userId || !code) {
+      return res.status(400).json({
+        success: false,
+        error: "User ID and code are required"
+      });
+    }
+
+    const user = await User.findById(userId);
+    // Allow verification if enabled OR if in setup phase (secret exists but not enabled yet)
+    if (!user || (!user.twoFactorEnabled && !user.twoFactorSecret)) {
+      return res.status(401).json({
+        success: false,
+        error: "2FA not configured for this user"
+      });
+    }
+
+    // Use an epochTolerance of 2 (allows +/- 60 seconds) to handle time drift
+    const isValid = verifySync({
+      token: code,
+      secret: user.twoFactorSecret,
+      epochTolerance: 2
+    });
+
+    if (!isValid) {
+      console.log(`[2FA DEBUG] Verification failed for ${user.username}. Provided: ${code}`);
+      return res.status(401).json({
+        success: false,
+        error: "Invalid 2FA code. Please ensure your device's time is synchronized."
+      });
+    }
+
+    // If this was a setup verification, fully enable it now
+    let activationMessage = "";
+    if (!user.twoFactorEnabled) {
+      user.twoFactorEnabled = true;
+      activationMessage = " 2FA has been fully enabled.";
+    }
+
+    // Update last login timestamp
+    user.lastLogin = new Date();
+    await user.save();
+
+    // Log login activity
+    await activityLogService.logActivity({
+      userId: user._id,
+      action: 'LOGIN',
+      module: 'AUTH',
+      description: `User ${user.username} logged in (2FA)`,
+      ip: req.ip || req.connection.remoteAddress,
+      organizationId: user.organizationId
+    });
+
+    // Generate token
+    const token = jwt.sign(
+      {
+        userid: user._id,
+        role: user.role,
+        organizationId: user.organizationId
+      },
+      "Hello",
+      { expiresIn: '24h' }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "2FA verification successful",
+      token: token,
+      role: user.role,
+      data: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        username: user.username,
+        role: user.role,
+        organizationId: user.organizationId,
+        department: user.department
+      }
+    });
+  } catch (err) {
+    console.error("2FA verify error:", err);
     res.status(500).json({
       success: false,
       error: "Server error"
@@ -490,13 +610,38 @@ async function toggleTwoFactor(req, res) {
       });
     }
 
-    user.twoFactorEnabled = !user.twoFactorEnabled;
+    if (user.twoFactorEnabled) {
+      user.twoFactorEnabled = false;
+      user.twoFactorSecret = null;
+      await user.save();
+      return res.status(200).json({
+        success: true,
+        message: "Two-factor authentication disabled successfully",
+        data: { twoFactorEnabled: false }
+      });
+    }
+
+    // If not enabled, start setup by generating secret but DON'T enable yet
+    const secret = generateSecret();
+    user.twoFactorSecret = secret;
+    // We store it, but don't set twoFactorEnabled: true until they confirm
     await user.save();
+
+    const otpauthUrl = generateURI({
+      label: user.email,
+      issuer: 'InventoryApp',
+      secret: secret
+    });
 
     res.status(200).json({
       success: true,
-      message: `Two-factor authentication ${user.twoFactorEnabled ? 'enabled' : 'disabled'} successfully`,
-      data: { twoFactorEnabled: user.twoFactorEnabled }
+      message: "2FA setup initiated. Please verify code to enable.",
+      data: {
+        twoFactorEnabled: false,
+        isSetup: true,
+        secret: secret,
+        otpauthUrl: otpauthUrl
+      }
     });
   } catch (err) {
     console.error("Toggle 2FA error:", err);
@@ -592,5 +737,5 @@ module.exports = {
   toggleuserstatus,
   assignUserToManager,
   getManagerUsers,
-  toggleTwoFactor
+  toggleTwoFactor, verify2FA
 };

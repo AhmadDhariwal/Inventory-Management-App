@@ -150,8 +150,8 @@ export class UserService {
     );
   }
 
-  toggleTwoFactor(): Observable<{success: boolean, message: string, data: {twoFactorEnabled: boolean}}> {
-    return this.http.put<{success: boolean, message: string, data: {twoFactorEnabled: boolean}}>(`${this.baseUrl}/toggle-2fa`, {}).pipe(
+  toggleTwoFactor(): Observable<{success: boolean, message: string, data: {twoFactorEnabled: boolean, secret?: string, otpauthUrl?: string, isSetup?: boolean}}> {
+    return this.http.put<{success: boolean, message: string, data: {twoFactorEnabled: boolean, secret?: string, otpauthUrl?: string, isSetup?: boolean}}>(`${this.baseUrl}/toggle-2fa`, {}).pipe(
       tap((result) => {
         if (result.success) {
           this.activityService.createLog({

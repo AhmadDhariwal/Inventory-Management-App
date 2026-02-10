@@ -1,7 +1,9 @@
 const ActivityLog = require("../models/activitylog");
+const User = require("../models/user");
 
 exports.getLogs = async (req, res) => {
   try {
+    const { userid, role, organizationId } = req;
     const {
       page = 1,
       limit = 10,
@@ -13,50 +15,61 @@ exports.getLogs = async (req, res) => {
       targetUserId = ""
     } = req.query;
 
-    const { userid, role, organizationId } = req;
+    const query = { organizationId };
 
-    // Build search query
-    const searchQuery = { organizationId };
-
-    // Strict filtering based on role
+    let associatedUserIds = [userid];
     if (role === 'admin') {
-      // Admin can filter by a specific user or see all in organization
-      if (targetUserId) {
-        searchQuery.user = targetUserId;
+      const createdUsers = await User.find({ createdBy: userid }).select('_id');
+      associatedUserIds = [...associatedUserIds, ...createdUsers.map(u => u._id)];
+    }
+
+    if (targetUserId) {
+      if (associatedUserIds.map(id => id.toString()).includes(targetUserId)) {
+        query.user = targetUserId;
+      } else {
+        return res.status(403).json({ success: false, message: 'Unauthorized to view logs for this user' });
       }
     } else {
-      // Non-admins (Managers, Users) can only see their own logs
-      searchQuery.user = userid;
+      query.user = { $in: associatedUserIds };
     }
 
-    if (search) {
-      searchQuery.$or = [
-        { entityName: { $regex: search, $options: "i" } },
-        { description: { $regex: search, $options: "i" } }
-      ];
+    if (action && action.trim() !== '') {
+      query.action = action.trim();
     }
 
-    if (action) {
-      searchQuery.action = action;
-    }
-
-    if (module) {
-      searchQuery.module = { $regex: module, $options: "i" };
+    if (module && module.trim() !== '') {
+      query.module = module.trim();
     }
 
     if (startDate || endDate) {
-      searchQuery.createdAt = {};
-      if (startDate) searchQuery.createdAt.$gte = new Date(startDate);
-      if (endDate) searchQuery.createdAt.$lte = new Date(endDate);
+      query.createdAt = {};
+      if (startDate) query.createdAt.$gte = new Date(startDate);
+      if (endDate) query.createdAt.$lte = new Date(endDate);
     }
 
-    const logs = await ActivityLog.find(searchQuery)
+    if (search && search.trim() !== '') {
+      const matchingUsers = await User.find({
+        organizationId,
+        $or: [
+          { name: { $regex: search, $options: "i" } },
+          { email: { $regex: search, $options: "i" } }
+        ]
+      }).select('_id');
+
+      query.$or = [
+        { entityName: { $regex: search, $options: "i" } },
+        { description: { $regex: search, $options: "i" } },
+        { user: { $in: matchingUsers.map(u => u._id) } }
+      ];
+    }
+
+    const logs = await ActivityLog.find(query)
       .populate("user", "name email role")
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(parseInt(limit));
 
-    const total = await ActivityLog.countDocuments(searchQuery);
+    const total = await ActivityLog.countDocuments(query);
     const totalPages = Math.ceil(total / limit);
 
     res.json({
@@ -72,7 +85,6 @@ exports.getLogs = async (req, res) => {
       }
     });
   } catch (err) {
-    console.error('Activity logs error:', err);
     res.status(500).json({ success: false, message: err.message });
   }
 };
@@ -88,7 +100,6 @@ exports.deleteLog = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Activity log not found' });
     }
 
-    // Permission check: Only admin or the owner can delete
     if (role !== 'admin' && log.user.toString() !== userid) {
       return res.status(403).json({ success: false, message: 'Unauthorized to delete this log' });
     }
@@ -100,7 +111,6 @@ exports.deleteLog = async (req, res) => {
       message: 'Activity log deleted successfully'
     });
   } catch (err) {
-    console.error('Delete activity log error:', err);
     res.status(500).json({ success: false, message: err.message });
   }
 };
@@ -108,7 +118,7 @@ exports.deleteLog = async (req, res) => {
 exports.createLog = async (req, res) => {
   try {
     const { action, module, entityId, entityName, description } = req.body;
-    const userId = req.userid; // Using userid from auth middleware
+    const userId = req.userid;
     const ipAddress = req.ip || req.connection.remoteAddress;
 
     if (!userId) {
@@ -130,7 +140,7 @@ exports.createLog = async (req, res) => {
       entityName,
       description,
       ipAddress,
-      organizationId: req.organizationId // Include organization context
+      organizationId: req.organizationId
     });
 
     await log.save();
@@ -142,14 +152,26 @@ exports.createLog = async (req, res) => {
       message: 'Activity logged successfully'
     });
   } catch (err) {
-    console.error('Create activity log error:', err);
     res.status(500).json({ success: false, message: err.message });
   }
 };
 
 exports.getLogStats = async (req, res) => {
   try {
+    const { userid, role, organizationId } = req;
+
+    const statsQuery = { organizationId };
+
+    if (role !== 'admin') {
+      statsQuery.user = userid;
+    } else {
+      const createdUsers = await User.find({ createdBy: userid }).select('_id');
+      const associatedUserIds = [userid, ...createdUsers.map(u => u._id)];
+      statsQuery.user = { $in: associatedUserIds };
+    }
+
     const stats = await ActivityLog.aggregate([
+      { $match: statsQuery },
       {
         $group: {
           _id: "$action",
@@ -159,6 +181,7 @@ exports.getLogStats = async (req, res) => {
     ]);
 
     const moduleStats = await ActivityLog.aggregate([
+      { $match: statsQuery },
       {
         $group: {
           _id: "$module",
@@ -175,7 +198,6 @@ exports.getLogStats = async (req, res) => {
       }
     });
   } catch (err) {
-    console.error('Activity stats error:', err);
     res.status(500).json({ success: false, message: err.message });
   }
 };

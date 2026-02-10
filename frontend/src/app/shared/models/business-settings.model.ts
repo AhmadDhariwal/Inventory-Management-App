@@ -2,8 +2,8 @@ export interface BusinessSettings {
   _id?: string;
   organizationId: string;
   
-  // Company Information
-  companyName: string;
+  // Organization Information
+  organizationName: string;
   industry: 'retail' | 'manufacturing' | 'wholesale' | 'services' | 'technology' | 'healthcare' | 'it' | 'education' | 'other';
   taxId?: string;
   address?: string;
@@ -33,6 +33,13 @@ export interface BusinessSettings {
   systemLogo?: string;
   emailSignature?: string;
   
+  // Security Settings
+  securitySettings?: {
+    twoFactorEnforced: boolean;
+    passwordExpiryDays: number;
+    sessionTimeout: number;
+  };
+
   createdAt?: Date;
   updatedAt?: Date;
 }

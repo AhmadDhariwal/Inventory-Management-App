@@ -6,42 +6,65 @@
 }
 
 .page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-main);
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+  }
+
   .header-info {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
   }
+}
 
-  .page-title {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
+.read-only-text {
+  padding: 0.75rem 1rem;
+  background: var(--bg-surface);
+  border-radius: 8px;
+  border: 1px solid var(--border-main);
+  color: var(--text-main);
+  font-weight: 500;
+  min-height: 45px;
+  display: flex;
+  align-items: center;
 
-    i {
-      color: var(--brand-primary);
-      font-size: 0.85em;
-      filter: drop-shadow(0 2px 4px rgba(var(--brand-primary-rgb), 0.2));
-    }
+  &--long {
+    align-items: flex-start;
+    min-height: 80px;
+    padding-top: 0.75rem;
   }
 
-  .header-status {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    font-size: 0.9rem;
+  &--link {
     color: var(--brand-primary);
-    font-weight: 600;
-    padding: 0.5rem 1rem;
-    background: var(--brand-primary-light);
-    border-radius: 20px;
+    font-family: monospace;
+    font-size: 0.9rem;
+  }
+}
 
-    .pulse-icon {
-      width: 8px;
-      height: 8px;
-      background: var(--brand-primary);
-      border-radius: 50%;
-      animation: pulse 2s infinite;
-    }
+.toggle-item.disabled {
+  opacity: 0.7;
+  cursor: default !important;
+
+  .form-checkbox {
+    cursor: default !important;
+  }
+}
+
+.settings-card {
+  transition: all 0.3s ease;
+
+  &.editing {
+    border-color: var(--brand-primary);
+    box-shadow: 0 0 0 4px var(--brand-primary-light);
   }
 }
 

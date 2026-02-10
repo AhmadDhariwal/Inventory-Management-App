@@ -8,11 +8,13 @@ import { Supplier } from '../../shared/models/inventory/supplier.model';
 import { Product } from '../../shared/models/inventory/product.model';
 import { Warehouse } from '../../shared/models/inventory/warehouse.model';
 import { AuthRoutingModule } from "../../auth/auth-routing.module";
+import { Router } from '@angular/router';
+import { AppCurrencyPipe } from '../../shared/pipes/currency.pipe';
 
 @Component({
   selector: 'app-purchase-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, AuthRoutingModule],
+  imports: [CommonModule, ReactiveFormsModule, AuthRoutingModule, AppCurrencyPipe],
   templateUrl: './purchase-form.component.html',
   styleUrl: './purchase-form.component.scss'
 })
@@ -27,7 +29,8 @@ export class PurchaseFormComponent implements OnInit {
     private fb: FormBuilder,
     private purchaseService: PurchaseService,
     private stockService: StockService,
-    private supplierService: SupplierService
+    private supplierService: SupplierService,
+    private router : Router,
   ) {
     this.purchaseForm = this.fb.group({
       supplier: ['', Validators.required],
@@ -130,6 +133,7 @@ export class PurchaseFormComponent implements OnInit {
             warehouse: ['', Validators.required],
             items: this.fb.array([this.createItemGroup()])
           });
+          this.router.navigate(['/purchases']);
         },
         error: (err) => {
           this.loading = false;

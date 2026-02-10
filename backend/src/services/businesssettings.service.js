@@ -11,10 +11,16 @@ class BusinessSettingsService {
 
       let settings = await BusinessSettings.findOne({ organizationId });
 
+      // Handle legacy companyName if it exists and organizationName is missing
+      if (settings && !settings.organizationName && settings._doc.companyName) {
+        settings.organizationName = settings._doc.companyName;
+        await settings.save();
+      }
+
       if (!settings) {
         settings = await BusinessSettings.create({
           organizationId,
-          companyName: "Your Company Name",
+          organizationName: "Your Organization Name",
           industry: "other",
           currency: "USD",
           timezone: "UTC",
@@ -42,11 +48,17 @@ class BusinessSettingsService {
   // Update business settings
   async updateSettings(organizationId, data) {
     try {
-      const settings = await this.getSettings(organizationId);
+      // Use findOneAndUpdate with $set to allow partial updates without triggering 
+      // strict validation on unrelated required fields (like organizationName) if they already exist
+      const settings = await BusinessSettings.findOneAndUpdate(
+        { organizationId },
+        { $set: data },
+        { new: true, runValidators: true }
+      );
 
-      // Update fields
-      Object.assign(settings, data);
-      await settings.save();
+      if (!settings) {
+        throw new Error("Settings not found");
+      }
 
       // Emit real-time update
       sendNotification(organizationId.toString(), 'SETTINGS_UPDATED', settings);
@@ -62,7 +74,7 @@ class BusinessSettingsService {
     try {
       const settings = await this.getSettings(organizationId);
       return {
-        companyName: settings.companyName,
+        organizationName: settings.organizationName,
         industry: settings.industry,
         taxId: settings.taxId,
         address: settings.address,

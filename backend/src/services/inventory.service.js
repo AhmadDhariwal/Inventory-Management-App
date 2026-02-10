@@ -95,7 +95,6 @@ const getstocklevels = async (productId, organizationId) => {
       .populate('warehouse', 'name')
       .lean();
 
-    // If no stock levels found and productId is provided, initialize them
     if (stockLevels.length === 0 && productId) {
       await stockLevelService.initializeStockLevels(organizationId);
       stockLevels = await StockLevel.find(query)
@@ -104,9 +103,12 @@ const getstocklevels = async (productId, organizationId) => {
         .lean();
     }
 
-    return stockLevels;
+    return stockLevels.map(level => ({
+      ...level,
+      availableQty: level.quantity,
+      totalValue: (level.quantity || 0) * (level.product?.cost || level.product?.price || 0)
+    }));
   } catch (error) {
-    console.error('Error getting stock levels:', error);
     throw error;
   }
 };
@@ -180,14 +182,31 @@ const updatestocklevel = async (stockLevelId, updateData) => {
 
 // Get stock summary
 const getstocksummary = async (filters) => {
-  // Implementation for stock summary
-  // TODO: Add actual summary logic using filters.organizationId
+  const query = {};
+  if (filters.organizationId) {
+    query.organizationId = filters.organizationId;
+  }
+
+  const stockLevels = await StockLevel.find(query)
+    .populate('product', 'cost price')
+    .lean();
+
+  const totalProducts = stockLevels.length;
+  const totalStock = stockLevels.reduce((sum, item) => sum + (item.quantity || 0), 0);
+  const inventoryValue = stockLevels.reduce((sum, item) => {
+    const value = (item.quantity || 0) * (item.product?.cost || item.product?.price || 0);
+    return sum + value;
+  }, 0);
+
+  const lowStockItems = stockLevels.filter(item => 
+    item.minStock > 0 && item.quantity <= item.minStock
+  ).length;
+
   return {
-    totalProducts: 0,
-    totalStock: 0,
-    lowStockItems: 0,
-    warehouses: 0,
-    inventoryValue: 0
+    totalProducts,
+    totalStock,
+    lowStockItems,
+    inventoryValue
   };
 };
 

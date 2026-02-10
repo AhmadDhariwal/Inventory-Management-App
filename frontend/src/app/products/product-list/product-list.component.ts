@@ -7,11 +7,12 @@ import { Router } from '@angular/router';
 import { Product } from '../../shared/models/inventory/product.model';
 import { ConfirmModalComponent } from '../../shared/components/confirm-dialog/confirm-dialog.component';
 import { AuthService } from '../../shared/services/auth.service';
+import { AppCurrencyPipe } from '../../shared/pipes/currency.pipe';
 
 @Component({
   selector: 'app-product-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, ConfirmModalComponent],
+  imports: [CommonModule, FormsModule, RouterModule, ConfirmModalComponent, AppCurrencyPipe],
   templateUrl: './product-list.component.html',
   styleUrl: './product-list.component.scss'
 })

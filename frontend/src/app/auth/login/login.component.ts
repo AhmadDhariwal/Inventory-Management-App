@@ -18,6 +18,9 @@ export class LoginComponent implements OnInit {
   successMessage = '';
   showPassword = false;
   returnUrl = '/dashboard';
+  requires2FA = false;
+  userId = '';
+  otpForm!: FormGroup;
 
   constructor(
     private fb: FormBuilder,
@@ -96,6 +99,13 @@ export class LoginComponent implements OnInit {
 
     this.authService.login(credentials).subscribe({
       next: (response) => {
+        if (response.requires2FA) {
+          this.loading = false;
+          this.requires2FA = true;
+          this.userId = response.userId || '';
+          this.initializeOTPForm();
+          return;
+        }
         this.loading = false;
         this.successMessage = 'Login successful! Redirecting...';
 
@@ -107,6 +117,33 @@ export class LoginComponent implements OnInit {
         this.loading = false;
         this.error = err?.error || 'Invalid credentials. Please try again.';
       }
+    });
+  }
+
+  onOTPSubmit(): void {
+    if (this.otpForm.invalid) return;
+
+    this.loading = true;
+    const code = this.otpForm.value.code;
+
+    this.authService.verify2FA(this.userId, code).subscribe({
+      next: () => {
+        this.loading = false;
+        this.successMessage = '2FA Verified! Redirecting...';
+        setTimeout(() => {
+          this.router.navigate([this.returnUrl]);
+        }, 1000);
+      },
+      error: (err) => {
+        this.loading = false;
+        this.error = err?.error || 'Invalid OTP code. Please try again.';
+      }
+    });
+  }
+
+  private initializeOTPForm(): void {
+    this.otpForm = this.fb.group({
+      code: ['', [Validators.required, Validators.pattern('^[0-9]{6}$')]]
     });
   }
 

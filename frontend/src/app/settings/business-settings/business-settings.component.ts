@@ -15,8 +15,10 @@ export class BusinessSettingsComponent implements OnInit {
   regionalForm!: FormGroup;
   preferencesForm!: FormGroup;
   systemForm!: FormGroup;
+  securityForm!: FormGroup;
   isLoading = false;
   isSaving = false;
+  isEditing = false;
   successMessage = '';
   errorMessage = '';
 
@@ -45,7 +47,7 @@ export class BusinessSettingsComponent implements OnInit {
 
   initializeForms(): void {
     this.companyForm = this.fb.group({
-      companyName: ['', [Validators.required]],
+      organizationName: ['', [Validators.required]],
       industry: ['other'],
       taxId: [''],
       address: [''],
@@ -78,6 +80,16 @@ export class BusinessSettingsComponent implements OnInit {
       systemLogo: [''],
       emailSignature: ['']
     });
+
+    this.initSecurityForm();
+  }
+
+  private initSecurityForm(): void {
+    this.securityForm = this.fb.group({
+      twoFactorEnforced: [false],
+      passwordExpiryDays: [90, [Validators.min(0)]],
+      sessionTimeout: [60, [Validators.min(1)]]
+    });
   }
 
   loadSettings(): void {
@@ -85,7 +97,7 @@ export class BusinessSettingsComponent implements OnInit {
     this.businessSettingsService.getSettings().subscribe({
       next: (settings) => {
         this.companyForm.patchValue({
-          companyName: settings.companyName,
+          organizationName: settings.organizationName,
           industry: settings.industry,
           taxId: settings.taxId,
           address: settings.address,
@@ -118,6 +130,10 @@ export class BusinessSettingsComponent implements OnInit {
           systemLogo: settings.systemLogo,
           emailSignature: settings.emailSignature
         });
+
+        if (settings.securitySettings) {
+          this.securityForm.patchValue(settings.securitySettings);
+        }
       },
       error: (error) => {
         console.error('Error loading business settings:', error);
@@ -161,6 +177,14 @@ export class BusinessSettingsComponent implements OnInit {
     }
   }
 
+  onSaveSecurity(): void {
+    if (this.securityForm.valid) {
+      this.saveSettings({ securitySettings: this.securityForm.value }, 'Security policies');
+    } else {
+      this.securityForm.markAllAsTouched();
+    }
+  }
+
   private saveSettings(data: any, type: string): void {
     this.isSaving = true;
     this.errorMessage = '';
@@ -168,6 +192,7 @@ export class BusinessSettingsComponent implements OnInit {
     this.businessSettingsService.updateSettings(data).subscribe({
       next: (settings) => {
         this.successMessage = `${type} updated successfully`;
+        this.isEditing = false;
         setTimeout(() => this.successMessage = '', 3000);
       },
       error: (error) => {
@@ -178,5 +203,17 @@ export class BusinessSettingsComponent implements OnInit {
         this.isSaving = false;
       }
     });
+  }
+
+  toggleEdit(): void {
+    this.isEditing = !this.isEditing;
+    if (!this.isEditing) {
+      this.loadSettings(); // Reset form if cancelling
+    }
+  }
+
+  cancelEdit(): void {
+    this.isEditing = false;
+    this.loadSettings();
   }
 }

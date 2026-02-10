@@ -10,6 +10,7 @@ import { OrganizationService, Organization } from '../../../shared/services/orga
 import { ThemeService } from '../../../shared/services/theme.service';
 import { BarcodeScannerComponent } from '../../../shared/components/barcode-scanner/barcode-scanner.component';
 import { NotificationService, AppNotification } from '../../../shared/services/notification.service';
+import { ConfigService } from '../../../shared/services/config.service';
 
 interface SearchSuggestion {
   _id: string;
@@ -48,6 +49,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   private organizationService = inject(OrganizationService);
   private themeService = inject(ThemeService);
   private notificationService = inject(NotificationService);
+  public configService = inject(ConfigService);
 
   constructor(private router: Router, private route: ActivatedRoute) {
     this.isDarkMode = this.themeService.getCurrentTheme();
@@ -79,9 +81,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
       this.loadSearchSuggestions(query);
     });
 
-    // Load organization data
-    this.loadOrganization();
-
     // Subscribe to notifications
     this.notificationService.unreadCount$.pipe(takeUntil(this.destroy$)).subscribe(count => {
       this.notificationCount = count;
@@ -92,18 +91,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
     });
   }
 
-  private loadOrganization(): void {
-    this.organizationService.getCurrentOrganization().subscribe({
-      next: (response) => {
-        if (response.success && response.data) {
-          this.organization = response.data;
-        }
-      },
-      error: (err) => {
-        console.error('Error loading organization:', err);
-      }
-    });
-  }
+  // Removed loadOrganization as it's now handled by configService
 
   ngOnDestroy() {
     this.destroy$.next();

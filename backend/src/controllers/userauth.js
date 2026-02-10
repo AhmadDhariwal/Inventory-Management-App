@@ -65,6 +65,11 @@ const toggleuserstatus = asyncHandler(async (req, res) => {
   await userService.toggleuserstatus(req, res);
 });
 
+// Verify 2FA
+const verify2FA = asyncHandler(async (req, res) => {
+  await userService.verify2FA(req, res);
+});
+
 // Assign user to manager (admin only)
 const assignUserToManager = asyncHandler(async (req, res) => {
   await userService.assignUserToManager(req, res);
@@ -87,5 +92,6 @@ module.exports = {
   toggleuserstatus,
   assignUserToManager,
   getManagerUsers,
-  toggleTwoFactor
+  toggleTwoFactor,
+  verify2FA
 };

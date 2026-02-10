@@ -4,9 +4,15 @@
       <h1 class="page-title"><i class="fas fa-building"></i> Business Settings</h1>
       <p class="page-description">Configure your organization's identity, localization, and system preferences</p>
     </div>
-    <div class="header-status" *ngIf="isSaving">
-      <span class="pulse-icon"></span>
-      Saving changes...
+    <div class="header-actions">
+      <button class="btn" [class.btn-secondary]="!isEditing" [class.btn-warning]="isEditing" (click)="toggleEdit()">
+        <i class="fas" [class.fa-edit]="!isEditing" [class.fa-times]="isEditing"></i>
+        <span>{{ isEditing ? 'Cancel Editing' : 'Edit Settings' }}</span>
+      </button>
+      <div class="header-status" *ngIf="isSaving">
+        <span class="pulse-icon"></span>
+        Saving changes...
+      </div>
     </div>
   </header>
 
@@ -23,11 +29,11 @@
 
   <div class="settings-sections" *ngIf="!isLoading">
     <!-- Company Information -->
-    <section class="settings-card">
+    <section class="settings-card" [class.editing]="isEditing">
       <div class="card-header">
         <div class="header-icon"><i class="fas fa-info-circle"></i></div>
         <div class="header-text">
-          <h2 class="card-title">Company Information</h2>
+          <h2 class="card-title">Organization Information</h2>
           <p class="card-description">Official details and contact information</p>
         </div>
       </div>
@@ -35,47 +41,54 @@
       <form [formGroup]="companyForm" (ngSubmit)="onSaveCompany()" class="form" *ngIf="companyForm">
         <div class="form-grid">
           <div class="form-group">
-            <label for="companyName" class="form-label">Company Name *</label>
-            <input id="companyName" formControlName="companyName" type="text" class="form-input" placeholder="Enter your company name" />
-            <div class="form-error" *ngIf="companyForm.get('companyName')?.invalid && companyForm.get('companyName')?.touched">
-              Company name is required
+            <label for="organizationName" class="form-label">Organization Name *</label>
+            <input *ngIf="isEditing" id="organizationName" formControlName="organizationName" type="text" class="form-input" placeholder="Enter your organization name" />
+            <div *ngIf="!isEditing" class="read-only-text">{{ companyForm.get('organizationName')?.value || 'N/A' }}</div>
+            <div class="form-error" *ngIf="isEditing && companyForm.get('organizationName')?.invalid && companyForm.get('organizationName')?.touched">
+              Organization name is required
             </div>
           </div>
 
           <div class="form-group">
             <label for="industry" class="form-label">Industry</label>
-            <select id="industry" formControlName="industry" class="form-select">
+            <select *ngIf="isEditing" id="industry" formControlName="industry" class="form-select">
               <option *ngFor="let ind of industries" [value]="ind">{{ ind | titlecase }}</option>
             </select>
+            <div *ngIf="!isEditing" class="read-only-text">{{ companyForm.get('industry')?.value | titlecase }}</div>
           </div>
 
           <div class="form-group">
             <label for="taxId" class="form-label">Tax ID / VAT Number</label>
-            <input id="taxId" formControlName="taxId" type="text" class="form-input" placeholder="Enter Tax ID" />
+            <input *ngIf="isEditing" id="taxId" formControlName="taxId" type="text" class="form-input" placeholder="Enter Tax ID" />
+            <div *ngIf="!isEditing" class="read-only-text">{{ companyForm.get('taxId')?.value || 'Not Set' }}</div>
           </div>
 
           <div class="form-group">
             <label for="phone" class="form-label">Phone Number</label>
-            <input id="phone" formControlName="phone" type="tel" class="form-input" placeholder="+1 (555) 123-4567" />
+            <input *ngIf="isEditing" id="phone" formControlName="phone" type="tel" class="form-input" placeholder="+1 (555) 123-4567" />
+            <div *ngIf="!isEditing" class="read-only-text">{{ companyForm.get('phone')?.value || 'Not Set' }}</div>
           </div>
 
           <div class="form-group">
             <label for="email" class="form-label">Business Email</label>
-            <input id="email" formControlName="email" type="email" class="form-input" placeholder="contact@company.com" />
+            <input *ngIf="isEditing" id="email" formControlName="email" type="email" class="form-input" placeholder="contact@company.com" />
+            <div *ngIf="!isEditing" class="read-only-text">{{ companyForm.get('email')?.value || 'Not Set' }}</div>
           </div>
 
           <div class="form-group">
             <label for="website" class="form-label">Website URL</label>
-            <input id="website" formControlName="website" type="url" class="form-input" placeholder="https://www.company.com" />
+            <input *ngIf="isEditing" id="website" formControlName="website" type="url" class="form-input" placeholder="https://www.company.com" />
+            <div *ngIf="!isEditing" class="read-only-text">{{ companyForm.get('website')?.value || 'Not Set' }}</div>
           </div>
 
           <div class="form-group full-width">
             <label for="address" class="form-label">Business Address</label>
-            <textarea id="address" formControlName="address" class="form-textarea" rows="2" placeholder="Enter your business address"></textarea>
+            <textarea *ngIf="isEditing" id="address" formControlName="address" class="form-textarea" rows="2" placeholder="Enter your business address"></textarea>
+            <div *ngIf="!isEditing" class="read-only-text read-only-text--long">{{ companyForm.get('address')?.value || 'Not Set' }}</div>
           </div>
         </div>
 
-        <div class="form-actions">
+        <div class="form-actions" *ngIf="isEditing">
           <button type="submit" class="btn btn-primary" [disabled]="companyForm.invalid || isSaving">
             <i class="fas fa-save" *ngIf="!isSaving"></i>
             <span>{{ isSaving ? 'Saving...' : 'Update Company Info' }}</span>
@@ -85,7 +98,7 @@
     </section>
 
     <!-- Regional Settings -->
-    <section class="settings-card">
+    <section class="settings-card" [class.editing]="isEditing">
       <div class="card-header">
         <div class="header-icon"><i class="fas fa-globe"></i></div>
         <div class="header-text">
@@ -98,38 +111,42 @@
         <div class="form-grid">
           <div class="form-group">
             <label for="currency" class="form-label">Main Currency *</label>
-            <select id="currency" formControlName="currency" class="form-select">
+            <select *ngIf="isEditing" id="currency" formControlName="currency" class="form-select">
               <option *ngFor="let curr of currencies" [value]="curr">{{ curr }}</option>
             </select>
+            <div *ngIf="!isEditing" class="read-only-text">{{ regionalForm.get('currency')?.value }}</div>
           </div>
 
           <div class="form-group">
             <label for="timezone" class="form-label">Select Timezone *</label>
-            <select id="timezone" formControlName="timezone" class="form-select">
+            <select *ngIf="isEditing" id="timezone" formControlName="timezone" class="form-select">
               <option value="UTC">UTC (Universal)</option>
               <option value="Asia/Karachi">PKT (Pakistan)</option>
               <option value="Asia/Dubai">GST (Dubai)</option>
               <option value="Europe/London">GMT (London)</option>
               <option value="America/New_York">EST (New York)</option>
             </select>
+            <div *ngIf="!isEditing" class="read-only-text">{{ regionalForm.get('timezone')?.value }}</div>
           </div>
 
           <div class="form-group">
             <label for="dateFormat" class="form-label">Preferred Date Format</label>
-            <select id="dateFormat" formControlName="dateFormat" class="form-select">
+            <select *ngIf="isEditing" id="dateFormat" formControlName="dateFormat" class="form-select">
               <option *ngFor="let fmt of dateFormats" [value]="fmt">{{ fmt }}</option>
             </select>
+            <div *ngIf="!isEditing" class="read-only-text">{{ regionalForm.get('dateFormat')?.value }}</div>
           </div>
 
           <div class="form-group">
             <label for="language" class="form-label">System Language</label>
-            <select id="language" formControlName="language" class="form-select">
+            <select *ngIf="isEditing" id="language" formControlName="language" class="form-select">
               <option *ngFor="let lang of languages" [value]="lang.code">{{ lang.name }}</option>
             </select>
+            <div *ngIf="!isEditing" class="read-only-text">{{ regionalForm.get('language')?.value | uppercase }}</div>
           </div>
         </div>
 
-        <div class="form-actions">
+        <div class="form-actions" *ngIf="isEditing">
           <button type="submit" class="btn btn-primary" [disabled]="regionalForm.invalid || isSaving">
             <i class="fas fa-save" *ngIf="!isSaving"></i>
             <span>{{ isSaving ? 'Saving...' : 'Update Regional Settings' }}</span>
@@ -139,7 +156,7 @@
     </section>
 
     <!-- Business Preferences -->
-    <section class="settings-card">
+    <section class="settings-card" [class.editing]="isEditing">
       <div class="card-header">
         <div class="header-icon"><i class="fas fa-cog"></i></div>
         <div class="header-text">
@@ -152,54 +169,58 @@
         <div class="form-grid">
           <div class="form-group">
             <label for="fiscalYearStart" class="form-label">Fiscal Year Start Month</label>
-            <select id="fiscalYearStart" formControlName="fiscalYearStart" class="form-select">
+            <select *ngIf="isEditing" id="fiscalYearStart" formControlName="fiscalYearStart" class="form-select">
               <option value="01">January</option>
               <option value="04">April</option>
               <option value="07">July</option>
               <option value="10">October</option>
             </select>
+            <div *ngIf="!isEditing" class="read-only-text">{{ preferencesForm.get('fiscalYearStart')?.value }} (Month Index)</div>
           </div>
 
           <div class="form-group">
             <label for="fiscalYearEnd" class="form-label">Fiscal Year End Month</label>
-            <select id="fiscalYearEnd" formControlName="fiscalYearEnd" class="form-select">
+            <select *ngIf="isEditing" id="fiscalYearEnd" formControlName="fiscalYearEnd" class="form-select">
               <option value="12">December</option>
               <option value="03">March</option>
               <option value="06">June</option>
               <option value="09">September</option>
             </select>
+            <div *ngIf="!isEditing" class="read-only-text">{{ preferencesForm.get('fiscalYearEnd')?.value }} (Month Index)</div>
           </div>
 
           <div class="form-group">
             <label for="defaultTaxRate" class="form-label">Default Tax Rate (%)</label>
-            <input id="defaultTaxRate" formControlName="defaultTaxRate" type="number" class="form-input" step="0.01" />
+            <input *ngIf="isEditing" id="defaultTaxRate" formControlName="defaultTaxRate" type="number" class="form-input" step="0.01" />
+            <div *ngIf="!isEditing" class="read-only-text">{{ preferencesForm.get('defaultTaxRate')?.value }}%</div>
           </div>
 
           <div class="form-group">
             <label for="autoSkuPrefix" class="form-label">Auto SKU Prefix</label>
-            <input id="autoSkuPrefix" formControlName="autoSkuPrefix" type="text" class="form-input" />
+            <input *ngIf="isEditing" id="autoSkuPrefix" formControlName="autoSkuPrefix" type="text" class="form-input" />
+            <div *ngIf="!isEditing" class="read-only-text">{{ preferencesForm.get('autoSkuPrefix')?.value }}</div>
           </div>
         </div>
 
         <div class="feature-toggles">
           <h3 class="section-title">Module Feature Toggles</h3>
           <div class="toggle-grid">
-            <label class="toggle-item">
-              <input type="checkbox" formControlName="enableMultiLocation" class="form-checkbox">
+            <label class="toggle-item" [class.disabled]="!isEditing">
+              <input type="checkbox" formControlName="enableMultiLocation" class="form-checkbox" [attr.disabled]="!isEditing ? 'disabled' : null">
               <div class="toggle-content">
                 <span class="toggle-label">Multi-location</span>
                 <span class="toggle-help">Manage stock across multiple warehouses</span>
               </div>
             </label>
-            <label class="toggle-item">
-              <input type="checkbox" formControlName="enableTaxCalculation" class="form-checkbox">
+            <label class="toggle-item" [class.disabled]="!isEditing">
+              <input type="checkbox" formControlName="enableTaxCalculation" class="form-checkbox" [attr.disabled]="!isEditing ? 'disabled' : null">
               <div class="toggle-content">
                 <span class="toggle-label">Auto Tax</span>
                 <span class="toggle-help">Calculate taxes on checkout automatically</span>
               </div>
             </label>
-            <label class="toggle-item">
-              <input type="checkbox" formControlName="enableDiscounts" class="form-checkbox">
+            <label class="toggle-item" [class.disabled]="!isEditing">
+              <input type="checkbox" formControlName="enableDiscounts" class="form-checkbox" [attr.disabled]="!isEditing ? 'disabled' : null">
               <div class="toggle-content">
                 <span class="toggle-label">Discounts</span>
                 <span class="toggle-help">Apply percentage or fixed discounts</span>
@@ -208,7 +229,7 @@
           </div>
         </div>
 
-        <div class="form-actions">
+        <div class="form-actions" *ngIf="isEditing">
           <button type="submit" class="btn btn-primary" [disabled]="preferencesForm.invalid || isSaving">
             <i class="fas fa-save" *ngIf="!isSaving"></i>
             <span>{{ isSaving ? 'Saving...' : 'Update Preferences' }}</span>
@@ -218,7 +239,7 @@
     </section>
 
     <!-- System & Brand Settings -->
-    <section class="settings-card">
+    <section class="settings-card" [class.editing]="isEditing">
       <div class="card-header">
         <div class="header-icon"><i class="fas fa-vial"></i></div>
         <div class="header-text">
@@ -231,28 +252,31 @@
         <div class="form-grid">
           <div class="form-group">
             <label for="defaultTheme" class="form-label">Global Theme</label>
-            <select id="defaultTheme" formControlName="defaultTheme" class="form-select">
+            <select *ngIf="isEditing" id="defaultTheme" formControlName="defaultTheme" class="form-select">
               <option value="light">Light Mode</option>
               <option value="dark">Dark Mode</option>
               <option value="system">Follow System</option>
             </select>
+            <div *ngIf="!isEditing" class="read-only-text">{{ systemForm.get('defaultTheme')?.value | titlecase }}</div>
           </div>
 
           <div class="form-group">
             <label for="systemLogo" class="form-label">System Logo URL</label>
-            <input id="systemLogo" formControlName="systemLogo" type="text" class="form-input" placeholder="URL to your logo" />
+            <input *ngIf="isEditing" id="systemLogo" formControlName="systemLogo" type="text" class="form-input" placeholder="URL to your logo" />
+            <div *ngIf="!isEditing" class="read-only-text read-only-text--link">{{ systemForm.get('systemLogo')?.value || 'No logo set' }}</div>
           </div>
 
           <div class="form-group full-width">
             <label for="emailSignature" class="form-label">Default Email Signature</label>
-            <textarea id="emailSignature" formControlName="emailSignature" class="form-textarea" rows="2" placeholder="Regards, Team..."></textarea>
+            <textarea *ngIf="isEditing" id="emailSignature" formControlName="emailSignature" class="form-textarea" rows="2" placeholder="Regards, Team..."></textarea>
+            <div *ngIf="!isEditing" class="read-only-text read-only-text--long">{{ systemForm.get('emailSignature')?.value || 'No signature set' }}</div>
           </div>
         </div>
 
         <div class="danger-zone">
           <h3 class="section-title">Maintenance Mode</h3>
-          <div class="toggle-item danger">
-            <input type="checkbox" formControlName="maintenanceMode" class="form-checkbox">
+          <div class="toggle-item danger" [class.disabled]="!isEditing">
+            <input type="checkbox" formControlName="maintenanceMode" class="form-checkbox" [attr.disabled]="!isEditing ? 'disabled' : null">
             <div class="toggle-content">
               <span class="toggle-label">Enable Maintenance Mode</span>
               <span class="toggle-help">Only admins will be able to access the system</span>
@@ -260,10 +284,57 @@
           </div>
         </div>
 
-        <div class="form-actions">
+        <div class="form-actions" *ngIf="isEditing">
           <button type="submit" class="btn btn-primary" [disabled]="systemForm.invalid || isSaving">
             <i class="fas fa-save" *ngIf="!isSaving"></i>
             <span>{{ isSaving ? 'Saving...' : 'Update System' }}</span>
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Security & Access Control -->
+    <section class="settings-card" [class.editing]="isEditing">
+      <div class="card-header">
+        <div class="header-icon"><i class="fas fa-shield-alt"></i></div>
+        <div class="header-text">
+          <h2 class="card-title">Security & Access Control</h2>
+          <p class="card-description">Organization-wide security policies and authentication rules</p>
+        </div>
+      </div>
+
+      <form [formGroup]="securityForm" (ngSubmit)="onSaveSecurity()" class="form" *ngIf="securityForm">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="passwordExpiryDays" class="form-label">Password Expiry (Days)</label>
+            <input *ngIf="isEditing" id="passwordExpiryDays" formControlName="passwordExpiryDays" type="number" class="form-input" />
+            <div *ngIf="!isEditing" class="read-only-text">{{ securityForm.get('passwordExpiryDays')?.value }} Days</div>
+          </div>
+
+          <div class="form-group">
+            <label for="sessionTimeout" class="form-label">Session Timeout (Minutes)</label>
+            <input *ngIf="isEditing" id="sessionTimeout" formControlName="sessionTimeout" type="number" class="form-input" />
+            <div *ngIf="!isEditing" class="read-only-text">{{ securityForm.get('sessionTimeout')?.value }} Minutes</div>
+          </div>
+        </div>
+
+        <div class="feature-toggles">
+          <h3 class="section-title">Global Security Policies</h3>
+          <div class="toggle-grid">
+            <label class="toggle-item" [class.disabled]="!isEditing" [class.active-policy]="securityForm.get('twoFactorEnforced')?.value">
+              <input type="checkbox" formControlName="twoFactorEnforced" class="form-checkbox" [attr.disabled]="!isEditing ? 'disabled' : null">
+              <div class="toggle-content">
+                <span class="toggle-label">Enforce Two-Factor Authentication</span>
+                <span class="toggle-help">All users will be required to enable 2FA to access the system</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-actions" *ngIf="isEditing">
+          <button type="submit" class="btn btn-primary" [disabled]="securityForm.invalid || isSaving">
+            <i class="fas fa-save" *ngIf="!isSaving"></i>
+            <span>{{ isSaving ? 'Saving...' : 'Update Security Policies' }}</span>
           </button>
         </div>
       </form>

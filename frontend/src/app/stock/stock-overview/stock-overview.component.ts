@@ -2,11 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { StockService } from '../../shared/services/stock.service';
+import { AppCurrencyPipe } from '../../shared/pipes/currency.pipe';
 
 @Component({
   selector: 'app-stock-overview',
   standalone: true,
-  imports: [RouterLink, CommonModule],
+  imports: [RouterLink, CommonModule, AppCurrencyPipe],
   templateUrl: './stock-overview.component.html',
   styleUrl: './stock-overview.component.scss'
 })

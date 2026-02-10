@@ -7,8 +7,8 @@ const businessSettingsSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
-  // Company Information
-  companyName: {
+  // Organization Information
+  organizationName: {
     type: String,
     required: true,
     trim: true
@@ -117,6 +117,21 @@ const businessSettingsSchema = new mongoose.Schema({
   },
   emailSignature: {
     type: String
+  },
+  // Security Settings
+  securitySettings: {
+    twoFactorEnforced: {
+      type: Boolean,
+      default: false
+    },
+    passwordExpiryDays: {
+      type: Number,
+      default: 90
+    },
+    sessionTimeout: {
+      type: Number,
+      default: 60 // minutes
+    }
   }
 }, {
   timestamps: true,

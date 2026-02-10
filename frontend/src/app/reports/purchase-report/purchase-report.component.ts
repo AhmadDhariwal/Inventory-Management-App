@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PurchaseService } from '../../shared/services/purchase.service';
 import { PurchaseOrder } from '../../shared/models/inventory/purchase-order.model';
+import { AppCurrencyPipe } from '../../shared/pipes/currency.pipe';
 
 interface PurchaseSummary {
   totalOrders: number;
@@ -17,7 +18,7 @@ interface PurchaseSummary {
 @Component({
   selector: 'app-purchase-report',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, AppCurrencyPipe],
   templateUrl: './purchase-report.component.html',
   styleUrls: ['./purchase-report.component.scss']
 })

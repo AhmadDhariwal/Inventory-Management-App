@@ -7,7 +7,8 @@ exports.logActivity = async ({
   entityId,
   entityName,
   description,
-  ip
+  ip,
+  organizationId
 }) => {
   try {
     await ActivityLog.create({
@@ -17,7 +18,8 @@ exports.logActivity = async ({
       entityId,
       entityName,
       description,
-      ipAddress: ip
+      ipAddress: ip,
+      organizationId
     });
   } catch (err) {
     console.error("Activity Log Error:", err.message);

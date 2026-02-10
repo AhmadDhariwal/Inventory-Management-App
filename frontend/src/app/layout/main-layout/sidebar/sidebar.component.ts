@@ -2,6 +2,7 @@ import { Component, EventEmitter, Output, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common'; // Import CommonModule for *ngIf
 import { AuthService } from '../../../shared/services/auth.service';
+import { ConfigService } from '../../../shared/services/config.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -13,6 +14,7 @@ import { AuthService } from '../../../shared/services/auth.service';
 export class SidebarComponent {
   @Output() close = new EventEmitter<void>();
   private authService = inject(AuthService);
+  public configService = inject(ConfigService);
 
   get userRole(): string {
     return this.authService.getUserRole() || '';

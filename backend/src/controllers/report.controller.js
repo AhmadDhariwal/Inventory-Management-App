@@ -89,13 +89,14 @@ const getallsuppliers = async (req, res) => {
 
 const getstocklevelsreport = async (req, res) => {
   try {
-    let report = await reportservice.getstocklevelsreport();
+    const { organizationId } = req;
+    let report = await reportservice.getstocklevelsreport(organizationId);
 
     // If no stock levels found, initialize them
     if (!report || report.length === 0) {
       console.log('No stock levels found, initializing...');
-      await stockLevelService.initializeStockLevels();
-      report = await reportservice.getstocklevelsreport();
+      await stockLevelService.initializeStockLevels(organizationId);
+      report = await reportservice.getstocklevelsreport(organizationId);
     }
 
     res.status(200).json(report);
@@ -106,7 +107,8 @@ const getstocklevelsreport = async (req, res) => {
 
 const getstocksummary = async (req, res) => {
   try {
-    const summary = await reportservice.getstocksummary();
+    const { organizationId } = req;
+    const summary = await reportservice.getstocksummary(organizationId);
     res.status(200).json(summary);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -115,7 +117,8 @@ const getstocksummary = async (req, res) => {
 
 const getlowstockreport = async (req, res) => {
   try {
-    const report = await reportservice.getlowstockreport();
+    const { organizationId } = req;
+    const report = await reportservice.getlowstockreport(organizationId);
     res.status(200).json(report);
   } catch (error) {
     res.status(500).json({ error: error.message });

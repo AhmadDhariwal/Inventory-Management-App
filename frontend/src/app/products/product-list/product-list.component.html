@@ -77,8 +77,8 @@
                 </div>
               </td>
               <td>{{ product.category?.name || 'Unassigned' }}</td>
-              <td class="numeric">{{ product.cost | currency }}</td>
-              <td class="numeric">{{ product.price | currency }}</td>
+              <td class="numeric">{{ product.cost | appCurrency }}</td>
+              <td class="numeric">{{ product.price | appCurrency }}</td>
               <td>
                 <span class="status-badge" [ngClass]="product.status.toLowerCase()">
                   {{ product.status }}

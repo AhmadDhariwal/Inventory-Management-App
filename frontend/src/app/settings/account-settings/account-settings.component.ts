@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../shared/services/auth.service';
 import { UserService, UserProfile, PasswordChangeRequest } from '../../shared/services/user.service';
@@ -7,7 +7,7 @@ import { UserService, UserProfile, PasswordChangeRequest } from '../../shared/se
 @Component({
   selector: 'app-account-settings',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule],
   templateUrl: './account-settings.component.html',
   styleUrl: './account-settings.component.scss'
 })
@@ -26,6 +26,10 @@ export class AccountSettingsComponent implements OnInit {
   passwordError = '';
   showPasswordForm = false;
   sessionsLoading = false;
+  twoFactorSecret = '';
+  twoFactorQrUrl = '';
+  twoFactorVerifyCode = '';
+  twoFactorStep: 'OFF' | 'SETUP' | 'ON' = 'OFF';
 
   constructor(
     private authService: AuthService,
@@ -66,6 +70,7 @@ export class AccountSettingsComponent implements OnInit {
     if (!this.user) return;
     
     this.twoFactorEnabled = !!this.user.twoFactorEnabled;
+    this.twoFactorStep = this.twoFactorEnabled ? 'ON' : 'OFF';
     const nameParts = this.user.name ? this.user.name.split(' ') : ['', ''];
     
     this.profileForm = this.fb.group({
@@ -238,15 +243,54 @@ export class AccountSettingsComponent implements OnInit {
     this.userService.toggleTwoFactor().subscribe({
       next: (response) => {
         if (response.success) {
-          this.twoFactorEnabled = response.data.twoFactorEnabled;
-          if (this.user) {
-            this.user.twoFactorEnabled = this.twoFactorEnabled;
-            localStorage.setItem('user', JSON.stringify(this.user));
+          const enabled = response.data.twoFactorEnabled;
+          if (response.data.isSetup) {
+            this.twoFactorStep = 'SETUP';
+            this.twoFactorSecret = response.data.secret || '';
+            if (response.data.otpauthUrl) {
+              // Use a more reliable and modern QR code service
+              this.twoFactorQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(response.data.otpauthUrl)}`;
+            }
+          } else {
+            this.twoFactorEnabled = false;
+            this.twoFactorStep = 'OFF';
+            this.twoFactorSecret = '';
+            this.twoFactorQrUrl = '';
+            if (this.user) {
+              this.user.twoFactorEnabled = false;
+              localStorage.setItem('user', JSON.stringify(this.user));
+            }
           }
         }
       },
       error: (error) => {
         console.error('Error toggling 2FA:', error);
+      },
+      complete: () => {
+        this.isLoading = false;
+      }
+    });
+  }
+
+  confirm2FA(): void {
+    if (!this.twoFactorVerifyCode || this.twoFactorVerifyCode.length !== 6) return;
+    
+    this.isLoading = true;
+    this.authService.verify2FA(this.user?._id || '', this.twoFactorVerifyCode).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.twoFactorEnabled = true;
+          this.twoFactorStep = 'ON';
+          this.twoFactorSecret = '';
+          this.twoFactorQrUrl = '';
+          if (this.user) {
+            this.user.twoFactorEnabled = true;
+            localStorage.setItem('user', JSON.stringify(this.user));
+          }
+        }
+      },
+      error: (error) => {
+        alert(error.error?.error || 'Invalid verification code');
       },
       complete: () => {
         this.isLoading = false;

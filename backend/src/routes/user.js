@@ -12,7 +12,8 @@ const {
     toggleuserstatus,
     assignUserToManager,
     getManagerUsers,
-    toggleTwoFactor
+    toggleTwoFactor,
+    verify2FA
 } = require('../controllers/userauth');
 const { restrictto, verifytoken } = require('../middleware/auth.middleware');
 const { adminOnly, adminOrManager, managerOnly, allRoles, canCreateUser } = require('../middleware/rbac.middleware');
@@ -21,6 +22,7 @@ const { ensureOrganizationContext } = require('../middleware/organization.middle
 // Public routes
 router.post('/', handleusersignup); // Initial signup
 router.post('/login', handleuserlogin);
+router.post('/verify-2fa', verify2FA);
 
 // Protected routes - require authentication and organization context
 router.use(verifytoken);

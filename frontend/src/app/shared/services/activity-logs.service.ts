@@ -11,7 +11,7 @@ export interface ActivityLog {
     name: string;
     email: string;
   };
-  action: 'CREATE' | 'UPDATE' | 'DELETE' | 'LOGIN' | 'LOGOUT';
+  action: 'CREATE' | 'UPDATE' | 'DELETE' | 'LOGIN' | 'LOGOUT' | 'APPROVE' | 'REJECT' | 'RECEIVE' | 'DISPATCH';
   module: string;
   entityId?: string;
   entityName?: string;
@@ -46,7 +46,7 @@ export interface LogFilters {
 }
 
 export interface LogActivity {
-  action: 'CREATE' | 'UPDATE' | 'DELETE' | 'LOGIN' | 'LOGOUT';
+  action: 'CREATE' | 'UPDATE' | 'DELETE' | 'LOGIN' | 'LOGOUT' | 'APPROVE' | 'REJECT' | 'RECEIVE' | 'DISPATCH';
   module: string;
   entityId?: string;
   entityName?: string;
@@ -73,7 +73,7 @@ export class ActivityLogsService {
       }
     });
 
-    return this.http.get<ActivityLogResponse>(`${this.api}`, { params })
+    return this.http.get<ActivityLogResponse>(`${this.api}`,  { params })
       .pipe(
         tap(response => {
           if (response.success) {
@@ -102,6 +102,7 @@ export class ActivityLogsService {
   refreshLogs(filters: LogFilters = {}): void {
     this.getLogs(filters).subscribe();
   }
+
 
   // Convenience methods for common actions
   logCreate(module: string, entityName: string, entityId?: string): Observable<any> {

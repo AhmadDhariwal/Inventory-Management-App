@@ -24,8 +24,10 @@ export interface RegisterRequest {
 export interface AuthResponse {
   success: boolean;
   message: string;
-  token: string;
-  role: string;
+  token?: string;
+  role?: string;
+  requires2FA?: boolean;
+  userId?: string;
   item?: any;
   data?: {
     _id: string;
@@ -47,6 +49,7 @@ export interface User {
   organizationId?: string;
   managerId?: string;
   department?: string;
+  twoFactorEnabled?: boolean;
 }
 
 @Injectable({
@@ -85,6 +88,18 @@ export class AuthService {
       );
   }
 
+  verify2FA(userId: string, code: string): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.baseUrl}/user/verify-2fa`, { userId, code })
+      .pipe(
+        tap((response: AuthResponse) => {
+          this.setAuthData(response);
+          // Log login activity
+          this.activityService.logLogin().subscribe();
+        }),
+        catchError(this.handleError)
+      );
+  }
+
   register(userData: RegisterRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.baseUrl}/user`, userData)
       .pipe(
@@ -98,7 +113,9 @@ export class AuthService {
   private setAuthData(response: AuthResponse): void {
     if (response.token) {
       localStorage.setItem(this.tokenKey, response.token);
-      localStorage.setItem(this.roleKey, response.role);
+      if (response.role) {
+        localStorage.setItem(this.roleKey, response.role);
+      }
       
       // Handle both old (item) and new (data) response formats
       const userData = response.data || response.item;
