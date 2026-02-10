@@ -22,6 +22,9 @@ import {
   ActivityLogResponse, 
   LogFilters 
 } from '../../shared/services/activity-logs.service';
+import { UserService, UserListItem } from '../../shared/services/user.service';
+import { AuthService } from '../../shared/services/auth.service';
+import { ConfirmModalComponent } from '../../shared/components/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-activity-logs',
@@ -42,7 +45,8 @@ import {
     MatChipsModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
-    MatTooltipModule
+    MatTooltipModule,
+    ConfirmModalComponent
   ],
   templateUrl: './activity-logs.component.html',
   styleUrls: ['./activity-logs.component.scss']
@@ -60,19 +64,28 @@ export class ActivityLogsComponent implements OnInit, OnDestroy {
   pageSizeOptions = [5, 10, 25, 50];
   
   // Table columns
-  displayedColumns: string[] = ['user', 'action', 'module', 'entityName', 'description', 'createdAt'];
+  displayedColumns: string[] = ['user', 'action', 'module', 'entityName', 'description', 'createdAt', 'actions'];
   
   // Filter options
   actionOptions = ['CREATE', 'UPDATE', 'DELETE', 'LOGIN', 'LOGOUT'];
   moduleOptions: string[] = [];
+  userOptions: UserListItem[] = [];
+  isAdmin = false;
+  
+  // Deletion
+  showDeleteModal = false;
+  logToDeleteId: string | null = null;
   
   private destroy$ = new Subject<void>();
 
   constructor(
     private fb: FormBuilder,
     private activityLogsService: ActivityLogsService,
+    private userService: UserService,
+    private authService: AuthService,
     private snackBar: MatSnackBar
   ) {
+    this.isAdmin = this.authService.hasRole('admin');
     this.filterForm = this.createFilterForm();
   }
 
@@ -80,6 +93,9 @@ export class ActivityLogsComponent implements OnInit, OnDestroy {
     this.setupFormSubscriptions();
     this.loadLogs();
     this.loadModuleOptions();
+    if (this.isAdmin) {
+      this.loadUserOptions();
+    }
   }
 
   ngOnDestroy(): void {
@@ -93,7 +109,8 @@ export class ActivityLogsComponent implements OnInit, OnDestroy {
       action: [''],
       module: [''],
       startDate: [''],
-      endDate: ['']
+      endDate: [''],
+      targetUserId: ['']
     });
   }
 
@@ -111,7 +128,7 @@ export class ActivityLogsComponent implements OnInit, OnDestroy {
       });
 
     // Other filters
-    ['action', 'module', 'startDate', 'endDate'].forEach(field => {
+    ['action', 'module', 'startDate', 'endDate', 'targetUserId'].forEach(field => {
       this.filterForm.get(field)?.valueChanges
         .pipe(takeUntil(this.destroy$))
         .subscribe(() => {
@@ -168,6 +185,52 @@ export class ActivityLogsComponent implements OnInit, OnDestroy {
           console.error('Failed to load module options:', error);
         }
       });
+  }
+
+  private loadUserOptions(): void {
+    this.userService.getAllUsers()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response: any) => {
+          if (response.success) {
+            this.userOptions = response.data;
+          }
+        },
+        error: (error) => {
+          console.error('Failed to load user options:', error);
+        }
+      });
+  }
+
+  deleteLog(id: string): void {
+    this.logToDeleteId = id;
+    this.showDeleteModal = true;
+  }
+
+  confirmDelete(): void {
+    if (!this.logToDeleteId) return;
+
+    this.loading = true;
+    this.showDeleteModal = false;
+    
+    this.activityLogsService.deleteLog(this.logToDeleteId)
+      .subscribe({
+        next: () => {
+          this.showSuccess('Activity log deleted');
+          this.loadLogs();
+          this.logToDeleteId = null;
+        },
+        error: (err) => {
+          this.showError(err.message || 'Failed to delete activity log');
+          this.loading = false;
+          this.logToDeleteId = null;
+        }
+      });
+  }
+
+  cancelDelete(): void {
+    this.showDeleteModal = false;
+    this.logToDeleteId = null;
   }
 
   onPageChange(event: PageEvent): void {

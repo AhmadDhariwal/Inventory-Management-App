@@ -55,6 +55,11 @@ const terminateSession = asyncHandler(async (req, res) => {
   await userService.terminateSession(req, res);
 });
 
+// Toggle 2FA
+const toggleTwoFactor = asyncHandler(async (req, res) => {
+  await userService.toggleTwoFactor(req, res);
+});
+
 // Toggle user status
 const toggleuserstatus = asyncHandler(async (req, res) => {
   await userService.toggleuserstatus(req, res);
@@ -81,5 +86,6 @@ module.exports = {
   allusers,
   toggleuserstatus,
   assignUserToManager,
-  getManagerUsers
+  getManagerUsers,
+  toggleTwoFactor
 };

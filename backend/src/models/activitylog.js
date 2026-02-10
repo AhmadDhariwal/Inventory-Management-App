@@ -32,8 +32,7 @@ const activityLogSchema = new mongoose.Schema(
     organizationId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Organization',
-      required: false, // Changed to false to prevent validation errors
-      index: true
+      required: true
     }
   },
   { timestamps: true }

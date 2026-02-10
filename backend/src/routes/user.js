@@ -11,7 +11,8 @@ const {
     allusers,
     toggleuserstatus,
     assignUserToManager,
-    getManagerUsers
+    getManagerUsers,
+    toggleTwoFactor
 } = require('../controllers/userauth');
 const { restrictto, verifytoken } = require('../middleware/auth.middleware');
 const { adminOnly, adminOrManager, managerOnly, allRoles, canCreateUser } = require('../middleware/rbac.middleware');
@@ -38,6 +39,7 @@ router.get('/manager-users/:managerId', adminOnly, getManagerUsers);
 router.get('/profile', allRoles, getUserProfile);
 router.put('/profile', allRoles, updateUserProfile);
 router.put('/change-password', allRoles, changePassword);
+router.put('/toggle-2fa', allRoles, toggleTwoFactor);
 
 // User status management (admin only)
 router.put('/:id/toggle-status', adminOnly, toggleuserstatus);

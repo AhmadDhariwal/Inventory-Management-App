@@ -4,6 +4,7 @@ import { Observable, BehaviorSubject } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { BusinessSettings, BusinessSettingsResponse } from '../models/business-settings.model';
 import { ActivityLogsService } from './activity-logs.service';
+import { SocketService } from './socket.service';
 
 @Injectable({ 
   providedIn: 'root' 
@@ -15,8 +16,18 @@ export class BusinessSettingsService {
 
   constructor(
     private http: HttpClient,
-    private activityService: ActivityLogsService
-  ) {}
+    private activityService: ActivityLogsService,
+    private socketService: SocketService
+  ) {
+    this.initSocketListener();
+  }
+
+  private initSocketListener(): void {
+    this.socketService.listen<BusinessSettings>('SETTINGS_UPDATED').subscribe((settings: BusinessSettings) => {
+      console.log('Business settings updated in real-time:', settings);
+      this.settingsSubject.next(settings);
+    });
+  }
 
   // Get all business settings
   getSettings(): Observable<BusinessSettings> {
@@ -36,7 +47,7 @@ export class BusinessSettingsService {
           action: 'UPDATE',
           module: 'Business Settings',
           entityName: 'Company Settings',
-          description: 'Updated business settings configuration'
+          description: `Updated business settings: ${Object.keys(data).join(', ')}`
         }).subscribe();
       })
     );
@@ -80,16 +91,20 @@ export class BusinessSettingsService {
       'PKR': '₨',
       'INR': '₹',
       'CAD': 'C$',
-      'AUD': 'A$'
+      'AUD': 'A$',
+      'AED': 'د.إ',
+      'SAR': '﷼'
     };
     
     return symbols[settings.currency] || '$';
   }
 
   // Format date according to settings
-  formatDate(date: Date): string {
+  formatDate(date: Date | string): string {
     const settings = this.getCurrentSettings();
-    if (!settings) return date.toLocaleDateString();
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    
+    if (!settings) return dateObj.toLocaleDateString();
     
     const options: Intl.DateTimeFormatOptions = {
       year: 'numeric',
@@ -99,13 +114,13 @@ export class BusinessSettingsService {
     
     switch (settings.dateFormat) {
       case 'DD/MM/YYYY':
-        return date.toLocaleDateString('en-GB', options);
+        return dateObj.toLocaleDateString('en-GB', options);
       case 'YYYY-MM-DD':
-        return date.toISOString().split('T')[0];
+        return dateObj.toISOString().split('T')[0];
       case 'DD.MM.YYYY':
-        return date.toLocaleDateString('de-DE', options);
+        return dateObj.toLocaleDateString('de-DE', options);
       default:
-        return date.toLocaleDateString('en-US', options);
+        return dateObj.toLocaleDateString('en-US', options);
     }
   }
 }

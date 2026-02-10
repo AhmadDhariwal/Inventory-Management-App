@@ -9,11 +9,11 @@ const getSecuritySettings = async (req, res) => {
   try {
     const userId = req.user.userid;
     let settings = await SecuritySettings.findOne({ user: new mongoose.Types.ObjectId(userId) });
-    
+
     if (!settings) {
       settings = await SecuritySettings.create({ user: userId });
     }
-    
+
     res.status(200).json({
       success: true,
       data: settings
@@ -32,7 +32,7 @@ const updateSecuritySettings = async (req, res) => {
       req.body,
       { new: true, upsert: true, runValidators: true }
     );
-    
+
     res.status(200).json({
       success: true,
       message: 'Security settings updated successfully',
@@ -49,11 +49,11 @@ const getNotificationSettings = async (req, res) => {
   try {
     const userId = req.user.userid;
     let settings = await NotificationSettings.findOne({ user: new mongoose.Types.ObjectId(userId) });
-    
+
     if (!settings) {
       settings = await NotificationSettings.create({ user: userId });
     }
-    
+
     res.status(200).json({
       success: true,
       data: settings
@@ -72,7 +72,7 @@ const updateNotificationSettings = async (req, res) => {
       req.body,
       { new: true, upsert: true, runValidators: true }
     );
-    
+
     res.status(200).json({
       success: true,
       message: 'Notification settings updated successfully',
@@ -89,11 +89,11 @@ const getInventorySettings = async (req, res) => {
   try {
     const userId = req.user.userid;
     let settings = await InventorySettings.findOne({ user: new mongoose.Types.ObjectId(userId) });
-    
+
     if (!settings) {
       settings = await InventorySettings.create({ user: userId });
     }
-    
+
     res.status(200).json({
       success: true,
       data: settings
@@ -112,7 +112,7 @@ const updateInventorySettings = async (req, res) => {
       req.body,
       { new: true, upsert: true, runValidators: true }
     );
-    
+
     res.status(200).json({
       success: true,
       message: 'Inventory settings updated successfully',
@@ -124,27 +124,14 @@ const updateInventorySettings = async (req, res) => {
   }
 };
 
-// Business Settings (Global)
+const businessSettingsService = require('../services/businesssettings.service');
+
+// Business Settings (Global/Company)
 const getBusinessSettings = async (req, res) => {
   try {
-    let settings = await BusinessSettings.findOne();
-    
-    if (!settings) {
-      settings = await BusinessSettings.create({
-        companyName: "Your Company Name",
-        industry: "other",
-        currency: "USD",
-        timezone: "UTC",
-        dateFormat: "MM/DD/YYYY",
-        language: "en",
-        fiscalYearStart: "01",
-        workingDays: "monday-friday",
-        enableMultiLocation: false,
-        enableTaxCalculation: true,
-        enableDiscounts: true
-      });
-    }
-    
+    const { organizationId } = req;
+    const settings = await businessSettingsService.getSettings(organizationId);
+
     res.status(200).json({
       success: true,
       data: settings
@@ -157,15 +144,9 @@ const getBusinessSettings = async (req, res) => {
 
 const updateBusinessSettings = async (req, res) => {
   try {
-    let settings = await BusinessSettings.findOne();
-    
-    if (!settings) {
-      settings = await BusinessSettings.create(req.body);
-    } else {
-      Object.assign(settings, req.body);
-      await settings.save();
-    }
-    
+    const { organizationId } = req;
+    const settings = await businessSettingsService.updateSettings(organizationId, req.body);
+
     res.status(200).json({
       success: true,
       message: 'Business settings updated successfully',

@@ -462,6 +462,7 @@ async function changePassword(req, res) {
     }
 
     user.password = await bcrypt.hash(newPassword, 8);
+    user.passwordLastChanged = new Date();
     await user.save();
 
     res.status(200).json({
@@ -477,12 +478,41 @@ async function changePassword(req, res) {
   }
 }
 
+async function toggleTwoFactor(req, res) {
+  try {
+    const userId = req.user.userid;
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error: "User not found"
+      });
+    }
+
+    user.twoFactorEnabled = !user.twoFactorEnabled;
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: `Two-factor authentication ${user.twoFactorEnabled ? 'enabled' : 'disabled'} successfully`,
+      data: { twoFactorEnabled: user.twoFactorEnabled }
+    });
+  } catch (err) {
+    console.error("Toggle 2FA error:", err);
+    res.status(500).json({
+      success: false,
+      error: "Server error"
+    });
+  }
+}
+
 async function getActiveSessions(req, res) {
   try {
     const sessions = [{
       id: '1',
-      device: 'Chrome on Windows',
-      location: 'New York, US',
+      device: req.headers['user-agent'] || 'Unknown Browser',
+      location: 'Local Session',
       lastActive: new Date(),
       current: true
     }];
@@ -561,5 +591,6 @@ module.exports = {
   allusers,
   toggleuserstatus,
   assignUserToManager,
-  getManagerUsers
+  getManagerUsers,
+  toggleTwoFactor
 };

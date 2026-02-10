@@ -1,25 +1,37 @@
 export interface BusinessSettings {
   _id?: string;
+  organizationId: string;
   
   // Company Information
   companyName: string;
-  industry: 'retail' | 'manufacturing' | 'wholesale' | 'services' | 'technology' | 'healthcare' | 'other';
+  industry: 'retail' | 'manufacturing' | 'wholesale' | 'services' | 'technology' | 'healthcare' | 'it' | 'education' | 'other';
+  taxId?: string;
   address?: string;
   phone?: string;
   email?: string;
+  website?: string;
   
   // Regional Settings
-  currency: 'USD' | 'EUR' | 'GBP' | 'PKR' | 'INR' | 'CAD' | 'AUD';
+  currency: 'USD' | 'EUR' | 'GBP' | 'PKR' | 'INR' | 'CAD' | 'AUD' | 'AED' | 'SAR';
   timezone: string;
   dateFormat: 'MM/DD/YYYY' | 'DD/MM/YYYY' | 'YYYY-MM-DD' | 'DD.MM.YYYY';
-  language: 'en' | 'es' | 'fr' | 'de' | 'ur' | 'hi';
+  language: 'en' | 'es' | 'fr' | 'de' | 'ur' | 'hi' | 'ar';
   
   // Business Preferences
   fiscalYearStart: '01' | '04' | '07' | '10';
+  fiscalYearEnd: '12' | '03' | '06' | '09';
   workingDays: 'monday-friday' | 'monday-saturday' | 'sunday-thursday' | 'custom';
+  defaultTaxRate: number;
+  autoSkuPrefix: string;
+  
+  // System Settings
+  maintenanceMode: boolean;
   enableMultiLocation: boolean;
   enableTaxCalculation: boolean;
   enableDiscounts: boolean;
+  defaultTheme: 'light' | 'dark' | 'system';
+  systemLogo?: string;
+  emailSignature?: string;
   
   createdAt?: Date;
   updatedAt?: Date;

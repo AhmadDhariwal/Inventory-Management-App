@@ -65,6 +65,7 @@ export class AccountSettingsComponent implements OnInit {
   initializeForms(): void {
     if (!this.user) return;
     
+    this.twoFactorEnabled = !!this.user.twoFactorEnabled;
     const nameParts = this.user.name ? this.user.name.split(' ') : ['', ''];
     
     this.profileForm = this.fb.group({
@@ -220,11 +221,37 @@ export class AccountSettingsComponent implements OnInit {
   }
 
   getPasswordLastChanged(): string {
-    return '30 days ago';
+    if (!this.user?.passwordLastChanged) return 'Never';
+    
+    const date = new Date(this.user.passwordLastChanged);
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - date.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) return 'Today';
+    if (diffDays === 1) return 'Yesterday';
+    return `${diffDays} days ago`;
   }
 
   toggleTwoFactor(): void {
-    this.twoFactorEnabled = !this.twoFactorEnabled;
+    this.isLoading = true;
+    this.userService.toggleTwoFactor().subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.twoFactorEnabled = response.data.twoFactorEnabled;
+          if (this.user) {
+            this.user.twoFactorEnabled = this.twoFactorEnabled;
+            localStorage.setItem('user', JSON.stringify(this.user));
+          }
+        }
+      },
+      error: (error) => {
+        console.error('Error toggling 2FA:', error);
+      },
+      complete: () => {
+        this.isLoading = false;
+      }
+    });
   }
 
   exportData(): void {

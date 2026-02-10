@@ -1,6 +1,12 @@
 const mongoose = require("mongoose");
 
 const businessSettingsSchema = new mongoose.Schema({
+  organizationId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Organization',
+    required: true,
+    unique: true
+  },
   // Company Information
   companyName: {
     type: String,
@@ -9,8 +15,12 @@ const businessSettingsSchema = new mongoose.Schema({
   },
   industry: {
     type: String,
-    enum: ['retail', 'manufacturing', 'wholesale', 'services', 'technology', 'healthcare', 'other'],
+    enum: ['retail', 'manufacturing', 'wholesale', 'services', 'technology', 'healthcare', 'it', 'education', 'other'],
     default: 'other'
+  },
+  taxId: {
+    type: String,
+    trim: true
   },
   address: {
     type: String,
@@ -25,12 +35,16 @@ const businessSettingsSchema = new mongoose.Schema({
     trim: true,
     lowercase: true
   },
-  
+  website: {
+    type: String,
+    trim: true
+  },
+
   // Regional Settings
   currency: {
     type: String,
     required: true,
-    enum: ['USD', 'EUR', 'GBP', 'PKR', 'INR', 'CAD', 'AUD'],
+    enum: ['USD', 'EUR', 'GBP', 'PKR', 'INR', 'CAD', 'AUD', 'AED', 'SAR'],
     default: 'USD'
   },
   timezone: {
@@ -45,20 +59,41 @@ const businessSettingsSchema = new mongoose.Schema({
   },
   language: {
     type: String,
-    enum: ['en', 'es', 'fr', 'de', 'ur', 'hi'],
+    enum: ['en', 'es', 'fr', 'de', 'ur', 'hi', 'ar'],
     default: 'en'
   },
-  
+
   // Business Preferences
   fiscalYearStart: {
     type: String,
     enum: ['01', '04', '07', '10'],
     default: '01'
   },
+  fiscalYearEnd: {
+    type: String,
+    enum: ['12', '03', '06', '09'],
+    default: '12'
+  },
   workingDays: {
     type: String,
     enum: ['monday-friday', 'monday-saturday', 'sunday-thursday', 'custom'],
     default: 'monday-friday'
+  },
+  defaultTaxRate: {
+    type: Number,
+    default: 0,
+    min: 0
+  },
+  autoSkuPrefix: {
+    type: String,
+    trim: true,
+    default: 'SKU-'
+  },
+
+  // System Settings
+  maintenanceMode: {
+    type: Boolean,
+    default: false
   },
   enableMultiLocation: {
     type: Boolean,
@@ -71,13 +106,23 @@ const businessSettingsSchema = new mongoose.Schema({
   enableDiscounts: {
     type: Boolean,
     default: true
+  },
+  defaultTheme: {
+    type: String,
+    enum: ['light', 'dark', 'system'],
+    default: 'light'
+  },
+  systemLogo: {
+    type: String
+  },
+  emailSignature: {
+    type: String
   }
-}, { 
+}, {
   timestamps: true,
   collection: 'businesssettings'
 });
 
-// Ensure only one business settings document exists
-businessSettingsSchema.index({}, { unique: true });
+// Organization-specific settings are handled by organizationId: { unique: true }
 
 module.exports = mongoose.model("BusinessSettings", businessSettingsSchema);

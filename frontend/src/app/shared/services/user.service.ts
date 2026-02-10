@@ -20,6 +20,8 @@ export interface UserProfile {
   createdAt: string;
   updatedAt: string;
   isActive?: boolean;
+  passwordLastChanged?: string;
+  twoFactorEnabled?: boolean;
 }
 
 export interface UserListItem {
@@ -142,6 +144,21 @@ export class UserService {
             module: 'User Management',
             entityName: 'Password',
             description: 'Changed user password'
+          }).subscribe();
+        }
+      })
+    );
+  }
+
+  toggleTwoFactor(): Observable<{success: boolean, message: string, data: {twoFactorEnabled: boolean}}> {
+    return this.http.put<{success: boolean, message: string, data: {twoFactorEnabled: boolean}}>(`${this.baseUrl}/toggle-2fa`, {}).pipe(
+      tap((result) => {
+        if (result.success) {
+          this.activityService.createLog({
+            action: 'UPDATE',
+            module: 'User Management',
+            entityName: 'Security',
+            description: `${result.data.twoFactorEnabled ? 'Enabled' : 'Disabled'} two-factor authentication`
           }).subscribe();
         }
       })

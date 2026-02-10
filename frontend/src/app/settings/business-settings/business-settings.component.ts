@@ -14,10 +14,24 @@ export class BusinessSettingsComponent implements OnInit {
   companyForm!: FormGroup;
   regionalForm!: FormGroup;
   preferencesForm!: FormGroup;
+  systemForm!: FormGroup;
   isLoading = false;
   isSaving = false;
   successMessage = '';
   errorMessage = '';
+
+  industries = ['retail', 'manufacturing', 'wholesale', 'services', 'technology', 'healthcare', 'it', 'education', 'other'];
+  currencies = ['USD', 'EUR', 'GBP', 'PKR', 'INR', 'CAD', 'AUD', 'AED', 'SAR'];
+  languages = [
+    { code: 'en', name: 'English' },
+    { code: 'es', name: 'Spanish' },
+    { code: 'fr', name: 'French' },
+    { code: 'de', name: 'German' },
+    { code: 'ur', name: 'Urdu' },
+    { code: 'hi', name: 'Hindi' },
+    { code: 'ar', name: 'Arabic' }
+  ];
+  dateFormats = ['MM/DD/YYYY', 'DD/MM/YYYY', 'YYYY-MM-DD', 'DD.MM.YYYY'];
 
   constructor(
     private fb: FormBuilder,
@@ -33,9 +47,11 @@ export class BusinessSettingsComponent implements OnInit {
     this.companyForm = this.fb.group({
       companyName: ['', [Validators.required]],
       industry: ['other'],
+      taxId: [''],
       address: [''],
       phone: [''],
-      email: ['', [Validators.email]]
+      email: ['', [Validators.email]],
+      website: ['']
     });
 
     this.regionalForm = this.fb.group({
@@ -47,10 +63,20 @@ export class BusinessSettingsComponent implements OnInit {
 
     this.preferencesForm = this.fb.group({
       fiscalYearStart: ['01'],
+      fiscalYearEnd: ['12'],
       workingDays: ['monday-friday'],
+      defaultTaxRate: [0, [Validators.min(0)]],
+      autoSkuPrefix: ['SKU-'],
       enableMultiLocation: [false],
       enableTaxCalculation: [true],
       enableDiscounts: [true]
+    });
+
+    this.systemForm = this.fb.group({
+      maintenanceMode: [false],
+      defaultTheme: ['light'],
+      systemLogo: [''],
+      emailSignature: ['']
     });
   }
 
@@ -61,9 +87,11 @@ export class BusinessSettingsComponent implements OnInit {
         this.companyForm.patchValue({
           companyName: settings.companyName,
           industry: settings.industry,
+          taxId: settings.taxId,
           address: settings.address,
           phone: settings.phone,
-          email: settings.email
+          email: settings.email,
+          website: settings.website
         });
         
         this.regionalForm.patchValue({
@@ -75,10 +103,20 @@ export class BusinessSettingsComponent implements OnInit {
         
         this.preferencesForm.patchValue({
           fiscalYearStart: settings.fiscalYearStart,
+          fiscalYearEnd: settings.fiscalYearEnd,
           workingDays: settings.workingDays,
+          defaultTaxRate: settings.defaultTaxRate,
+          autoSkuPrefix: settings.autoSkuPrefix,
           enableMultiLocation: settings.enableMultiLocation,
           enableTaxCalculation: settings.enableTaxCalculation,
           enableDiscounts: settings.enableDiscounts
+        });
+
+        this.systemForm.patchValue({
+          maintenanceMode: settings.maintenanceMode,
+          defaultTheme: settings.defaultTheme,
+          systemLogo: settings.systemLogo,
+          emailSignature: settings.emailSignature
         });
       },
       error: (error) => {
@@ -115,6 +153,14 @@ export class BusinessSettingsComponent implements OnInit {
     }
   }
 
+  onSaveSystem(): void {
+    if (this.systemForm.valid) {
+      this.saveSettings(this.systemForm.value, 'System settings');
+    } else {
+      this.systemForm.markAllAsTouched();
+    }
+  }
+
   private saveSettings(data: any, type: string): void {
     this.isSaving = true;
     this.errorMessage = '';
@@ -126,6 +172,7 @@ export class BusinessSettingsComponent implements OnInit {
       },
       error: (error) => {
         this.errorMessage = error.error?.error || `Failed to update ${type.toLowerCase()}`;
+        console.error(`Save error (${type}):`, error);
       },
       complete: () => {
         this.isSaving = false;

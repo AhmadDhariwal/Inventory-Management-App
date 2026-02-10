@@ -37,8 +37,7 @@ const productschema = new mongoose.Schema({
   organizationId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Organization',
-    required: true,
-    index: true
+    required: true
   },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,

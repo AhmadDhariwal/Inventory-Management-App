@@ -1,38 +1,42 @@
 <div class="settings-page">
   <header class="page-header">
-    <h1 class="page-title">Business Settings</h1>
-    <p class="page-description">Configure your organization's basic information and preferences</p>
+    <div class="header-info">
+      <h1 class="page-title"><i class="fas fa-building"></i> Business Settings</h1>
+      <p class="page-description">Configure your organization's identity, localization, and system preferences</p>
+    </div>
+    <div class="header-status" *ngIf="isSaving">
+      <span class="pulse-icon"></span>
+      Saving changes...
+    </div>
   </header>
 
   <!-- Success/Error Messages -->
   <div class="alert alert-success" *ngIf="successMessage">
     <i class="fas fa-check-circle"></i>
-    {{ successMessage }}
+    <span>{{ successMessage }}</span>
   </div>
   
   <div class="alert alert-error" *ngIf="errorMessage">
     <i class="fas fa-exclamation-circle"></i>
-    {{ errorMessage }}
+    <span>{{ errorMessage }}</span>
   </div>
 
   <div class="settings-sections" *ngIf="!isLoading">
     <!-- Company Information -->
     <section class="settings-card">
       <div class="card-header">
-        <h2 class="card-title">Company Information</h2>
-        <p class="card-description">Basic details about your organization</p>
+        <div class="header-icon"><i class="fas fa-info-circle"></i></div>
+        <div class="header-text">
+          <h2 class="card-title">Company Information</h2>
+          <p class="card-description">Official details and contact information</p>
+        </div>
       </div>
 
       <form [formGroup]="companyForm" (ngSubmit)="onSaveCompany()" class="form" *ngIf="companyForm">
         <div class="form-grid">
           <div class="form-group">
             <label for="companyName" class="form-label">Company Name *</label>
-            <input
-              id="companyName"
-              formControlName="companyName"
-              type="text"
-              class="form-input"
-              placeholder="Enter your company name" />
+            <input id="companyName" formControlName="companyName" type="text" class="form-input" placeholder="Enter your company name" />
             <div class="form-error" *ngIf="companyForm.get('companyName')?.invalid && companyForm.get('companyName')?.touched">
               Company name is required
             </div>
@@ -41,55 +45,40 @@
           <div class="form-group">
             <label for="industry" class="form-label">Industry</label>
             <select id="industry" formControlName="industry" class="form-select">
-              <option value="other">Select Industry</option>
-              <option value="retail">Retail</option>
-              <option value="manufacturing">Manufacturing</option>
-              <option value="wholesale">Wholesale</option>
-              <option value="services">Services</option>
-              <option value="technology">Technology</option>
-              <option value="healthcare">Healthcare</option>
-              <option value="other">Other</option>
+              <option *ngFor="let ind of industries" [value]="ind">{{ ind | titlecase }}</option>
             </select>
           </div>
 
-          <div class="form-group full-width">
-            <label for="address" class="form-label">Business Address</label>
-            <textarea
-              id="address"
-              formControlName="address"
-              class="form-textarea"
-              rows="3"
-              placeholder="Enter your business address"></textarea>
+          <div class="form-group">
+            <label for="taxId" class="form-label">Tax ID / VAT Number</label>
+            <input id="taxId" formControlName="taxId" type="text" class="form-input" placeholder="Enter Tax ID" />
           </div>
 
           <div class="form-group">
             <label for="phone" class="form-label">Phone Number</label>
-            <input
-              id="phone"
-              formControlName="phone"
-              type="tel"
-              class="form-input"
-              placeholder="+1 (555) 123-4567" />
+            <input id="phone" formControlName="phone" type="tel" class="form-input" placeholder="+1 (555) 123-4567" />
           </div>
 
           <div class="form-group">
             <label for="email" class="form-label">Business Email</label>
-            <input
-              id="email"
-              formControlName="email"
-              type="email"
-              class="form-input"
-              placeholder="contact@company.com" />
-            <div class="form-error" *ngIf="companyForm.get('email')?.invalid && companyForm.get('email')?.touched">
-              Please enter a valid email address
-            </div>
+            <input id="email" formControlName="email" type="email" class="form-input" placeholder="contact@company.com" />
+          </div>
+
+          <div class="form-group">
+            <label for="website" class="form-label">Website URL</label>
+            <input id="website" formControlName="website" type="url" class="form-input" placeholder="https://www.company.com" />
+          </div>
+
+          <div class="form-group full-width">
+            <label for="address" class="form-label">Business Address</label>
+            <textarea id="address" formControlName="address" class="form-textarea" rows="2" placeholder="Enter your business address"></textarea>
           </div>
         </div>
 
         <div class="form-actions">
           <button type="submit" class="btn btn-primary" [disabled]="companyForm.invalid || isSaving">
-            <span *ngIf="isSaving">Saving...</span>
-            <span *ngIf="!isSaving">Save Company Information</span>
+            <i class="fas fa-save" *ngIf="!isSaving"></i>
+            <span>{{ isSaving ? 'Saving...' : 'Update Company Info' }}</span>
           </button>
         </div>
       </form>
@@ -98,73 +87,52 @@
     <!-- Regional Settings -->
     <section class="settings-card">
       <div class="card-header">
-        <h2 class="card-title">Regional Settings</h2>
-        <p class="card-description">Configure currency, timezone, and localization preferences</p>
+        <div class="header-icon"><i class="fas fa-globe"></i></div>
+        <div class="header-text">
+          <h2 class="card-title">Regional Settings</h2>
+          <p class="card-description">Localization, currency, and timezone preferences</p>
+        </div>
       </div>
 
       <form [formGroup]="regionalForm" (ngSubmit)="onSaveRegional()" class="form" *ngIf="regionalForm">
         <div class="form-grid">
           <div class="form-group">
-            <label for="currency" class="form-label">Currency *</label>
+            <label for="currency" class="form-label">Main Currency *</label>
             <select id="currency" formControlName="currency" class="form-select">
-              <option value="USD">USD - US Dollar</option>
-              <option value="EUR">EUR - Euro</option>
-              <option value="GBP">GBP - British Pound</option>
-              <option value="PKR">PKR - Pakistani Rupee</option>
-              <option value="INR">INR - Indian Rupee</option>
-              <option value="CAD">CAD - Canadian Dollar</option>
-              <option value="AUD">AUD - Australian Dollar</option>
+              <option *ngFor="let curr of currencies" [value]="curr">{{ curr }}</option>
             </select>
-            <div class="form-error" *ngIf="regionalForm.get('currency')?.invalid && regionalForm.get('currency')?.touched">
-              Currency is required
-            </div>
           </div>
 
           <div class="form-group">
-            <label for="timezone" class="form-label">Timezone *</label>
+            <label for="timezone" class="form-label">Select Timezone *</label>
             <select id="timezone" formControlName="timezone" class="form-select">
-              <option value="UTC">UTC - Coordinated Universal Time</option>
-              <option value="America/New_York">EST - Eastern Time</option>
-              <option value="America/Chicago">CST - Central Time</option>
-              <option value="America/Denver">MST - Mountain Time</option>
-              <option value="America/Los_Angeles">PST - Pacific Time</option>
-              <option value="Europe/London">GMT - Greenwich Mean Time</option>
-              <option value="Europe/Paris">CET - Central European Time</option>
-              <option value="Asia/Karachi">PKT - Pakistan Time</option>
-              <option value="Asia/Kolkata">IST - India Time</option>
+              <option value="UTC">UTC (Universal)</option>
+              <option value="Asia/Karachi">PKT (Pakistan)</option>
+              <option value="Asia/Dubai">GST (Dubai)</option>
+              <option value="Europe/London">GMT (London)</option>
+              <option value="America/New_York">EST (New York)</option>
             </select>
-            <div class="form-error" *ngIf="regionalForm.get('timezone')?.invalid && regionalForm.get('timezone')?.touched">
-              Timezone is required
-            </div>
           </div>
 
           <div class="form-group">
-            <label for="dateFormat" class="form-label">Date Format</label>
+            <label for="dateFormat" class="form-label">Preferred Date Format</label>
             <select id="dateFormat" formControlName="dateFormat" class="form-select">
-              <option value="MM/DD/YYYY">MM/DD/YYYY (US)</option>
-              <option value="DD/MM/YYYY">DD/MM/YYYY (UK)</option>
-              <option value="YYYY-MM-DD">YYYY-MM-DD (ISO)</option>
-              <option value="DD.MM.YYYY">DD.MM.YYYY (German)</option>
+              <option *ngFor="let fmt of dateFormats" [value]="fmt">{{ fmt }}</option>
             </select>
           </div>
 
           <div class="form-group">
-            <label for="language" class="form-label">Language</label>
+            <label for="language" class="form-label">System Language</label>
             <select id="language" formControlName="language" class="form-select">
-              <option value="en">English</option>
-              <option value="es">Spanish</option>
-              <option value="fr">French</option>
-              <option value="de">German</option>
-              <option value="ur">Urdu</option>
-              <option value="hi">Hindi</option>
+              <option *ngFor="let lang of languages" [value]="lang.code">{{ lang.name }}</option>
             </select>
           </div>
         </div>
 
         <div class="form-actions">
           <button type="submit" class="btn btn-primary" [disabled]="regionalForm.invalid || isSaving">
-            <span *ngIf="isSaving">Saving...</span>
-            <span *ngIf="!isSaving">Save Regional Settings</span>
+            <i class="fas fa-save" *ngIf="!isSaving"></i>
+            <span>{{ isSaving ? 'Saving...' : 'Update Regional Settings' }}</span>
           </button>
         </div>
       </form>
@@ -173,14 +141,17 @@
     <!-- Business Preferences -->
     <section class="settings-card">
       <div class="card-header">
-        <h2 class="card-title">Business Preferences</h2>
-        <p class="card-description">Configure operational settings and preferences</p>
+        <div class="header-icon"><i class="fas fa-cog"></i></div>
+        <div class="header-text">
+          <h2 class="card-title">Operational Preferences</h2>
+          <p class="card-description">Fiscal rules and inventory behavior</p>
+        </div>
       </div>
 
       <form [formGroup]="preferencesForm" (ngSubmit)="onSavePreferences()" class="form" *ngIf="preferencesForm">
         <div class="form-grid">
           <div class="form-group">
-            <label for="fiscalYearStart" class="form-label">Fiscal Year Start</label>
+            <label for="fiscalYearStart" class="form-label">Fiscal Year Start Month</label>
             <select id="fiscalYearStart" formControlName="fiscalYearStart" class="form-select">
               <option value="01">January</option>
               <option value="04">April</option>
@@ -190,48 +161,117 @@
           </div>
 
           <div class="form-group">
-            <label for="workingDays" class="form-label">Working Days</label>
-            <select id="workingDays" formControlName="workingDays" class="form-select">
-              <option value="monday-friday">Monday to Friday</option>
-              <option value="monday-saturday">Monday to Saturday</option>
-              <option value="sunday-thursday">Sunday to Thursday</option>
-              <option value="custom">Custom</option>
+            <label for="fiscalYearEnd" class="form-label">Fiscal Year End Month</label>
+            <select id="fiscalYearEnd" formControlName="fiscalYearEnd" class="form-select">
+              <option value="12">December</option>
+              <option value="03">March</option>
+              <option value="06">June</option>
+              <option value="09">September</option>
             </select>
+          </div>
+
+          <div class="form-group">
+            <label for="defaultTaxRate" class="form-label">Default Tax Rate (%)</label>
+            <input id="defaultTaxRate" formControlName="defaultTaxRate" type="number" class="form-input" step="0.01" />
+          </div>
+
+          <div class="form-group">
+            <label for="autoSkuPrefix" class="form-label">Auto SKU Prefix</label>
+            <input id="autoSkuPrefix" formControlName="autoSkuPrefix" type="text" class="form-input" />
           </div>
         </div>
 
-        <div class="form-section">
-          <h3 class="section-title">Business Features</h3>
-          <div class="checkbox-group">
-            <label class="checkbox-item">
+        <div class="feature-toggles">
+          <h3 class="section-title">Module Feature Toggles</h3>
+          <div class="toggle-grid">
+            <label class="toggle-item">
               <input type="checkbox" formControlName="enableMultiLocation" class="form-checkbox">
-              <span class="checkbox-label">Multi-location Support</span>
-              <small class="checkbox-help">Enable inventory management across multiple locations</small>
+              <div class="toggle-content">
+                <span class="toggle-label">Multi-location</span>
+                <span class="toggle-help">Manage stock across multiple warehouses</span>
+              </div>
             </label>
-            <label class="checkbox-item">
+            <label class="toggle-item">
               <input type="checkbox" formControlName="enableTaxCalculation" class="form-checkbox">
-              <span class="checkbox-label">Automatic Tax Calculation</span>
-              <small class="checkbox-help">Automatically calculate taxes on transactions</small>
+              <div class="toggle-content">
+                <span class="toggle-label">Auto Tax</span>
+                <span class="toggle-help">Calculate taxes on checkout automatically</span>
+              </div>
             </label>
-            <label class="checkbox-item">
+            <label class="toggle-item">
               <input type="checkbox" formControlName="enableDiscounts" class="form-checkbox">
-              <span class="checkbox-label">Discount Management</span>
-              <small class="checkbox-help">Enable discount features for sales and purchases</small>
+              <div class="toggle-content">
+                <span class="toggle-label">Discounts</span>
+                <span class="toggle-help">Apply percentage or fixed discounts</span>
+              </div>
             </label>
           </div>
         </div>
 
         <div class="form-actions">
           <button type="submit" class="btn btn-primary" [disabled]="preferencesForm.invalid || isSaving">
-            <span *ngIf="isSaving">Saving...</span>
-            <span *ngIf="!isSaving">Save Preferences</span>
+            <i class="fas fa-save" *ngIf="!isSaving"></i>
+            <span>{{ isSaving ? 'Saving...' : 'Update Preferences' }}</span>
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- System & Brand Settings -->
+    <section class="settings-card">
+      <div class="card-header">
+        <div class="header-icon"><i class="fas fa-vial"></i></div>
+        <div class="header-text">
+          <h2 class="card-title">System & Branding</h2>
+          <p class="card-description">Control system-wide behavior and appearance</p>
+        </div>
+      </div>
+
+      <form [formGroup]="systemForm" (ngSubmit)="onSaveSystem()" class="form" *ngIf="systemForm">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="defaultTheme" class="form-label">Global Theme</label>
+            <select id="defaultTheme" formControlName="defaultTheme" class="form-select">
+              <option value="light">Light Mode</option>
+              <option value="dark">Dark Mode</option>
+              <option value="system">Follow System</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="systemLogo" class="form-label">System Logo URL</label>
+            <input id="systemLogo" formControlName="systemLogo" type="text" class="form-input" placeholder="URL to your logo" />
+          </div>
+
+          <div class="form-group full-width">
+            <label for="emailSignature" class="form-label">Default Email Signature</label>
+            <textarea id="emailSignature" formControlName="emailSignature" class="form-textarea" rows="2" placeholder="Regards, Team..."></textarea>
+          </div>
+        </div>
+
+        <div class="danger-zone">
+          <h3 class="section-title">Maintenance Mode</h3>
+          <div class="toggle-item danger">
+            <input type="checkbox" formControlName="maintenanceMode" class="form-checkbox">
+            <div class="toggle-content">
+              <span class="toggle-label">Enable Maintenance Mode</span>
+              <span class="toggle-help">Only admins will be able to access the system</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" [disabled]="systemForm.invalid || isSaving">
+            <i class="fas fa-save" *ngIf="!isSaving"></i>
+            <span>{{ isSaving ? 'Saving...' : 'Update System' }}</span>
           </button>
         </div>
       </form>
     </section>
   </div>
 
-  <div *ngIf="isLoading" class="loading-container">
-    <div class="loading">Loading business settings...</div>
+  <div *ngIf="isLoading" class="loading-overlay">
+    <div class="spinner"></div>
+    <p>Retrieving organization settings...</p>
   </div>
 </div>

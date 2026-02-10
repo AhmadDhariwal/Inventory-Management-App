@@ -38,8 +38,7 @@ const userschema = new mongoose.Schema({
     organizationId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Organization',
-        required: true,
-        index: true
+        required: true
     },
     // Manager hierarchy - only for users with role 'user'
     managerId: {
@@ -64,6 +63,14 @@ const userschema = new mongoose.Schema({
     lastLogin: {
         type: Date,
         default: null
+    },
+    passwordLastChanged: {
+        type: Date,
+        default: Date.now
+    },
+    twoFactorEnabled: {
+        type: Boolean,
+        default: false
     }
 
 }, { timestamps: true });

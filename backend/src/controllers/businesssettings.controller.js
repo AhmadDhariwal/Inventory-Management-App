@@ -4,7 +4,8 @@ class BusinessSettingsController {
   // GET /api/business-settings
   async getBusinessSettings(req, res) {
     try {
-      const settings = await businessSettingsService.getSettings();
+      const { organizationId } = req;
+      const settings = await businessSettingsService.getSettings(organizationId);
       res.status(200).json({
         success: true,
         data: settings,
@@ -21,7 +22,8 @@ class BusinessSettingsController {
   // PUT /api/business-settings
   async updateBusinessSettings(req, res) {
     try {
-      const settings = await businessSettingsService.updateSettings(req.body);
+      const { organizationId } = req;
+      const settings = await businessSettingsService.updateSettings(organizationId, req.body);
       res.status(200).json({
         success: true,
         data: settings,
@@ -38,7 +40,8 @@ class BusinessSettingsController {
   // GET /api/business-settings/company
   async getCompanyInfo(req, res) {
     try {
-      const companyInfo = await businessSettingsService.getCompanyInfo();
+      const { organizationId } = req;
+      const companyInfo = await businessSettingsService.getCompanyInfo(organizationId);
       res.status(200).json({
         success: true,
         data: companyInfo,
@@ -55,7 +58,8 @@ class BusinessSettingsController {
   // GET /api/business-settings/regional
   async getRegionalSettings(req, res) {
     try {
-      const regionalSettings = await businessSettingsService.getRegionalSettings();
+      const { organizationId } = req;
+      const regionalSettings = await businessSettingsService.getRegionalSettings(organizationId);
       res.status(200).json({
         success: true,
         data: regionalSettings,
@@ -72,7 +76,8 @@ class BusinessSettingsController {
   // GET /api/business-settings/preferences
   async getBusinessPreferences(req, res) {
     try {
-      const preferences = await businessSettingsService.getBusinessPreferences();
+      const { organizationId } = req;
+      const preferences = await businessSettingsService.getBusinessPreferences(organizationId);
       res.status(200).json({
         success: true,
         data: preferences,

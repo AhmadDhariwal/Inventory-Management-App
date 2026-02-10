@@ -63,12 +63,11 @@ const organizationSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'user'
   }
-}, { 
-  timestamps: true 
+}, {
+  timestamps: true
 });
 
 // Index for efficient queries
-organizationSchema.index({ email: 1 });
 organizationSchema.index({ isActive: 1 });
 
 const Organization = mongoose.model('Organization', organizationSchema);

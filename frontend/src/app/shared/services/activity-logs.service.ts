@@ -42,6 +42,7 @@ export interface LogFilters {
   endDate?: string;
   page?: number;
   limit?: number;
+  targetUserId?: string;
 }
 
 export interface LogActivity {
@@ -90,6 +91,11 @@ export class ActivityLogsService {
 
   getLogStats(): Observable<any> {
     return this.http.get(`${this.api}/stats`)
+      .pipe(catchError(this.handleError));
+  }
+
+  deleteLog(id: string): Observable<any> {
+    return this.http.delete(`${this.api}/${id}`)
       .pipe(catchError(this.handleError));
   }
 

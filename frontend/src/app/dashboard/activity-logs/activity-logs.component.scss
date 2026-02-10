@@ -11,14 +11,14 @@
   margin-bottom: 24px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  
+
   .mat-mdc-card-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 24px;
   }
-  
+
   .mat-mdc-card-title {
     display: flex;
     align-items: center;
@@ -26,24 +26,24 @@
     font-size: 28px;
     font-weight: 600;
     margin: 0;
-    
+
     mat-icon {
       font-size: 32px;
       width: 32px;
       height: 32px;
     }
   }
-  
+
   .mat-mdc-card-subtitle {
     font-size: 16px;
     opacity: 0.9;
     margin: 8px 0 0 44px;
   }
-  
+
   .header-actions {
     button {
       color: white;
-      
+
       &:hover {
         background-color: rgba(255, 255, 255, 0.1);
       }
@@ -54,7 +54,7 @@
 // Filters Card
 .filters-card {
   margin-bottom: 24px;
-  
+
   .filters-form {
     .filter-row {
       display: flex;
@@ -62,25 +62,25 @@
       align-items: flex-end;
       margin-bottom: 16px;
       flex-wrap: wrap;
-      
+
       &:last-child {
         margin-bottom: 0;
       }
-      
+
       .mat-mdc-form-field {
         flex: 1;
         min-width: 200px;
-        
+
         &.search-field {
           flex: 2;
           min-width: 300px;
         }
       }
-      
+
       .clear-filters-btn {
         height: 56px;
         min-width: 140px;
-        
+
         mat-icon {
           margin-right: 8px;
         }
@@ -96,7 +96,7 @@
   align-items: center;
   justify-content: center;
   padding: 48px;
-  
+
   p {
     margin-top: 16px;
     color: #666;
@@ -108,16 +108,16 @@
 .error-card {
   background-color: #ffebee;
   border-left: 4px solid #f44336;
-  
+
   .error-content {
     display: flex;
     align-items: center;
     gap: 12px;
-    
+
     mat-icon {
       font-size: 24px;
     }
-    
+
     span {
       flex: 1;
       color: #d32f2f;
@@ -130,11 +130,11 @@
 .table-card {
   .table-container {
     overflow-x: auto;
-    
+
     .activity-table {
       width: 100%;
       background: white;
-      
+
       .mat-mdc-header-cell {
         background-color: #f8f9fa;
         font-weight: 600;
@@ -142,17 +142,17 @@
         border-bottom: 2px solid #dee2e6;
         padding: 16px;
       }
-      
+
       .mat-mdc-cell {
         padding: 16px;
         border-bottom: 1px solid #e9ecef;
       }
-      
+
       .mat-mdc-row {
         &:hover {
           background-color: #f8f9fa;
         }
-        
+
         &:nth-child(even) {
           background-color: #fdfdfd;
         }
@@ -166,7 +166,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  
+
   .user-avatar {
     width: 40px;
     height: 40px;
@@ -179,17 +179,29 @@
     font-weight: 600;
     font-size: 16px;
   }
-  
+
   .user-details {
     .user-name {
       font-weight: 500;
       color: #212529;
       margin-bottom: 2px;
     }
-    
+
     .user-email {
       font-size: 12px;
       color: #6c757d;
+    }
+
+    .user-role-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      background-color: #f1f3f5;
+      color: #495057;
+      margin-top: 4px;
     }
   }
 }
@@ -198,17 +210,17 @@
 .mat-mdc-chip {
   font-weight: 500;
   font-size: 12px;
-  
+
   &.mat-primary {
     background-color: #e3f2fd;
     color: #1976d2;
   }
-  
+
   &.mat-accent {
     background-color: #f3e5f5;
     color: #7b1fa2;
   }
-  
+
   &.mat-warn {
     background-color: #ffebee;
     color: #d32f2f;
@@ -250,7 +262,7 @@
     color: #495057;
     margin-bottom: 2px;
   }
-  
+
   .time {
     font-size: 12px;
     color: #6c757d;
@@ -262,7 +274,7 @@
   text-align: center;
   padding: 48px 24px;
   color: #6c757d;
-  
+
   mat-icon {
     font-size: 64px;
     width: 64px;
@@ -270,13 +282,13 @@
     margin-bottom: 16px;
     opacity: 0.5;
   }
-  
+
   h3 {
     margin: 0 0 8px 0;
     font-size: 20px;
     font-weight: 500;
   }
-  
+
   p {
     margin: 0;
     font-size: 14px;
@@ -296,7 +308,7 @@
     background-color: #f44336 !important;
     color: white !important;
   }
-  
+
   .success-snackbar {
     background-color: #4caf50 !important;
     color: white !important;
@@ -308,32 +320,33 @@
   .activity-logs-container {
     padding: 16px;
   }
-  
+
   .filters-form .filter-row {
     flex-direction: column;
-    
+
     .mat-mdc-form-field {
       width: 100%;
       min-width: unset;
     }
-    
+
     .clear-filters-btn {
       width: 100%;
     }
   }
-  
+
   .header-card .mat-mdc-card-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 16px;
   }
-  
+
   .header-actions {
     align-self: flex-end;
   }
-  
+
   .table-container {
     .activity-table {
+
       .mat-mdc-header-cell,
       .mat-mdc-cell {
         padding: 8px;
@@ -341,7 +354,7 @@
       }
     }
   }
-  
+
   .user-info {
     .user-avatar {
       width: 32px;
@@ -355,17 +368,17 @@
   .activity-logs-container {
     padding: 12px;
   }
-  
+
   .header-card .mat-mdc-card-title {
     font-size: 24px;
-    
+
     mat-icon {
       font-size: 28px;
       width: 28px;
       height: 28px;
     }
   }
-  
+
   .description {
     max-width: 120px;
   }

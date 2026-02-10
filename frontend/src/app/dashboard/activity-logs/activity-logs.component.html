@@ -47,6 +47,16 @@
               </mat-option>
             </mat-select>
           </mat-form-field>
+
+          <mat-form-field appearance="outline" *ngIf="isAdmin">
+            <mat-label>User</mat-label>
+            <mat-select formControlName="targetUserId">
+              <mat-option value="">All Users</mat-option>
+              <mat-option *ngFor="let user of userOptions" [value]="user._id">
+                {{ user.name }} ({{ user.role }})
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
         </div>
 
         <div class="filter-row">
@@ -64,7 +74,7 @@
             <mat-datepicker #endPicker></mat-datepicker>
           </mat-form-field>
 
-          <button mat-stroked-button (click)="clearFilters()" class="clear-filters-btn">
+          <button mat-stroked-button (click)="$event.preventDefault(); clearFilters()" class="clear-filters-btn">
             <mat-icon>clear</mat-icon>
             Clear Filters
           </button>
@@ -104,6 +114,7 @@
                 <div class="user-details">
                   <div class="user-name">{{ log.user?.name || 'Unknown' }}</div>
                   <div class="user-email">{{ log.user?.email || '' }}</div>
+                  <div class="user-role-badge" *ngIf="log.user?.role">{{ log.user.role }}</div>
                 </div>
               </div>
             </td>
@@ -156,6 +167,16 @@
             </td>
           </ng-container>
 
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let log">
+              <button mat-icon-button color="warn" (click)="deleteLog(log._id)" matTooltip="Delete log">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
           <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
         </table>
@@ -179,4 +200,16 @@
       </mat-paginator>
     </mat-card-content>
   </mat-card>
+
+  <!-- Delete Confirmation Modal -->
+  <app-confirm-modal
+    [isVisible]="showDeleteModal"
+    title="Delete Activity Log"
+    message="Are you sure you want to delete this activity log? This action cannot be undone."
+    confirmText="Delete"
+    cancelText="Cancel"
+    type="warning"
+    (confirm)="confirmDelete()"
+    (cancel)="cancelDelete()">
+  </app-confirm-modal>
 </div>
