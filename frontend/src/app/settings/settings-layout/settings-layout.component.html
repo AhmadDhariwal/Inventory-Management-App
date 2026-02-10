@@ -15,34 +15,34 @@
         <a routerLink="account" routerLinkActive="active" class="nav-item">
           <span>Account Settings</span>
         </a>
-        <a *ngIf="hasAnyRole(['admin', 'manager'])" routerLink="business" routerLinkActive="active" class="nav-item">
+        <a href="javascript:void(0)" *ngIf="hasAnyRole(['admin', 'manager'])" (click)="onRestrictedAccess('Business Settings')" routerLinkActive="active" class="nav-item">
           <span>Business Settings</span>
         </a>
       </div>
       
       <div class="nav-section" *ngIf="hasAnyRole(['admin', 'manager'])">
         <h3 class="nav-section-title">Operations</h3>
-        <a routerLink="inventory" routerLinkActive="active" class="nav-item">
+        <a href="javascript:void(0)" (click)="onRestrictedAccess('Inventory Settings')" routerLinkActive="active" class="nav-item">
           <span>Inventory Settings</span>
         </a>
       </div>
       
       <div class="nav-section">
         <h3 class="nav-section-title">Security & Privacy</h3>
-        <a *ngIf="hasRole('admin')" routerLink="security" routerLinkActive="active" class="nav-item">
+        <a href="javascript:void(0)" *ngIf="hasRole('admin')" (click)="onRestrictedAccess('Security Settings')" routerLinkActive="active" class="nav-item">
           <span>Security Settings</span>
         </a>
-        <a routerLink="notifications" routerLinkActive="active" class="nav-item">
+        <a href="javascript:void(0)" (click)="onRestrictedAccess('Notifications')" routerLinkActive="active" class="nav-item">
           <span>Notifications</span>
         </a>
       </div>
       
       <div class="nav-section" *ngIf="hasRole('admin')">
         <h3 class="nav-section-title">Administration</h3>
-        <a routerLink="roles" routerLinkActive="active" class="nav-item">
+        <a href="javascript:void(0)" (click)="onRestrictedAccess('User Roles')" routerLinkActive="active" class="nav-item">
           <span>User Roles</span>
         </a>
-        <a routerLink="users" routerLinkActive="active" class="nav-item">
+        <a href="javascript:void(0)" (click)="onRestrictedAccess('Users')" routerLinkActive="active" class="nav-item">
           <span>Users</span>
         </a>
       </div>
@@ -53,3 +53,15 @@
     <router-outlet></router-outlet>
   </main>
 </div>
+
+<!-- Custom Restriction Modal -->
+<app-confirm-modal
+  [isVisible]="showRestrictionModal"
+  title="Access Restricted"
+  [message]="'You are not eligible for ' + restrictionFeature + ' or cannot access it. You only have access to Account Settings.'"
+  confirmText="Stay on Account Settings"
+  cancelText="Close"
+  type="info"
+  (confirm)="closeRestrictionModal()"
+  (cancel)="closeRestrictionModal()"
+></app-confirm-modal>

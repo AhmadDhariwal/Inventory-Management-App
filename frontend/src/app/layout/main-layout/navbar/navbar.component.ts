@@ -11,6 +11,7 @@ import { ThemeService } from '../../../shared/services/theme.service';
 import { BarcodeScannerComponent } from '../../../shared/components/barcode-scanner/barcode-scanner.component';
 import { NotificationService, AppNotification } from '../../../shared/services/notification.service';
 import { ConfigService } from '../../../shared/services/config.service';
+import { ConfirmModalComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 
 interface SearchSuggestion {
   _id: string;
@@ -21,7 +22,7 @@ interface SearchSuggestion {
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, BarcodeScannerComponent],
+  imports: [CommonModule, FormsModule, RouterModule, BarcodeScannerComponent, ConfirmModalComponent],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.scss'
 })
@@ -41,6 +42,9 @@ export class NavbarComponent implements OnInit, OnDestroy {
   showNotifications = false;
   notifications: AppNotification[] = [];
   organization: Organization | null = null;
+  
+  showRestrictionModal = false;
+  restrictionFeature = '';
 
   private destroy$ = new Subject<void>();
   private searchSubject = new Subject<string>();
@@ -261,5 +265,19 @@ export class NavbarComponent implements OnInit, OnDestroy {
   onlogout(): void {
     this.authservice.logout();
     this.router.navigate(['/']);
+  }
+
+  onRestrictedAccess(feature: string): void {
+    this.restrictionFeature = feature;
+    this.showRestrictionModal = true;
+  }
+
+  closeRestrictionModal(): void {
+    this.showRestrictionModal = false;
+  }
+
+  navigateToAccountSettings(): void {
+    this.closeRestrictionModal();
+    this.router.navigate(['/settings/account']);
   }
 }

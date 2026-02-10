@@ -3,17 +3,17 @@ const router = express.Router();
 const settingsController = require('../controllers/settings.controller');
 const { verifytoken, restrictto } = require('../middleware/auth.middleware');
 
-// Security Settings - User can view/update their own
-router.get('/security', verifytoken, settingsController.getSecuritySettings);
-router.put('/security', verifytoken, settingsController.updateSecuritySettings);
+// Security Settings - restricted to admin/manager
+router.get('/security', verifytoken, restrictto(['admin', 'manager']), settingsController.getSecuritySettings);
+router.put('/security', verifytoken, restrictto(['admin', 'manager']), settingsController.updateSecuritySettings);
 
-// Notification Settings - User can view/update their own
-router.get('/notifications', verifytoken, settingsController.getNotificationSettings);
-router.put('/notifications', verifytoken, settingsController.updateNotificationSettings);
+// Notification Settings - restricted to admin/manager
+router.get('/notifications', verifytoken, restrictto(['admin', 'manager']), settingsController.getNotificationSettings);
+router.put('/notifications', verifytoken, restrictto(['admin', 'manager']), settingsController.updateNotificationSettings);
 
-// Inventory Settings - User can view/update their own
-router.get('/inventory', verifytoken, settingsController.getInventorySettings);
-router.put('/inventory', verifytoken, settingsController.updateInventorySettings);
+// Inventory Settings - restricted to admin/manager
+router.get('/inventory', verifytoken, restrictto(['admin', 'manager']), settingsController.getInventorySettings);
+router.put('/inventory', verifytoken, restrictto(['admin', 'manager']), settingsController.updateInventorySettings);
 
 // Business Settings - Admin only (global settings)
 router.get('/business', verifytoken, restrictto(['admin']), settingsController.getBusinessSettings);
