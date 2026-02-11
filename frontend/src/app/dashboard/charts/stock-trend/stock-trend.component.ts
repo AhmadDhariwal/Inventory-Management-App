@@ -7,11 +7,13 @@ import {
   ViewChild,
   AfterViewInit
 } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import Chart from 'chart.js/auto';
 
 @Component({
   selector: 'app-stock-trend',
   standalone: true,
+  imports: [CommonModule],
   templateUrl: './stock-trend.component.html',
   styleUrls: ['./stock-trend.component.scss']
 })
@@ -49,11 +51,11 @@ export class StockTrendComponent implements OnChanges, AfterViewInit {
     const netMovement: number[] = [];
 
     this.trend.forEach(day => {
-      const date = new Date(day._id);
-      labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+      const date = day.date || day._id;
+      labels.push(new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
 
-      const inQty = day.movements?.find((m: any) => m.type === 'IN')?.quantity || 0;
-      const outQty = day.movements?.find((m: any) => m.type === 'OUT')?.quantity || 0;
+      const inQty = day.inQty || 0;
+      const outQty = day.outQty || 0;
       const net = inQty - outQty;
 
       stockIn.push(inQty);

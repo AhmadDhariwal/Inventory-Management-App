@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, OnInit, inject, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import { Component, EventEmitter, Output, OnInit, inject, OnDestroy, ViewChild, ElementRef, HostListener } from '@angular/core';
 import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -102,8 +102,25 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    // Close all dropdowns when clicking outside
+    const target = event.target as HTMLElement;
+    if (!target.closest('.navbar__user-menu') && !target.closest('.notifications-wrapper')) {
+      this.closeAllDropdowns();
+    }
+  }
+
   getUserRole(): string {
     return this.authservice.getUserRole() || 'user';
+  }
+
+  hasRole(role: string): boolean {
+    return this.authservice.hasRole(role);
+  }
+
+  hasAnyRole(roles: string[]): boolean {
+    return this.authservice.hasAnyRole(roles);
   }
 
   getCurrentUser() {
@@ -237,12 +254,15 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   markAllAsRead(): void {
-    this.notificationService.markAllAsRead();
+    this.notificationService.markAllAsRead().subscribe();
   }
 
   onNotificationClick(notification: AppNotification): void {
-    // Handle specific notification navigation if needed
+    if (!notification.read) {
+      this.notificationService.markAsRead(notification._id).subscribe();
+    }
     this.showNotifications = false;
+    // Optional: navigate based on notification type
   }
 
   private getPageTitle(url: string): string {
@@ -260,6 +280,31 @@ export class NavbarComponent implements OnInit, OnDestroy {
     if (url.includes('/reports')) return 'Reports';
     if (url.includes('/settings')) return 'Settings';
     return 'Dashboard';
+  }
+
+  getTypeIcon(type: string): string {
+    const icons: any = {
+      'LOW_STOCK': 'fa-exclamation-triangle',
+      'PURCHASE_APPROVAL': 'fa-file-invoice-dollar',
+      'STOCK_MOVEMENT': 'fa-exchange-alt',
+      'ORDER_STATUS': 'fa-shopping-cart',
+      'SYSTEM': 'fa-cog',
+      'INFO': 'fa-info-circle',
+      'SUCCESS': 'fa-check-circle',
+      'WARNING': 'fa-exclamation-circle'
+    };
+    return icons[type] || 'fa-bell';
+  }
+
+  getTypeClass(type: string): string {
+    const classes: any = {
+      'LOW_STOCK': 'type-error',
+      'PURCHASE_APPROVAL': 'type-info',
+      'STOCK_MOVEMENT': 'type-success',
+      'ORDER_STATUS': 'type-info',
+      'SYSTEM': 'type-warning'
+    };
+    return classes[type] || '';
   }
 
   onlogout(): void {

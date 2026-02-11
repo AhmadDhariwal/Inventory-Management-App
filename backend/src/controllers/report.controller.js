@@ -4,7 +4,8 @@ const Supplier = require("../models/supplier");
 
 const getstockreport = async (req, res) => {
   try {
-    const report = await reportservice.getstockreport();
+    const { organizationId } = req;
+    const report = await reportservice.getstockreport(organizationId);
     res.status(200).json(report);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -13,7 +14,8 @@ const getstockreport = async (req, res) => {
 
 const getstockmovementreport = async (req, res) => {
   try {
-    const report = await reportservice.getstockmovementreport();
+    const { organizationId } = req;
+    const report = await reportservice.getstockmovementreport(organizationId);
     res.status(200).json(report);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -22,7 +24,8 @@ const getstockmovementreport = async (req, res) => {
 
 const exportStockMovementsCSV = async (req, res) => {
   try {
-    const csv = await reportservice.exportStockMovementsCSV(req.query);
+    const { organizationId } = req;
+    const csv = await reportservice.exportStockMovementsCSV({ ...req.query, organizationId });
     res.setHeader('Content-Type', 'text/csv');
     res.setHeader('Content-Disposition', 'attachment; filename=stock-movements.csv');
     res.send(csv);
@@ -33,7 +36,8 @@ const exportStockMovementsCSV = async (req, res) => {
 
 const exportStockMovementsExcel = async (req, res) => {
   try {
-    const buffer = await reportservice.exportStockMovementsExcel(req.query);
+    const { organizationId } = req;
+    const buffer = await reportservice.exportStockMovementsExcel({ ...req.query, organizationId });
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     res.setHeader('Content-Disposition', 'attachment; filename=stock-movements.xlsx');
     res.send(buffer);
@@ -44,7 +48,8 @@ const exportStockMovementsExcel = async (req, res) => {
 
 const exportStockSummaryCSV = async (req, res) => {
   try {
-    const csv = await reportservice.exportStockSummaryCSV(req.query);
+    const { organizationId } = req;
+    const csv = await reportservice.exportStockSummaryCSV({ ...req.query, organizationId });
     res.setHeader('Content-Type', 'text/csv');
     res.setHeader('Content-Disposition', 'attachment; filename=stock-summary.csv');
     res.send(csv);
@@ -55,7 +60,8 @@ const exportStockSummaryCSV = async (req, res) => {
 
 const exportStockSummaryExcel = async (req, res) => {
   try {
-    const buffer = await reportservice.exportStockSummaryExcel(req.query);
+    const { organizationId } = req;
+    const buffer = await reportservice.exportStockSummaryExcel({ ...req.query, organizationId });
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     res.setHeader('Content-Disposition', 'attachment; filename=stock-summary.xlsx');
     res.send(buffer);
@@ -66,7 +72,8 @@ const exportStockSummaryExcel = async (req, res) => {
 
 const getpurchasereport = async (req, res) => {
   try {
-    const report = await reportservice.getpurchasereport();
+    const { organizationId } = req;
+    const report = await reportservice.getpurchasereport(organizationId);
     res.status(200).json(report);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -75,7 +82,8 @@ const getpurchasereport = async (req, res) => {
 
 const getallsuppliers = async (req, res) => {
   try {
-    const suppliers = await Supplier.find({ isActive: true })
+    const { organizationId } = req;
+    const suppliers = await Supplier.find({ organizationId, isActive: true })
       .select('_id name')
       .sort({ name: 1 });
     res.status(200).json({
@@ -127,7 +135,8 @@ const getlowstockreport = async (req, res) => {
 
 const exportPurchaseOrdersCSV = async (req, res) => {
   try {
-    const csv = await reportservice.exportPurchaseOrdersCSV(req.query);
+    const { organizationId } = req;
+    const csv = await reportservice.exportPurchaseOrdersCSV({ ...req.query, organizationId });
     res.setHeader('Content-Type', 'text/csv');
     res.setHeader('Content-Disposition', 'attachment; filename=purchase-orders.csv');
     res.send(csv);
@@ -138,7 +147,8 @@ const exportPurchaseOrdersCSV = async (req, res) => {
 
 const exportPurchaseOrdersExcel = async (req, res) => {
   try {
-    const buffer = await reportservice.exportPurchaseOrdersExcel(req.query);
+    const { organizationId } = req;
+    const buffer = await reportservice.exportPurchaseOrdersExcel({ ...req.query, organizationId });
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     res.setHeader('Content-Disposition', 'attachment; filename=purchase-orders.xlsx');
     res.send(buffer);
@@ -149,8 +159,9 @@ const exportPurchaseOrdersExcel = async (req, res) => {
 
 const getproductreport = async (req, res) => {
   try {
+    const { organizationId } = req;
     const { category } = req.query;
-    const data = await reportservice.getproductreport(category);
+    const data = await reportservice.getproductreport(category, organizationId);
 
     res.status(200).json(data);
   } catch (error) {

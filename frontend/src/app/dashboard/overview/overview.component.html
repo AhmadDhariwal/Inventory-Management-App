@@ -186,7 +186,7 @@
     </section>
 
     <!-- Data Visuals -->
-    <div class="charts-container">
+    <div class="charts-container" *ngIf="stats.totalproducts > 0 || stats.stockInToday > 0 || stats.stockOutToday > 0 || stats.totalpurchases > 0; else noDataMessage">
       <section class="charts-section">
         <h2 class="section-title">Inventory Fluctuations</h2>
         <div class="single-chart">
@@ -208,6 +208,24 @@
         </div>
       </section>
     </div>
+
+    <ng-template #noDataMessage>
+      <div class="empty-state-welcome animate-fade-in">
+        <div class="empty-state-card">
+          <div class="empty-icon"><i class="fas fa-rocket"></i></div>
+          <h2>Welcome to your new Dashboard</h2>
+          <p>It looks like you're just getting started. Add your first products and record some stock movements to see real-time analytics here.</p>
+          <div class="empty-actions">
+            <button class="primary-action" routerLink="/products/new">
+              <i class="fas fa-plus"></i> Add First Product
+            </button>
+            <button class="secondary-action" routerLink="/suppliers/add">
+              <i class="fas fa-truck"></i> Connect Supplier
+            </button>
+          </div>
+        </div>
+      </div>
+    </ng-template>
 
     <!-- AI Forecasting Widget -->
     <section class="widget-section">

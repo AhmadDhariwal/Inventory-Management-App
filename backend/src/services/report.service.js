@@ -5,18 +5,36 @@ const User = require("../models/user");
 const Warehouse = require("../models/warehouse");
 const PurchaseOrder = require("../models/purchaseorder");
 const mongoose = require("mongoose");
+const { getOrganizationFilter } = require('../utils/rbac.helpers');
 
 
-const getstockreport = async () => {
-  const products = await Product.find()
+const getstockreport = async (organizationId) => {
+  const products = await Product.find({ organizationId })
     .select("name sku stockQuantity price")
     .lean();
 
   return products;
 };
 
-const getstockmovementreport = async () => {
-  return await StockMovement.find()
+const getstockmovementreport = async (organizationId, user = null) => {
+  // Build role-based filter
+  let assignedUsers = [];
+  if (user && user.role === 'manager') {
+    const userDoc = await User.findById(user.userid);
+    assignedUsers = userDoc?.assignedUsers || [];
+  }
+
+  const filter = { organizationId: new mongoose.Types.ObjectId(organizationId) };
+
+  // Apply role-based filtering on 'user' field
+  if (user && user.role !== 'admin') {
+    const userIds = user.role === 'manager'
+      ? [user.userid, ...assignedUsers]
+      : [user.userid];
+    filter.user = { $in: userIds.map(id => new mongoose.Types.ObjectId(id)) };
+  }
+
+  return await StockMovement.find(filter)
     .populate("product", "name sku")
     .populate("warehouse", "name")
     .populate("user", "name email")
@@ -24,8 +42,8 @@ const getstockmovementreport = async () => {
     .lean();
 };
 
-const getpurchasereport = async () => {
-  return await PurchaseOrder.find()
+const getpurchasereport = async (organizationId) => {
+  return await PurchaseOrder.find({ organizationId })
     .populate("supplier", "name email phone")
     .populate("items.product", "name sku")
     .sort({ createdAt: -1 })
@@ -229,10 +247,12 @@ const getstocklevelsreport = async (organizationId) => {
 // };
 const getlowstockreport = async (organizationId) => {
   const query = {
-    $expr: { $and: [
-      { $gt: ["$minStock", 0] },
-      { $lte: ["$quantity", "$minStock"] }
-    ]}
+    $expr: {
+      $and: [
+        { $gt: ["$minStock", 0] },
+        { $lte: ["$quantity", "$minStock"] }
+      ]
+    }
   };
 
   if (organizationId) {
@@ -304,8 +324,27 @@ const getstocksummary = async (organizationId) => {
 };
 
 
-const exportStockMovementsCSV = async (filters = {}) => {
-  const movements = await StockMovement.find()
+const exportStockMovementsCSV = async (filters = {}, user = null) => {
+  const { organizationId } = filters;
+
+  // Build role-based filter
+  let assignedUsers = [];
+  if (user && user.role === 'manager') {
+    const userDoc = await User.findById(user.userid);
+    assignedUsers = userDoc?.assignedUsers || [];
+  }
+
+  const filter = { organizationId: new mongoose.Types.ObjectId(organizationId) };
+
+  // Apply role-based filtering on 'user' field
+  if (user && user.role !== 'admin') {
+    const userIds = user.role === 'manager'
+      ? [user.userid, ...assignedUsers]
+      : [user.userid];
+    filter.user = { $in: userIds.map(id => new mongoose.Types.ObjectId(id)) };
+  }
+
+  const movements = await StockMovement.find(filter)
     .populate("product", "name sku")
     .populate("warehouse", "name")
     .populate("user", "name")
@@ -320,8 +359,27 @@ const exportStockMovementsCSV = async (filters = {}) => {
   return csvHeader + csvRows;
 };
 
-const exportStockMovementsExcel = async (filters = {}) => {
-  const movements = await StockMovement.find()
+const exportStockMovementsExcel = async (filters = {}, user = null) => {
+  const { organizationId } = filters;
+
+  // Build role-based filter
+  let assignedUsers = [];
+  if (user && user.role === 'manager') {
+    const userDoc = await User.findById(user.userid);
+    assignedUsers = userDoc?.assignedUsers || [];
+  }
+
+  const filter = { organizationId: new mongoose.Types.ObjectId(organizationId) };
+
+  // Apply role-based filtering on 'user' field
+  if (user && user.role !== 'admin') {
+    const userIds = user.role === 'manager'
+      ? [user.userid, ...assignedUsers]
+      : [user.userid];
+    filter.user = { $in: userIds.map(id => new mongoose.Types.ObjectId(id)) };
+  }
+
+  const movements = await StockMovement.find(filter)
     .populate("product", "name sku")
     .populate("warehouse", "name")
     .populate("user", "name")
@@ -338,7 +396,7 @@ const exportStockMovementsExcel = async (filters = {}) => {
 };
 
 const exportStockSummaryCSV = async (filters = {}) => {
-  const summary = await getstocksummary();
+  const summary = await getstocksummary(filters.organizationId);
 
   const csvContent = `Metric,Value
 Total Products,${summary.totalProducts}
@@ -351,7 +409,7 @@ Inventory Value,${summary.inventoryValue}`;
 };
 
 const exportStockSummaryExcel = async (filters = {}) => {
-  const summary = await getstocksummary();
+  const summary = await getstocksummary(filters.organizationId);
 
   const csvContent = `Metric,Value
 Total Products,${summary.totalProducts}
@@ -364,7 +422,8 @@ Inventory Value,${summary.inventoryValue}`;
 };
 
 const exportPurchaseOrdersCSV = async (filters = {}) => {
-  const orders = await PurchaseOrder.find()
+  const { organizationId } = filters;
+  const orders = await PurchaseOrder.find({ organizationId })
     .populate("supplier", "name email")
     .populate("items.product", "name sku")
     .sort({ createdAt: -1 })
@@ -380,7 +439,8 @@ const exportPurchaseOrdersCSV = async (filters = {}) => {
 };
 
 const exportPurchaseOrdersExcel = async (filters = {}) => {
-  const orders = await PurchaseOrder.find()
+  const { organizationId } = filters;
+  const orders = await PurchaseOrder.find({ organizationId })
     .populate("supplier", "name email")
     .populate("items.product", "name sku")
     .sort({ createdAt: -1 })
@@ -395,14 +455,17 @@ const exportPurchaseOrdersExcel = async (filters = {}) => {
   return Buffer.from(csvHeader + csvRows);
 };
 
-const getproductreport = async (category) => {
+const getproductreport = async (category, organizationId) => {
   // Get all products first
-  const products = await Product.find()
+  const products = await Product.find({ organizationId })
     .populate('category', 'name')
     .lean();
 
   // Calculate stock levels from stock movements
   const stockAggregation = await StockMovement.aggregate([
+    {
+      $match: { organizationId: new mongoose.Types.ObjectId(organizationId) }
+    },
     {
       $group: {
         _id: {

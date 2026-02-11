@@ -15,8 +15,14 @@ const init = (server, allowedOrigins) => {
         console.log('New client connected:', socket.id);
 
         socket.on('join', (room) => {
-            socket.join(room);
-            console.log(`Client ${socket.id} joined room: ${room}`);
+            // Room is organization ID
+            socket.join(`org_${room}`);
+            console.log(`Client ${socket.id} joined organization room: org_${room}`);
+        });
+
+        socket.on('join-user', (userId) => {
+            socket.join(`user_${userId}`);
+            console.log(`Client ${socket.id} joined user room: user_${userId}`);
         });
 
         socket.on('disconnect', () => {

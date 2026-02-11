@@ -25,7 +25,7 @@ export class SocketService implements OnDestroy {
     this.socket.on('connect', () => {
       console.log('Socket connected');
       this.connected$.next(true);
-      this.joinOrganizationRoom();
+      this.joinRooms();
     });
 
     this.socket.on('disconnect', () => {
@@ -50,16 +50,25 @@ export class SocketService implements OnDestroy {
 
     this.authService.currentUser$.subscribe(user => {
       if (user && user.organizationId && this.socket.connected) {
-        this.joinOrganizationRoom();
+        this.joinRooms();
       }
     });
   }
 
-  private joinOrganizationRoom(): void {
+  private joinRooms(): void {
     const orgId = this.authService.getOrganizationId();
-    if (orgId && this.socket.connected) {
-      this.socket.emit('join', orgId);
-      console.log('Joined organization room:', orgId);
+    const user = this.authService.getCurrentUser();
+    
+    if (this.socket.connected) {
+      if (orgId) {
+        this.socket.emit('join', orgId);
+        console.log('Joined organization room:', orgId);
+      }
+      
+      if (user && user._id) {
+        this.socket.emit('join-user', user._id);
+        console.log('Joined user room:', user._id);
+      }
     }
   }
 

@@ -89,54 +89,36 @@ export class OverviewComponent implements OnInit, OnDestroy {
     // Load stock trend with quality fallback
     this.dashboardService.getStockTrend(30).subscribe({
       next: data => {
-        if (data && data.length > 0) {
-          this.stockTrendData = data;
-          console.log(' Stock trend loaded from API:', data.length, 'days');
-        } else {
-          this.stockTrendData = this.generateMockStockData();
-          console.log(' Using mock stock trend data');
-        }
+        this.stockTrendData = (data && data.length > 0) ? data : [];
+        console.log(' Stock trend loaded:', this.stockTrendData.length, 'days');
       },
       error: err => {
         console.error(' Stock trend API error:', err);
-        this.stockTrendData = this.generateMockStockData();
-        console.log(' Fallback to mock stock trend data');
+        this.stockTrendData = [];
       }
     });
 
     // Load purchase trend with quality fallback
     this.dashboardService.getPurchaseTrend(30).subscribe({
       next: data => {
-        if (data && data.length > 0) {
-          this.purchaseTrendData = data;
-          console.log(' Purchase trend loaded from API:', data.length, 'days');
-        } else {
-          this.purchaseTrendData = this.generateMockPurchaseData();
-          console.log('Using mock purchase trend data');
-        }
+        this.purchaseTrendData = (data && data.length > 0) ? data : [];
+        console.log(' Purchase trend loaded:', this.purchaseTrendData.length, 'days');
       },
       error: err => {
         console.error(' Purchase trend API error:', err);
-        this.purchaseTrendData = this.generateMockPurchaseData();
-        console.log(' Fallback to mock purchase trend data');
+        this.purchaseTrendData = [];
       }
     });
 
     // Load sales trend with quality fallback
     this.dashboardService.getSalesTrend(30).subscribe({
       next: data => {
-        if (data && data.length > 0) {
-          this.salesTrendData = data;
-          console.log(' Sales trend loaded from API:', data.length, 'days');
-        } else {
-          this.salesTrendData = this.generateMockSalesData();
-          console.log(' Using mock sales trend data');
-        }
+        this.salesTrendData = (data && data.length > 0) ? data : [];
+        console.log(' Sales trend loaded:', this.salesTrendData.length, 'days');
       },
       error: err => {
         console.error(' Sales trend API error:', err);
-        this.salesTrendData = this.generateMockSalesData();
-        console.log('Fallback to mock sales trend data');
+        this.salesTrendData = [];
       }
     });
   }
@@ -171,120 +153,5 @@ export class OverviewComponent implements OnInit, OnDestroy {
 
   trackByProductId(index: number, item: any): any {
     return item.productName + item.warehouseName;
-  }
-
-  generateMockTrendData(): any[] {
-    const data = [];
-    const today = new Date();
-
-    for (let i = 29; i >= 0; i--) {
-      const date = new Date(today);
-      date.setDate(date.getDate() - i);
-
-      // Generate realistic stock movement data
-      const baseIn = 100;
-      const baseOut = 80;
-      const variation = 50;
-
-      data.push({
-        _id: date.toISOString().split('T')[0],
-        movements: [
-          {
-            type: 'IN',
-            quantity: Math.floor(baseIn + (Math.random() - 0.5) * variation)
-          },
-          {
-            type: 'OUT',
-            quantity: Math.floor(baseOut + (Math.random() - 0.5) * variation)
-          }
-        ]
-      });
-    }
-
-    return data;
-  }
-
-  generateMockStockData(): any[] {
-    const data = [];
-    const today = new Date();
-
-    for (let i = 29; i >= 0; i--) {
-      const date = new Date(today);
-      date.setDate(date.getDate() - i);
-
-      // Generate realistic stock movement with trends
-      const dayOfWeek = date.getDay();
-      const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
-
-      const baseIn = isWeekend ? 60 : 120;
-      const baseOut = isWeekend ? 40 : 100;
-      const variation = 40;
-
-      data.push({
-        _id: date.toISOString().split('T')[0],
-        movements: [
-          {
-            type: 'IN',
-            quantity: Math.max(0, Math.floor(baseIn + (Math.random() - 0.5) * variation))
-          },
-          {
-            type: 'OUT',
-            quantity: Math.max(0, Math.floor(baseOut + (Math.random() - 0.5) * variation))
-          }
-        ]
-      });
-    }
-
-    return data;
-  }
-
-  generateMockPurchaseData(): any[] {
-    const data = [];
-    const today = new Date();
-
-    for (let i = 29; i >= 0; i--) {
-      const date = new Date(today);
-      date.setDate(date.getDate() - i);
-
-      // Generate realistic purchase patterns
-      const dayOfWeek = date.getDay();
-      const isWeekday = dayOfWeek >= 1 && dayOfWeek <= 5;
-
-      const baseAmount = isWeekday ? 3000 : 1500;
-      const baseQuantity = isWeekday ? 150 : 75;
-
-      data.push({
-        _id: date.toISOString().split('T')[0],
-        totalAmount: Math.floor(baseAmount + (Math.random() - 0.5) * 2000),
-        totalQuantity: Math.floor(baseQuantity + (Math.random() - 0.5) * 100)
-      });
-    }
-
-    return data;
-  }
-
-  generateMockSalesData(): any[] {
-    const data = [];
-    const today = new Date();
-
-    for (let i = 29; i >= 0; i--) {
-      const date = new Date(today);
-      date.setDate(date.getDate() - i);
-
-      // Generate realistic sales patterns with weekly trends
-      const dayOfWeek = date.getDay();
-      const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
-
-      const baseRevenue = isWeekend ? 6000 : 4500;
-      const baseOrders = isWeekend ? 35 : 25;
-
-      data.push({
-        _id: date.toISOString().split('T')[0],
-        totalRevenue: Math.floor(baseRevenue + (Math.random() - 0.5) * 3000),
-        totalOrders: Math.floor(baseOrders + (Math.random() - 0.5) * 20)
-      });
-    }
-
-    return data;
   }
 }

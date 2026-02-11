@@ -5,7 +5,11 @@ const notificationSettingsSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'user',
     required: true,
-    unique: true
+  },
+  organizationId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Organization',
+    required: true
   },
   emailNotifications: {
     type: Boolean,
@@ -20,6 +24,14 @@ const notificationSettingsSchema = new mongoose.Schema({
     default: true
   },
   lowStockAlerts: {
+    type: Boolean,
+    default: true
+  },
+  purchaseApprovals: {
+    type: Boolean,
+    default: true
+  },
+  stockMovement: {
     type: Boolean,
     default: true
   },
@@ -40,5 +52,7 @@ const notificationSettingsSchema = new mongoose.Schema({
     default: true
   }
 }, { timestamps: true });
+
+notificationSettingsSchema.index({ user: 1, organizationId: 1 }, { unique: true });
 
 module.exports = mongoose.model('NotificationSettings', notificationSettingsSchema);

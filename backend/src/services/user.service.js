@@ -154,24 +154,24 @@ async function allusers(req, res) {
 
     // Role-based filtering
     if (req.userRole === 'admin') {
-      // Admins see only users they created + themselves
-      query = {
-        $and: [
-          { organizationId: req.organizationId },
-          {
-            $or: [
-              { createdBy: req.user.userid },
-              { _id: req.user.userid }
-            ]
-          }
-        ]
-      };
+      // Admins see everyone in their organization
+      query = { organizationId: req.organizationId };
     } else if (req.userRole === 'manager') {
       // Managers see their assigned users + themselves
-      query._id = { $in: [...req.assignedUsers, req.user.userid] };
+      const assignedUserIds = (req.assignedUsers || []).map(id => id.toString());
+      query = {
+        organizationId: req.organizationId,
+        $or: [
+          { _id: { $in: assignedUserIds } },
+          { _id: req.user.userid }
+        ]
+      };
     } else if (req.userRole === 'user') {
       // Users see only themselves
-      query._id = req.user.userid;
+      query = {
+        _id: req.user.userid,
+        organizationId: req.organizationId
+      };
     }
 
     const users = await User.find(query)

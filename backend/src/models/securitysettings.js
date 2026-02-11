@@ -5,7 +5,11 @@ const securitySettingsSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'user',
     required: true,
-    unique: true
+  },
+  organizationId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Organization',
+    required: true
   },
   sessionTimeout: {
     type: Number,
@@ -50,5 +54,7 @@ const securitySettingsSchema = new mongoose.Schema({
     default: false
   }
 }, { timestamps: true });
+
+securitySettingsSchema.index({ user: 1, organizationId: 1 }, { unique: true });
 
 module.exports = mongoose.model('SecuritySettings', securitySettingsSchema);

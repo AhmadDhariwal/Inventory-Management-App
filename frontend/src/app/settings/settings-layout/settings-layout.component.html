@@ -15,34 +15,44 @@
         <a routerLink="account" routerLinkActive="active" class="nav-item">
           <span>Account Settings</span>
         </a>
-        <a href="javascript:void(0)" *ngIf="hasAnyRole(['admin', 'manager'])" (click)="onRestrictedAccess('Business Settings')" routerLinkActive="active" class="nav-item">
+        <a [routerLink]="hasAnyRole(['admin', 'manager']) ? 'business' : null"
+           (click)="getUserRole() === 'user' ? onRestrictedAccess('Business Settings') : null"
+           routerLinkActive="active" class="nav-item">
           <span>Business Settings</span>
         </a>
       </div>
       
-      <div class="nav-section" *ngIf="hasAnyRole(['admin', 'manager'])">
+      <div class="nav-section">
         <h3 class="nav-section-title">Operations</h3>
-        <a href="javascript:void(0)" (click)="onRestrictedAccess('Inventory Settings')" routerLinkActive="active" class="nav-item">
+        <a [routerLink]="hasAnyRole(['admin', 'manager']) ? 'inventory' : null"
+           (click)="getUserRole() === 'user' ? onRestrictedAccess('Inventory Settings') : null"
+           routerLinkActive="active" class="nav-item">
           <span>Inventory Settings</span>
         </a>
       </div>
       
       <div class="nav-section">
         <h3 class="nav-section-title">Security & Privacy</h3>
-        <a href="javascript:void(0)" *ngIf="hasRole('admin')" (click)="onRestrictedAccess('Security Settings')" routerLinkActive="active" class="nav-item">
+        <a [routerLink]="hasRole('admin') ? 'security' : null"
+           (click)="getUserRole() === 'user' ? onRestrictedAccess('Security Settings') : null"
+           routerLinkActive="active" class="nav-item">
           <span>Security Settings</span>
         </a>
-        <a href="javascript:void(0)" (click)="onRestrictedAccess('Notifications')" routerLinkActive="active" class="nav-item">
+        <a routerLink="notifications" routerLinkActive="active" class="nav-item">
           <span>Notifications</span>
         </a>
       </div>
       
-      <div class="nav-section" *ngIf="hasRole('admin')">
+      <div class="nav-section" *ngIf="hasRole('admin') || getUserRole() === 'user'">
         <h3 class="nav-section-title">Administration</h3>
-        <a href="javascript:void(0)" (click)="onRestrictedAccess('User Roles')" routerLinkActive="active" class="nav-item">
+        <a [routerLink]="hasRole('admin') ? 'roles' : null"
+           (click)="getUserRole() === 'user' ? onRestrictedAccess('User Roles') : null"
+           routerLinkActive="active" class="nav-item" *ngIf="hasRole('admin') || getUserRole() === 'user'">
           <span>User Roles</span>
         </a>
-        <a href="javascript:void(0)" (click)="onRestrictedAccess('Users')" routerLinkActive="active" class="nav-item">
+        <a [routerLink]="hasRole('admin') ? 'users' : null"
+           (click)="getUserRole() === 'user' ? onRestrictedAccess('Users') : null"
+           routerLinkActive="active" class="nav-item" *ngIf="hasRole('admin') || getUserRole() === 'user'">
           <span>Users</span>
         </a>
       </div>

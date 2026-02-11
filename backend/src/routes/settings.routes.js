@@ -7,9 +7,9 @@ const { verifytoken, restrictto } = require('../middleware/auth.middleware');
 router.get('/security', verifytoken, restrictto(['admin', 'manager']), settingsController.getSecuritySettings);
 router.put('/security', verifytoken, restrictto(['admin', 'manager']), settingsController.updateSecuritySettings);
 
-// Notification Settings - restricted to admin/manager
-router.get('/notifications', verifytoken, restrictto(['admin', 'manager']), settingsController.getNotificationSettings);
-router.put('/notifications', verifytoken, restrictto(['admin', 'manager']), settingsController.updateNotificationSettings);
+// Notification Settings - accessible to all authenticated users
+router.get('/notifications', verifytoken, restrictto(['admin', 'manager', 'user']), settingsController.getNotificationSettings);
+router.put('/notifications', verifytoken, restrictto(['admin', 'manager', 'user']), settingsController.updateNotificationSettings);
 
 // Inventory Settings - restricted to admin/manager
 router.get('/inventory', verifytoken, restrictto(['admin', 'manager']), settingsController.getInventorySettings);

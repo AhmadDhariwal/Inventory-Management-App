@@ -67,6 +67,8 @@ export interface NotificationSettings {
   smsNotifications: boolean;
   pushNotifications: boolean;
   lowStockAlerts: boolean;
+  purchaseApprovals: boolean;
+  stockMovement: boolean;
   orderUpdates: boolean;
   systemMaintenance: boolean;
   weeklyReports: boolean;

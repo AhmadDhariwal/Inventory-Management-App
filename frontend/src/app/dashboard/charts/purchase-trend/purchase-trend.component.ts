@@ -7,11 +7,13 @@ import {
   ViewChild,
   AfterViewInit
 } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import Chart from 'chart.js/auto';
 
 @Component({
   selector: 'app-purchase-trend',
   standalone: true,
+  imports: [CommonModule],
   templateUrl: './purchase-trend.component.html',
   styleUrls: ['./purchase-trend.component.scss']
 })
@@ -47,8 +49,8 @@ export class PurchaseTrendComponent implements OnChanges, AfterViewInit {
     const quantities: number[] = [];
 
     this.trend.forEach(day => {
-      const date = new Date(day._id);
-      labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+      const date = day.date || day._id;
+      labels.push(new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
       amounts.push(day.totalAmount || 0);
       quantities.push(day.totalQuantity || 0);
     });

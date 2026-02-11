@@ -2,28 +2,65 @@ const express = require("express");
 const router = express.Router();
 const product = require("../models/product");
 const Category = require("../models/category");
+const User = require("../models/user");
 const { verifytoken, restrictto } = require("../middleware/auth.middleware");
 
-// GET all products - Scoped to Organization
+// GET all products - Role-based filtering
 router.get("/", verifytoken, async (req, res) => {
   try {
-    const products = await product.find({ organizationId: req.organizationId })
+    // Build role-based filter
+    const filter = { organizationId: req.organizationId };
+
+    if (req.user.role !== 'admin') {
+      // Get assigned users for managers
+      let assignedUsers = [];
+      if (req.user.role === 'manager') {
+        const userDoc = await User.findById(req.user.userid);
+        assignedUsers = userDoc?.assignedUsers || [];
+      }
+
+      // Filter by creator
+      const userIds = req.user.role === 'manager'
+        ? [req.user.userid, ...assignedUsers]
+        : [req.user.userid];
+      filter.createdBy = { $in: userIds };
+    }
+
+    const products = await product.find(filter)
       .populate('category', 'name')
       .sort({ createdAt: -1 });
+
+    console.log(`Products (${req.user.role}): ${products.length} products`);
     res.json(products);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-// GET single product - Scoped to Organization
+// GET single product - Role-based access control
 router.get("/:id", verifytoken, async (req, res) => {
   try {
-    const productData = await product.findOne({ _id: req.params.id, organizationId: req.organizationId })
+    const filter = { _id: req.params.id, organizationId: req.organizationId };
+
+    // Non-admins can only view their own or assigned users' products
+    if (req.user.role !== 'admin') {
+      let assignedUsers = [];
+      if (req.user.role === 'manager') {
+        const userDoc = await User.findById(req.user.userid);
+        assignedUsers = userDoc?.assignedUsers || [];
+      }
+
+      const userIds = req.user.role === 'manager'
+        ? [req.user.userid, ...assignedUsers]
+        : [req.user.userid];
+      filter.createdBy = { $in: userIds };
+    }
+
+    const productData = await product.findOne(filter)
       .populate('category', 'name');
 
     if (!productData) {
-      return res.status(404).json({ error: 'Product not found' });
+      return res.status(404).json({ error: 'Product not found or access denied' });
     }
     res.json(productData);
   } catch (error) {

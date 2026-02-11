@@ -2,6 +2,7 @@ const StockLevel = require('../models/stocklevel');
 const Product = require('../models/product');
 const Warehouse = require('../models/warehouse');
 const socketUtils = require('../utils/socket');
+const notificationService = require('./notification.service');
 
 /**
  * Initialize stock levels for all products in all warehouses for a specific organization
@@ -131,13 +132,33 @@ const updateStockQuantity = async (productId, warehouseId, organizationId, quant
       const productName = stockLevel.product ? stockLevel.product.name : 'Unknown Product';
       const warehouseName = stockLevel.warehouse ? stockLevel.warehouse.name : 'Unknown Warehouse';
 
-      socketUtils.sendNotification(organizationId, 'LOW_STOCK', {
-        message: `Low stock alert: ${productName} in ${warehouseName} is at ${stockLevel.quantity}.`,
-        productId: productId,
-        warehouseId: warehouseId,
-        currentQuantity: stockLevel.quantity,
-        reorderLevel: stockLevel.reorderLevel
-      });
+      notificationService.notifyOrganizationRole(
+        organizationId,
+        'admin',
+        'LOW_STOCK',
+        `Low Stock: ${productName}`,
+        `${productName} in ${warehouseName} is at ${stockLevel.quantity}.`,
+        {
+          productId: productId,
+          warehouseId: warehouseId,
+          currentQuantity: stockLevel.quantity,
+          reorderLevel: stockLevel.reorderLevel
+        }
+      );
+
+      notificationService.notifyOrganizationRole(
+        organizationId,
+        'manager',
+        'LOW_STOCK',
+        `Low Stock: ${productName}`,
+        `${productName} in ${warehouseName} is at ${stockLevel.quantity}.`,
+        {
+          productId: productId,
+          warehouseId: warehouseId,
+          currentQuantity: stockLevel.quantity,
+          reorderLevel: stockLevel.reorderLevel
+        }
+      );
     }
 
     return stockLevel;

@@ -26,6 +26,8 @@ export class NotificationSettingsComponent implements OnInit {
       smsNotifications: [false],
       pushNotifications: [true],
       lowStockAlerts: [true],
+      purchaseApprovals: [true],
+      stockMovement: [true],
       orderUpdates: [true],
       systemMaintenance: [true],
       weeklyReports: [false],

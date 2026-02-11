@@ -3,6 +3,64 @@
  * Utility functions for role-based access control and organization filtering
  */
 
+const User = require('../models/user');
+
+/**
+ * Build role-based filter for queries
+ * @param {String} role - User role (admin, manager, user)
+ * @param {String} userId - Current user ID
+ * @param {String} organizationId - Organization ID
+ * @param {Array} assignedUsers - Array of assigned user IDs (for managers)
+ * @param {String} ownerField - Field name for ownership (default: 'createdBy')
+ * @returns {Object} - MongoDB query filter
+ */
+const buildRoleBasedFilter = (role, userId, organizationId, assignedUsers = [], ownerField = 'createdBy') => {
+    const filter = { organizationId };
+
+    if (role === 'admin') {
+        return filter;
+    }
+
+    if (role === 'manager') {
+        filter[ownerField] = { $in: [userId, ...assignedUsers] };
+        return filter;
+    }
+
+    filter[ownerField] = userId;
+    return filter;
+};
+
+/**
+ * Build role-based aggregation pipeline match stage
+ * @param {String} role - User role
+ * @param {String} userId - Current user ID
+ * @param {String} organizationId - Organization ID
+ * @param {Array} assignedUsers - Array of assigned user IDs
+ * @param {String} ownerField - Field name for ownership
+ * @returns {Array} - Array of $match stages
+ */
+const buildRoleBasedPipeline = (role, userId, organizationId, assignedUsers = [], ownerField = 'createdBy') => {
+    const pipeline = [{ $match: { organizationId } }];
+
+    if (role === 'manager') {
+        pipeline.push({ $match: { [ownerField]: { $in: [userId, ...assignedUsers] } } });
+    } else if (role === 'user') {
+        pipeline.push({ $match: { [ownerField]: userId } });
+    }
+
+    return pipeline;
+};
+
+/**
+ * Get assigned users for a manager
+ * @param {String} userId - Manager user ID
+ * @returns {Promise<Array>} - Array of assigned user IDs
+ */
+const getAssignedUsers = async (userId) => {
+    const user = await User.findById(userId).select('assignedUsers');
+    return user?.assignedUsers || [];
+};
+
 /**
  * Check if user can access a specific resource
  * @param {Object} user - Current user object with role and organizationId
@@ -12,19 +70,16 @@
  * @returns {Boolean} - True if user can access the resource
  */
 const canAccessResource = (user, resource, ownerField = 'user', assignedUsers = []) => {
-    // Check organization match first
     if (resource.organizationId.toString() !== user.organizationId.toString()) {
         return false;
     }
 
-    // Admins have full access within their organization
     if (user.role === 'admin') {
         return true;
     }
 
     const resourceOwnerId = resource[ownerField]?.toString();
 
-    // Managers can access resources from assigned users
     if (user.role === 'manager') {
         const isAssigned = assignedUsers.some(
             userId => userId.toString() === resourceOwnerId
@@ -32,7 +87,6 @@ const canAccessResource = (user, resource, ownerField = 'user', assignedUsers = 
         return isAssigned || resourceOwnerId === user.userid.toString();
     }
 
-    // Users can only access their own resources
     return resourceOwnerId === user.userid.toString();
 };
 
@@ -44,15 +98,13 @@ const canAccessResource = (user, resource, ownerField = 'user', assignedUsers = 
  */
 const getAccessibleUserIds = (user, assignedUsers = []) => {
     if (user.role === 'admin') {
-        return null; // Null indicates all users in organization
+        return null;
     }
 
     if (user.role === 'manager') {
-        // Manager can access their assigned users + themselves
         return [...assignedUsers.map(id => id.toString()), user.userid.toString()];
     }
 
-    // Users can only access their own data
     return [user.userid.toString()];
 };
 
@@ -80,12 +132,10 @@ const getOrganizationFilter = (user, assignedUsers = [], userField = 'user') => 
         organizationId: user.organizationId
     };
 
-    // Admins see all data in their organization
     if (user.role === 'admin') {
         return filter;
     }
 
-    // Managers see data from assigned users
     if (user.role === 'manager') {
         filter[userField] = {
             $in: [...assignedUsers, user.userid]
@@ -93,7 +143,6 @@ const getOrganizationFilter = (user, assignedUsers = [], userField = 'user') => 
         return filter;
     }
 
-    // Users see only their own data
     filter[userField] = user.userid;
     return filter;
 };
@@ -106,17 +155,14 @@ const getOrganizationFilter = (user, assignedUsers = [], userField = 'user') => 
  * @returns {Boolean} - True if action is allowed
  */
 const canManageUser = (currentUser, targetUserId, assignedUsers = []) => {
-    // Admins can manage all users in their organization
     if (currentUser.role === 'admin') {
         return true;
     }
 
-    // Managers can manage their assigned users
     if (currentUser.role === 'manager') {
         return assignedUsers.some(id => id.toString() === targetUserId.toString());
     }
 
-    // Users cannot manage other users
     return false;
 };
 
@@ -136,7 +182,6 @@ const validateRoleAssignment = (currentUserRole, targetRole) => {
     const currentLevel = roleHierarchy[currentUserRole] || 0;
     const targetLevel = roleHierarchy[targetRole] || 0;
 
-    // Users cannot create other users
     if (currentUserRole === 'user') {
         return {
             valid: false,
@@ -144,7 +189,6 @@ const validateRoleAssignment = (currentUserRole, targetRole) => {
         };
     }
 
-    // Managers can only create users
     if (currentUserRole === 'manager' && targetRole !== 'user') {
         return {
             valid: false,
@@ -152,7 +196,6 @@ const validateRoleAssignment = (currentUserRole, targetRole) => {
         };
     }
 
-    // Admins cannot create other admins
     if (currentUserRole === 'admin' && targetRole === 'admin') {
         return {
             valid: false,
@@ -160,7 +203,6 @@ const validateRoleAssignment = (currentUserRole, targetRole) => {
         };
     }
 
-    // Cannot assign role equal or higher than own role
     if (targetLevel >= currentLevel) {
         return {
             valid: false,
@@ -190,7 +232,6 @@ const getOrganizationPipeline = (user, assignedUsers = [], userField = 'user') =
         }
     ];
 
-    // Add user filtering for non-admins
     if (user.role === 'manager') {
         pipeline.push({
             $match: {
@@ -211,6 +252,9 @@ const getOrganizationPipeline = (user, assignedUsers = [], userField = 'user') =
 };
 
 module.exports = {
+    buildRoleBasedFilter,
+    buildRoleBasedPipeline,
+    getAssignedUsers,
     canAccessResource,
     getAccessibleUserIds,
     isManagerOf,

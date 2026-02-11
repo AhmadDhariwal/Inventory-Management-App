@@ -59,7 +59,8 @@ exports.getstock = async (req, res) => {
 exports.getstocklevels = async (req, res) => {
   try {
     const productId = req.query.productId;
-    const stockLevels = await inventoryservice.getstocklevels(productId, req.organizationId); // Pass organizationId
+    const user = req.user; // Get user from request
+    const stockLevels = await inventoryservice.getstocklevels(productId, req.organizationId, user);
     res.status(200).json(stockLevels);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -75,7 +76,7 @@ exports.updatestocklevel = async (req, res) => {
 
     const stockLevelId = req.params.id;
     const updateData = req.body;
-    const updatedStockLevel = await inventoryservice.updatestocklevel(stockLevelId, updateData);
+    const updatedStockLevel = await inventoryservice.updatestocklevel(stockLevelId, updateData, req.organizationId);
 
     console.log('Stock level update successful');
     res.status(200).json({
@@ -98,7 +99,8 @@ exports.getstocksummary = async (req, res) => {
       organizationId: req.organizationId // Add organizationId
     };
 
-    const summary = await inventoryservice.getstocksummary(filters);
+    const user = req.user; // Get user from request
+    const summary = await inventoryservice.getstocksummary(filters, user);
     res.status(200).json(summary);
   } catch (error) {
     res.status(400).json({ error: error.message });

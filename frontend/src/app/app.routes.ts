@@ -80,6 +80,12 @@ export const routes: Routes = [
         loadChildren: () =>
           import('./settings/settings.module').then(m => m.SettingsModule),
         canActivate: [AuthGuard]
+      },
+      {
+        path: 'notifications',
+        loadComponent: () =>
+          import('./notifications/notification-activity/notification-activity.component').then(m => m.NotificationActivityComponent),
+        canActivate: [AuthGuard]
       }
     ]
   },

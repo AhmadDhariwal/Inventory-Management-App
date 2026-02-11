@@ -18,6 +18,7 @@ const settingsroutes = require("./src/routes/settings.routes");
 const activitylogroutes = require("./src/routes/activitylog.routes");
 const organizationroutes = require("./src/routes/organization.routes");
 const forecastingroutes = require("./src/routes/forecasting.routes");
+const notificationroutes = require("./src/routes/notification.routes");
 const cors = require('cors');
 const userroute = require('./src/routes/user');
 const { verifytoken, restrictto } = require('./src/middleware/auth.middleware');
@@ -75,6 +76,7 @@ app.use("/api/business-settings", verifytoken, ensureOrganizationContext, enforc
 app.use("/api/settings", verifytoken, ensureOrganizationContext, enforceSecurityPolicies, settingsroutes);
 app.use("/api/activitylog", verifytoken, ensureOrganizationContext, enforceSecurityPolicies, checkMaintenanceMode, activitylogroutes);
 app.use("/api/forecasting", verifytoken, ensureOrganizationContext, enforceSecurityPolicies, checkMaintenanceMode, forecastingroutes);
+app.use("/api/notifications", verifytoken, ensureOrganizationContext, enforceSecurityPolicies, notificationroutes);
 
 
 // app.get('/', (req, res) => {

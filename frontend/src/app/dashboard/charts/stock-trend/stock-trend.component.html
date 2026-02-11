@@ -1,7 +1,13 @@
 <div class="chart-card">
   <h3 class="title">Stock Movement Trend (Last 30 Days)</h3>
 
-  <div class="chart-container">
+  <div class="chart-container" *ngIf="trend && trend.length > 0">
     <canvas #chartCanvas></canvas>
+  </div>
+
+  <div class="empty-state" *ngIf="!trend || trend.length === 0">
+    <i class="fas fa-chart-line"></i>
+    <p>No stock movement data available</p>
+    <span>Start recording stock movements to see trends</span>
   </div>
 </div>

@@ -7,11 +7,13 @@ import {
   ViewChild,
   AfterViewInit
 } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import Chart from 'chart.js/auto';
 
 @Component({
   selector: 'app-sales-trend',
   standalone: true,
+  imports: [CommonModule],
   templateUrl: './sales-trend.component.html',
   styleUrls: ['./sales-trend.component.scss']
 })
@@ -47,8 +49,8 @@ export class SalesTrendComponent implements OnChanges, AfterViewInit {
     const orders: number[] = [];
 
     this.trend.forEach(day => {
-      const date = new Date(day._id);
-      labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+      const date = day.date || day._id;
+      labels.push(new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
       revenue.push(day.totalRevenue || 0);
       orders.push(day.totalOrders || 0);
     });

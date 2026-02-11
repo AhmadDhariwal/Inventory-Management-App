@@ -363,3 +363,100 @@
     padding: 0 1.5rem 4rem;
   }
 }
+
+/* Empty State */
+.empty-state-welcome {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  padding: 3rem;
+  background: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  border: 1px dashed var(--border-main);
+  text-align: center;
+  margin-top: 2rem;
+
+  .empty-state-card {
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .empty-icon {
+    width: 80px;
+    height: 80px;
+    background: var(--bg-main);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: var(--brand-primary);
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow-md);
+  }
+
+  h2 {
+    font-size: 1.75rem;
+    color: var(--text-main);
+    font-weight: 700;
+  }
+
+  p {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+
+  .empty-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+
+    button {
+      padding: 0.875rem 1.5rem;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 1rem;
+
+      i {
+        font-size: 1.1rem;
+      }
+
+      &.primary-action {
+        background: var(--grad-primary);
+        color: white;
+        border: none;
+        box-shadow: var(--shadow-md);
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: var(--shadow-lg);
+        }
+      }
+
+      &.secondary-action {
+        background: transparent;
+        border: 2px solid var(--border-main);
+        color: var(--text-main);
+
+        &:hover {
+          border-color: var(--brand-primary);
+          color: var(--brand-primary);
+          background: var(--bg-main);
+        }
+      }
+    }
+  }
+}

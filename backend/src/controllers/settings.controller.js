@@ -8,11 +8,12 @@ const mongoose = require('mongoose');
 const getSecuritySettings = async (req, res) => {
   try {
     const userId = req.user.userid;
-    let settings = await SecuritySettings.findOne({ user: new mongoose.Types.ObjectId(userId) });
-
-    if (!settings) {
-      settings = await SecuritySettings.create({ user: userId });
-    }
+    const organizationId = req.organizationId;
+    let settings = await SecuritySettings.findOneAndUpdate(
+      { user: new mongoose.Types.ObjectId(userId), organizationId },
+      { $setOnInsert: { user: userId, organizationId } },
+      { new: true, upsert: true, setDefaultsOnInsert: true }
+    );
 
     res.status(200).json({
       success: true,
@@ -27,8 +28,9 @@ const getSecuritySettings = async (req, res) => {
 const updateSecuritySettings = async (req, res) => {
   try {
     const userId = req.user.userid;
+    const organizationId = req.organizationId;
     const settings = await SecuritySettings.findOneAndUpdate(
-      { user: new mongoose.Types.ObjectId(userId) },
+      { user: new mongoose.Types.ObjectId(userId), organizationId },
       req.body,
       { new: true, upsert: true, runValidators: true }
     );
@@ -48,11 +50,12 @@ const updateSecuritySettings = async (req, res) => {
 const getNotificationSettings = async (req, res) => {
   try {
     const userId = req.user.userid;
-    let settings = await NotificationSettings.findOne({ user: new mongoose.Types.ObjectId(userId) });
-
-    if (!settings) {
-      settings = await NotificationSettings.create({ user: userId });
-    }
+    const organizationId = req.organizationId;
+    let settings = await NotificationSettings.findOneAndUpdate(
+      { user: new mongoose.Types.ObjectId(userId), organizationId },
+      { $setOnInsert: { user: userId, organizationId } },
+      { new: true, upsert: true, setDefaultsOnInsert: true }
+    );
 
     res.status(200).json({
       success: true,
@@ -67,8 +70,9 @@ const getNotificationSettings = async (req, res) => {
 const updateNotificationSettings = async (req, res) => {
   try {
     const userId = req.user.userid;
+    const organizationId = req.organizationId;
     const settings = await NotificationSettings.findOneAndUpdate(
-      { user: new mongoose.Types.ObjectId(userId) },
+      { user: new mongoose.Types.ObjectId(userId), organizationId },
       req.body,
       { new: true, upsert: true, runValidators: true }
     );
@@ -88,11 +92,12 @@ const updateNotificationSettings = async (req, res) => {
 const getInventorySettings = async (req, res) => {
   try {
     const userId = req.user.userid;
-    let settings = await InventorySettings.findOne({ user: new mongoose.Types.ObjectId(userId) });
-
-    if (!settings) {
-      settings = await InventorySettings.create({ user: userId });
-    }
+    const organizationId = req.organizationId;
+    let settings = await InventorySettings.findOneAndUpdate(
+      { user: new mongoose.Types.ObjectId(userId), organizationId },
+      { $setOnInsert: { user: userId, organizationId } },
+      { new: true, upsert: true, setDefaultsOnInsert: true }
+    );
 
     res.status(200).json({
       success: true,
@@ -107,8 +112,9 @@ const getInventorySettings = async (req, res) => {
 const updateInventorySettings = async (req, res) => {
   try {
     const userId = req.user.userid;
+    const organizationId = req.organizationId;
     const settings = await InventorySettings.findOneAndUpdate(
-      { user: new mongoose.Types.ObjectId(userId) },
+      { user: new mongoose.Types.ObjectId(userId), organizationId },
       req.body,
       { new: true, upsert: true, runValidators: true }
     );

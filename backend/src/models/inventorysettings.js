@@ -5,7 +5,11 @@ const inventorySettingsSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'user',
     required: true,
-    unique: true
+  },
+  organizationId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Organization',
+    required: true
   },
   allowNegativeStock: {
     type: Boolean,
@@ -54,5 +58,7 @@ const inventorySettingsSchema = new mongoose.Schema({
     default: false
   }
 }, { timestamps: true });
+
+inventorySettingsSchema.index({ user: 1, organizationId: 1 }, { unique: true });
 
 module.exports = mongoose.model('InventorySettings', inventorySettingsSchema);

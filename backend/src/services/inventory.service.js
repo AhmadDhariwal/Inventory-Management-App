@@ -2,7 +2,11 @@ const InventorySettings = require('../models/inventorysettings');
 const StockLevel = require('../models/stocklevel');
 const NotificationSettings = require('../models/notificationsettings');
 const StockMovement = require('../models/stockmovement');
+const Product = require('../models/product');
+const User = require('../models/user');
 const stockLevelService = require('./stocklevel.service');
+const { getOrganizationFilter } = require('../utils/rbac.helpers');
+const mongoose = require('mongoose');
 
 // Check if user allows negative stock
 const checkNegativeStockAllowed = async (userId) => {
@@ -45,8 +49,8 @@ const checkLowStockAlertsEnabled = async (userId) => {
   }
 };
 
-// Get low stock items based on user settings
-const getLowStockItems = async (userId, organizationId) => {
+// Get low stock items based on user settings with role-based filtering
+const getLowStockItems = async (userId, organizationId, user = null) => {
   try {
     const thresholds = await getUserStockThresholds(userId);
     const alertsEnabled = await checkLowStockAlertsEnabled(userId);
@@ -55,13 +59,30 @@ const getLowStockItems = async (userId, organizationId) => {
       return [];
     }
 
+    // Build role-based filter
+    let assignedUsers = [];
+    if (user && user.role === 'manager') {
+      const userDoc = await User.findById(user.userid);
+      assignedUsers = userDoc?.assignedUsers || [];
+    }
+
+    // Get accessible product IDs based on role
+    let productFilter = { organizationId: new mongoose.Types.ObjectId(organizationId) };
+    if (user && user.role !== 'admin') {
+      const userIds = user.role === 'manager'
+        ? [user.userid, ...assignedUsers]
+        : [user.userid];
+      productFilter.createdby = { $in: userIds };
+    }
+
+    const accessibleProducts = await Product.find(productFilter).select('_id').lean();
+    const productIds = accessibleProducts.map(p => p._id);
+
     const query = {
+      organizationId,
+      product: { $in: productIds },
       $expr: { $lte: ["$quantity", thresholds.lowStockThreshold] }
     };
-
-    if (organizationId) {
-      query.organizationId = organizationId;
-    }
 
     const lowStockItems = await StockLevel.find(query)
       .populate('product', 'name sku')
@@ -78,17 +99,35 @@ const getLowStockItems = async (userId, organizationId) => {
   }
 };
 
-// Get stock levels for a specific product or all products
-const getstocklevels = async (productId, organizationId) => {
+// Get stock levels for a specific product or all products with role-based filtering
+const getstocklevels = async (productId, organizationId, user = null) => {
   try {
-    let query = {};
-    if (productId) {
-      query.product = productId;
+    // Build role-based filter for products
+    let assignedUsers = [];
+    if (user && user.role === 'manager') {
+      const userDoc = await User.findById(user.userid);
+      assignedUsers = userDoc?.assignedUsers || [];
     }
 
-    if (organizationId) {
-      query.organizationId = organizationId;
+    // Get accessible product IDs based on role
+    let productFilter = { organizationId: new mongoose.Types.ObjectId(organizationId) };
+    if (productId) {
+      productFilter._id = new mongoose.Types.ObjectId(productId);
     }
+    if (user && user.role !== 'admin') {
+      const userIds = user.role === 'manager'
+        ? [user.userid, ...assignedUsers]
+        : [user.userid];
+      productFilter.createdby = { $in: userIds };
+    }
+
+    const accessibleProducts = await Product.find(productFilter).select('_id').lean();
+    const productIds = accessibleProducts.map(p => p._id);
+
+    let query = {
+      organizationId,
+      product: { $in: productIds }
+    };
 
     let stockLevels = await StockLevel.find(query)
       .populate('product', 'name sku cost price')
@@ -170,9 +209,9 @@ const getcurrentstock = async (productId, warehouseId, organizationId) => {
 };
 
 // Update stock level
-const updatestocklevel = async (stockLevelId, updateData) => {
-  const updatedStockLevel = await StockLevel.findByIdAndUpdate(
-    stockLevelId,
+const updatestocklevel = async (stockLevelId, updateData, organizationId) => {
+  const updatedStockLevel = await StockLevel.findOneAndUpdate(
+    { _id: stockLevelId, organizationId },
     updateData,
     { new: true }
   ).populate('product', 'name sku').populate('warehouse', 'name');
@@ -180,12 +219,31 @@ const updatestocklevel = async (stockLevelId, updateData) => {
   return updatedStockLevel;
 };
 
-// Get stock summary
-const getstocksummary = async (filters) => {
-  const query = {};
-  if (filters.organizationId) {
-    query.organizationId = filters.organizationId;
+// Get stock summary with role-based filtering
+const getstocksummary = async (filters, user = null) => {
+  // Build role-based filter for products
+  let assignedUsers = [];
+  if (user && user.role === 'manager') {
+    const userDoc = await User.findById(user.userid);
+    assignedUsers = userDoc?.assignedUsers || [];
   }
+
+  // Get accessible product IDs based on role
+  let productFilter = { organizationId: new mongoose.Types.ObjectId(filters.organizationId) };
+  if (user && user.role !== 'admin') {
+    const userIds = user.role === 'manager'
+      ? [user.userid, ...assignedUsers]
+      : [user.userid];
+    productFilter.createdby = { $in: userIds };
+  }
+
+  const accessibleProducts = await Product.find(productFilter).select('_id').lean();
+  const productIds = accessibleProducts.map(p => p._id);
+
+  const query = {
+    organizationId: filters.organizationId,
+    product: { $in: productIds }
+  };
 
   const stockLevels = await StockLevel.find(query)
     .populate('product', 'cost price')
@@ -198,7 +256,7 @@ const getstocksummary = async (filters) => {
     return sum + value;
   }, 0);
 
-  const lowStockItems = stockLevels.filter(item => 
+  const lowStockItems = stockLevels.filter(item =>
     item.minStock > 0 && item.quantity <= item.minStock
   ).length;
 

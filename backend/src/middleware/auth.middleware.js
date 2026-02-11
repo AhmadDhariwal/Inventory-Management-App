@@ -30,6 +30,7 @@ async function verifytoken(req, res, next) {
     };
     req.userid = decoded.userid;
     req.role = decoded.role;
+    req.organizationId = decoded.organizationId;
 
     next();
   } catch (err) {
@@ -71,6 +72,7 @@ async function user(req, res, next) {
       organizationId: decoded.organizationId
     };
     req.userid = decoded.userid;
+    req.organizationId = decoded.organizationId;
 
     next();
   } catch (error) {

@@ -1,6 +1,11 @@
 <div class="chart-card">
   <h3 class="title">Purchase Trends (Last 30 Days)</h3>
-  <div class="chart-container">
+  <div class="chart-container" *ngIf="trend && trend.length > 0">
     <canvas #chartCanvas></canvas>
+  </div>
+  <div class="empty-state" *ngIf="!trend || trend.length === 0">
+    <i class="fas fa-shopping-cart"></i>
+    <p>No purchase data available</p>
+    <span>Create purchase orders to see trends</span>
   </div>
 </div>

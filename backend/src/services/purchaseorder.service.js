@@ -6,6 +6,7 @@ const StockLevel = require("../models/stocklevel");
 const Inventory = require("../models/model");
 const User = require("../models/user");
 const { getOrganizationFilter, canAccessResource, canManageUser } = require("../utils/rbac.helpers");
+const notificationService = require("./notification.service");
 
 const createpurchaseorder = async (data, userId, organizationId) => {
   const { supplier, items, warehouse, totalamount } = data;
@@ -40,15 +41,32 @@ const createpurchaseorder = async (data, userId, organizationId) => {
 
   await purchaseorder.populate('createdBy', 'name');
 
+  // Notify admins and managers about new PO requiring approval
+  notificationService.notifyOrganizationRole(
+    organizationId,
+    'admin',
+    'PURCHASE_APPROVAL',
+    'New Purchase Order',
+    `New PO ${purchaseorder._id} created by ${purchaseorder.createdBy.name} requires approval.`,
+    { purchaseOrderId: purchaseorder._id }
+  );
+  notificationService.notifyOrganizationRole(
+    organizationId,
+    'manager',
+    'PURCHASE_APPROVAL',
+    'New Purchase Order',
+    `New PO ${purchaseorder._id} created by ${purchaseorder.createdBy.name} requires approval.`,
+    { purchaseOrderId: purchaseorder._id }
+  );
+
   return purchaseorder;
 };
 
 const processPurchaseOrderReceipt = async (purchaseOrderId, user) => {
   const userId = user.userid || user._id;
-  const purchaseorder = await Purchaseorder.findById(purchaseOrderId);
+  const organizationId = user.organizationId;
+  const purchaseorder = await Purchaseorder.findOne({ _id: purchaseOrderId, organizationId });
   if (!purchaseorder) throw new Error("Purchase order not found");
-
-  const organizationId = purchaseorder.organizationId;
 
   for (let item of purchaseorder.items) {
     // Validate product exists in organization
@@ -118,6 +136,16 @@ const processPurchaseOrderReceipt = async (purchaseOrderId, user) => {
   purchaseorder.receivedAt = new Date();
   await purchaseorder.save();
 
+  // Notify the creator that their order was received
+  notificationService.createNotification(
+    purchaseorder.createdBy,
+    'ORDER_STATUS',
+    'Purchase Order Received',
+    `Your PO ${purchaseorder._id} has been fully received.`,
+    { purchaseOrderId: purchaseorder._id, status: 'RECEIVED' },
+    organizationId
+  );
+
   return { purchaseorder };
 };
 
@@ -170,7 +198,8 @@ const getpurchaseorderbyid = async (id, user, organizationId) => {
 
 // Approve purchase order
 const approvepurchaseorder = async (id, user) => {
-  const purchaseorder = await Purchaseorder.findById(id);
+  const organizationId = user.organizationId;
+  const purchaseorder = await Purchaseorder.findOne({ _id: id, organizationId });
   if (!purchaseorder) throw new Error("Purchase order not found");
 
   // Check Access/Permission
@@ -211,12 +240,23 @@ const approvepurchaseorder = async (id, user) => {
   purchaseorder.approvedBy = user.userid;
   await purchaseorder.save();
 
+  // Notify the creator that their order was approved
+  notificationService.createNotification(
+    purchaseorder.createdBy,
+    'ORDER_STATUS',
+    'Purchase Order Approved',
+    `Your PO ${purchaseorder._id} has been approved.`,
+    { purchaseOrderId: purchaseorder._id, status: 'APPROVED' },
+    purchaseorder.organizationId
+  );
+
   return purchaseorder;
 };
 
 // Receive purchase order manually
 const receivepurchaseorder = async (id, user) => {
-  const purchaseorder = await Purchaseorder.findById(id);
+  const organizationId = user.organizationId;
+  const purchaseorder = await Purchaseorder.findOne({ _id: id, organizationId });
   if (!purchaseorder) throw new Error("Purchase order not found");
 
   // Same permission checks as approve? Or just restricted to admin/manager
@@ -234,7 +274,8 @@ const receivepurchaseorder = async (id, user) => {
 // Delete purchase order
 const deletepurchaseorder = async (id, user) => {
   try {
-    const purchaseorder = await Purchaseorder.findById(id);
+    const organizationId = user.organizationId;
+    const purchaseorder = await Purchaseorder.findOne({ _id: id, organizationId });
     if (!purchaseorder) {
       throw new Error("Purchase order not found");
     }

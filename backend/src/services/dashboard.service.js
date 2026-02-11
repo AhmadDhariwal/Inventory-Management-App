@@ -1,217 +1,3 @@
-// // const Product = require("../models/product");
-// // const Supplier = require("../models/supplier");
-// // const stockmovement = require("../models/stockmovement.js")
-// // const PurchaseOrder = require("../models/purchaseorder");
-// // const StockLevel = require("../models/stocklevel.js");
-
-// // const getdashboardstats = async () => {
-// //   const totalproducts = await Product.countDocuments();
-// //   const totalsuppliers = await Supplier.countDocuments();
-
-// //   const stockAggregation = await stockmovement.aggregate([
-// //       {
-// //         $group: {
-// //           _id: "$product",
-// //           availableQty: {
-// //             $sum: {
-// //               $cond: [
-// //                 { $eq: ["$type", "IN"] },
-// //                 "$quantity",
-// //                 { $multiply: ["$quantity", -1] }
-// //               ]
-// //             }
-// //           }
-// //         }
-// //       }
-// //     ]);
-
-// //     const totalStock = stockAggregation.reduce(
-// //       (sum, item) => sum + item.availableQty,
-// //       0
-// //     );
-// //   const totalpurchases = await PurchaseOrder.aggregate([
-// //     { $group: { _id: null, total: { $sum: "$totalamount" } } }
-// //   ]);
-
-// //   // const lowstockproducts = await Product.find({
-// //   //   stockquantity: { $lte: "$minstocklevel" }
-// //   // }).select("name sku stockquantity minstocklevel");
-
-
-// //   const lowStockItems = await StockLevel.aggregate([
-// //   {
-// //     $lookup: {
-// //       from: "products",
-// //       localField: "product",
-// //       foreignField: "_id",
-// //       as: "product"
-// //     }
-// //   },
-// //   { $unwind: "$product" },
-// //   {
-// //     $match: {
-// //       $expr: { $lte: ["$quantity", "$product.minstocklevel"] }
-// //     }
-// //   },
-// //   {
-// //     $project: {
-// //       productName: "$product.name",
-// //       sku: "$product.sku",
-// //       availableQty: "$quantity",
-// //       minStock: "$product.minstocklevel"
-// //     }
-// //   }
-// // ]);
-
-// //   return {
-// //     totalproducts,
-// //     totalsuppliers,
-// //     totalStock, //: totalstock[0]?.total || 0,
-// //     totalpurchases: totalpurchases[0]?.total || 0,
-// //     lowStockItems
-// //   };
-// // };
-
-
-// const Product = require('../models/product');
-// const Supplier = require('../models/supplier');
-// const PurchaseOrder = require('../models/purchaseorder');
-// const StockMovement = require('../models/stockmovement');
-// const StockLevel = require('../models/stocklevel');
-
-// exports.getDashboardSummary = async () => {
-
-//   /* =======================
-//      1️⃣ KPI SECTION
-//   ======================== */
-
-//   const [
-//     totalProducts,
-//     totalSuppliers,
-//     totalPurchaseAmount,
-//     totalStockQty
-//   ] = await Promise.all([
-//     Product.countDocuments(),
-//     Supplier.countDocuments(),
-//     PurchaseOrder.aggregate([
-//       { $group: { _id: null, total: { $sum: "$totalamount" } } }
-//     ]),
-//     StockLevel.aggregate([
-//       { $group: { _id: null, qty: { $sum: "$quantity" } } }
-//     ])
-//   ]);
-
-//   /* =======================
-//      2️⃣ LOW STOCK ALERTS
-//   ======================== */
-
-//   const lowStockItems = await StockLevel.aggregate([
-//     {
-//       $lookup: {
-//         from: 'products',
-//         localField: 'product',
-//         foreignField: '_id',
-//         as: 'product'
-//       }
-//     },
-//     { $unwind: '$product' },
-//     {
-//       $match: {
-//         $expr: { $lte: ['$quantity', '$minStock'] }
-//       }
-//     },
-//     {
-//       $project: {
-//         productName: '$product.name',
-//         sku: '$product.sku',
-//         availableQty: '$quantity',
-//         minStock: '$minStock'
-//       }
-//     }
-//   ]);
-
-//   /* =======================
-//      3️⃣ WIDGET DATA
-//   ======================== */
-
-//   const today = new Date();
-//   today.setHours(0, 0, 0, 0);
-
-//   const stockInToday = await StockMovement.aggregate([
-//     {
-//       $match: {
-//         type: 'IN',
-//         createdAt: { $gte: today }
-//       }
-//     },
-//     {
-//       $group: {
-//         _id: null,
-//         qty: { $sum: '$quantity' }
-//       }
-//     }
-//   ]);
-
-//   const stockOutToday = await StockMovement.aggregate([
-//     {
-//       $match: {
-//         type: 'OUT',
-//         createdAt: { $gte: today }
-//       }
-//     },
-//     {
-//       $group: {
-//         _id: null,
-//         qty: { $sum: '$quantity' }
-//       }
-//     }
-//   ]);
-
-//   const pendingPurchases = await PurchaseOrder.countDocuments({ status: 'PENDING' });
-
-//   /* =======================
-//      4️⃣ CHART DATA (BASIC)
-//   ======================== */
-
-//   const stockTrend = await StockMovement.aggregate([
-//     {
-//       $group: {
-//         _id: { $month: '$createdAt' },
-//         qty: { $sum: '$quantity' }
-//       }
-//     },
-//     { $sort: { '_id': 1 } }
-//   ]);
-
-//   /* =======================
-//      FINAL RESPONSE
-//   ======================== */
-
-//   return {
-//     kpis: {
-//       totalProducts,
-//       totalSuppliers,
-//       totalStockQty: totalStockQty[0]?.qty || 0,
-//       totalPurchaseAmount: totalPurchaseAmount[0]?.total || 0
-//     },
-//     alerts: {
-//       lowStockCount: lowStockItems.length,
-//       lowStockItems
-//     },
-//     widgets: {
-//       pendingPurchases,
-//       stockInToday: stockInToday[0]?.qty || 0,
-//       stockOutToday: stockOutToday[0]?.qty || 0
-//     },
-//     charts: {
-//       stockTrend
-//     }
-//   };
-// };
-
-// //module.exports = { getdashboardstats };
-
-
 const Product = require('../models/product');
 const Supplier = require('../models/supplier');
 const PurchaseOrder = require('../models/purchaseorder');
@@ -219,139 +5,108 @@ const SalesOrder = require('../models/salesorder');
 const StockMovement = require('../models/stockmovement');
 const StockLevel = require('../models/stocklevel');
 const User = require('../models/user');
-const { getOrganizationFilter, getOrganizationPipeline } = require('../utils/rbac.helpers');
+const mongoose = require('mongoose');
+
+const getAccessibleUserIds = async (role, userId) => {
+  if (role === 'admin') {
+    return null;
+  }
+  
+  if (role === 'manager') {
+    const user = await User.findById(userId).select('assignedUsers');
+    const assignedUsers = user?.assignedUsers || [];
+    return [userId, ...assignedUsers.map(id => id.toString())];
+  }
+  
+  return [userId];
+};
+
+const buildFilter = (organizationId, role, userIds, fieldName = 'createdBy') => {
+  const filter = { organizationId: new mongoose.Types.ObjectId(organizationId) };
+  
+  if (role !== 'admin' && userIds) {
+    filter[fieldName] = { $in: userIds.map(id => new mongoose.Types.ObjectId(id)) };
+  }
+  
+  return filter;
+};
 
 exports.getDashboardSummary = async (user, organizationId) => {
   try {
-    // Ensure organizationId is in user object for RBAC helpers
-    user.organizationId = organizationId;
+    const userIds = await getAccessibleUserIds(user.role, user.userid);
+    
+    const productFilter = { organizationId: new mongoose.Types.ObjectId(organizationId) };
+    const supplierFilter = { organizationId: new mongoose.Types.ObjectId(organizationId) };
+    const purchaseFilter = buildFilter(organizationId, user.role, userIds, 'createdBy');
+    const movementFilter = buildFilter(organizationId, user.role, userIds, 'user');
+    const stockFilter = { organizationId: new mongoose.Types.ObjectId(organizationId) };
 
-    let assignedUsers = [];
-    if (user.role === 'manager' || user.role === 'user') {
-      const userDoc = await User.findById(user.userid);
-      assignedUsers = userDoc?.assignedUsers || [];
-    }
-
-    const productFilter = { organizationId };
-    const supplierFilter = { organizationId };
-    const purchaseOrderFilter = getOrganizationFilter(user, assignedUsers, 'createdBy');
-    const purchasePipelineMatch = getOrganizationPipeline(user, assignedUsers, 'createdBy');
-    const stockPipelineMatch = [{ $match: { organizationId } }];
-    const movementPipelineMatch = getOrganizationPipeline(user, assignedUsers, 'user');
-
-    // 2. Execute Queries
-
-    // Get basic counts
-    const totalProducts = await Product.countDocuments(productFilter);
-    const totalSuppliers = await Supplier.countDocuments(supplierFilter);
-
-    // Get total purchase amount (only approved/received orders)
-    // We need to merge our RBAC pipeline with the status filter
-    const purchaseAmountPipeline = [
-      ...purchasePipelineMatch,
-      {
-        $match: {
-          status: { $in: ["APPROVED", "RECEIVED"] }
-        }
-      },
-      { $group: { _id: null, total: { $sum: "$totalamount" } } }
-    ];
-
-    const purchaseAmount = await PurchaseOrder.aggregate(purchaseAmountPipeline);
-
-    // Get total stock quantity (Org wide)
-    const stockQty = await StockLevel.aggregate([
-      ...stockPipelineMatch,
-      { $group: { _id: null, qty: { $sum: "$quantity" } } }
-    ]);
-
-    // Get low stock items (Org wide)
-    const lowStockItems = await StockLevel.aggregate([
-      ...stockPipelineMatch,
-      {
-        $lookup: {
-          from: 'products',
-          localField: 'product',
-          foreignField: '_id',
-          as: 'productInfo'
-        }
-      },
-      {
-        $lookup: {
-          from: 'warehouses',
-          localField: 'warehouse',
-          foreignField: '_id',
-          as: 'warehouseInfo'
-        }
-      },
-      {
-        $match: {
-          $expr: {
-            $and: [
-              { $gt: ["$minStock", 0] },
-              { $lte: ["$quantity", "$minStock"] }
-            ]
-          }
-        }
-      },
-      {
-        $project: {
-          productId: "$product",
-          productName: { $arrayElemAt: ["$productInfo.name", 0] },
-          sku: { $arrayElemAt: ["$productInfo.sku", 0] },
-          warehouseName: { $arrayElemAt: ["$warehouseInfo.name", 0] },
-          availableQty: "$quantity",
-          minStock: "$minStock"
-        }
-      }
-    ]);
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-
-    const stockInToday = await StockMovement.aggregate([
-      ...movementPipelineMatch,
-      {
-        $match: {
+    const [
+      totalProducts,
+      totalSuppliers,
+      purchaseAmount,
+      stockQty,
+      lowStockItems,
+      stockInToday,
+      stockOutToday,
+      pendingPurchases,
+      approvedPurchases
+    ] = await Promise.all([
+      Product.countDocuments(productFilter),
+      Supplier.countDocuments(supplierFilter),
+      
+      PurchaseOrder.aggregate([
+        { $match: { ...purchaseFilter, status: { $in: ["APPROVED", "RECEIVED"] } } },
+        { $group: { _id: null, total: { $sum: "$totalamount" } } }
+      ]),
+      
+      StockLevel.aggregate([
+        { $match: stockFilter },
+        { $group: { _id: null, qty: { $sum: "$quantity" } } }
+      ]),
+      
+      StockLevel.aggregate([
+        { $match: stockFilter },
+        { $lookup: { from: 'products', localField: 'product', foreignField: '_id', as: 'productInfo' } },
+        { $lookup: { from: 'warehouses', localField: 'warehouse', foreignField: '_id', as: 'warehouseInfo' } },
+        { $match: { $expr: { $and: [{ $gt: ["$minStock", 0] }, { $lte: ["$quantity", "$minStock"] }] } } },
+        { $project: { 
+          productId: "$product", 
+          productName: { $arrayElemAt: ["$productInfo.name", 0] }, 
+          sku: { $arrayElemAt: ["$productInfo.sku", 0] }, 
+          warehouseName: { $arrayElemAt: ["$warehouseInfo.name", 0] }, 
+          availableQty: "$quantity", 
+          minStock: "$minStock" 
+        }}
+      ]),
+      
+      StockMovement.aggregate([
+        { $match: { 
+          ...movementFilter, 
           type: 'IN',
-          createdAt: { $gte: today, $lt: tomorrow }
-        }
-      },
-      {
-        $group: {
-          _id: null,
-          qty: { $sum: '$quantity' }
-        }
-      }
-    ]);
-
-    const stockOutToday = await StockMovement.aggregate([
-      ...movementPipelineMatch,
-      {
-        $match: {
+          createdAt: { 
+            $gte: new Date(new Date().setHours(0, 0, 0, 0)),
+            $lt: new Date(new Date().setHours(23, 59, 59, 999))
+          }
+        }},
+        { $group: { _id: null, qty: { $sum: '$quantity' } } }
+      ]),
+      
+      StockMovement.aggregate([
+        { $match: { 
+          ...movementFilter, 
           type: 'OUT',
-          createdAt: { $gte: today, $lt: tomorrow }
-        }
-      },
-      {
-        $group: {
-          _id: null,
-          qty: { $sum: '$quantity' }
-        }
-      }
+          createdAt: { 
+            $gte: new Date(new Date().setHours(0, 0, 0, 0)),
+            $lt: new Date(new Date().setHours(23, 59, 59, 999))
+          }
+        }},
+        { $group: { _id: null, qty: { $sum: '$quantity' } } }
+      ]),
+      
+      PurchaseOrder.countDocuments({ ...purchaseFilter, status: 'PENDING' }),
+      PurchaseOrder.countDocuments({ ...purchaseFilter, status: 'APPROVED' })
     ]);
-
-    const pendingPurchases = await PurchaseOrder.countDocuments({
-      ...purchaseOrderFilter,
-      status: 'PENDING'
-    });
-
-    const approvedPurchases = await PurchaseOrder.countDocuments({
-      ...purchaseOrderFilter,
-      status: 'APPROVED'
-    });
 
     return {
       kpis: {
@@ -372,169 +127,96 @@ exports.getDashboardSummary = async (user, organizationId) => {
       }
     };
   } catch (error) {
+    console.error('Dashboard error:', error);
     throw error;
   }
 };
 
-// Stock Trend API
 exports.getStockTrend = async (days = 30, user, organizationId) => {
   try {
-    user.organizationId = organizationId;
-
+    const userIds = await getAccessibleUserIds(user.role, user.userid);
+    const movementFilter = buildFilter(organizationId, user.role, userIds, 'user');
+    
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
     startDate.setHours(0, 0, 0, 0);
 
-    let assignedUsers = [];
-    if (user.role === 'manager') {
-      const userDoc = await User.findById(user.userid);
-      assignedUsers = userDoc?.assignedUsers || [];
-    }
-    const movementPipelineMatch = getOrganizationPipeline(user, assignedUsers, 'user');
-
     const stockTrend = await StockMovement.aggregate([
-      ...movementPipelineMatch,
-      {
-        $match: {
-          createdAt: { $gte: startDate }
-        }
+      { $match: { ...movementFilter, createdAt: { $gte: startDate } } },
+      { 
+        $group: { 
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } }, 
+          inQty: { $sum: { $cond: [{ $eq: ["$type", "IN"] }, "$quantity", 0] } }, 
+          outQty: { $sum: { $cond: [{ $eq: ["$type", "OUT"] }, "$quantity", 0] } } 
+        } 
       },
-      {
-        $group: {
-          _id: {
-            $dateToString: {
-              format: "%Y-%m-%d",
-              date: "$createdAt"
-            }
-          },
-          movements: {
-            $push: {
-              type: "$type",
-              quantity: "$quantity"
-            }
-          }
-        }
-      },
-      {
-        $project: {
-          _id: 1,
-          movements: {
-            $map: {
-              input: ["IN", "OUT"],
-              as: "type",
-              in: {
-                type: "$$type",
-                quantity: {
-                  $sum: {
-                    $map: {
-                      input: {
-                        $filter: {
-                          input: "$movements",
-                          cond: { $eq: ["$$this.type", "$$type"] }
-                        }
-                      },
-                      in: "$$this.quantity"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      { $sort: { "_id": 1 } }
+      { $sort: { "_id": 1 } },
+      { $project: { date: "$_id", inQty: 1, outQty: 1, _id: 0 } }
     ]);
 
     return stockTrend;
   } catch (error) {
+    console.error('Stock trend error:', error);
     throw error;
   }
 };
 
-// Purchase Trend API
 exports.getPurchaseTrend = async (days = 30, user, organizationId) => {
   try {
-    user.organizationId = organizationId;
-
+    const userIds = await getAccessibleUserIds(user.role, user.userid);
+    const purchaseFilter = buildFilter(organizationId, user.role, userIds, 'createdBy');
+    
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
     startDate.setHours(0, 0, 0, 0);
 
-    let assignedUsers = [];
-    if (user.role === 'manager') {
-      const userDoc = await User.findById(user.userid);
-      assignedUsers = userDoc?.assignedUsers || [];
-    }
-    const purchasePipelineMatch = getOrganizationPipeline(user, assignedUsers, 'createdBy');
-
     const purchaseTrend = await PurchaseOrder.aggregate([
-      ...purchasePipelineMatch,
-      {
-        $match: {
-          createdAt: { $gte: startDate }
-        }
+      { $match: { ...purchaseFilter, createdAt: { $gte: startDate } } },
+      { $unwind: "$items" },
+      { 
+        $group: { 
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } }, 
+          totalAmount: { $sum: "$totalamount" }, 
+          totalQuantity: { $sum: "$items.quantity" }, 
+          count: { $sum: 1 } 
+        } 
       },
-      {
-        $group: {
-          _id: {
-            $dateToString: {
-              format: "%Y-%m-%d",
-              date: "$createdAt"
-            }
-          },
-          totalAmount: { $sum: "$totalamount" },
-          totalQuantity: { $sum: "$totalquantity" }
-        }
-      },
-      { $sort: { "_id": 1 } }
+      { $sort: { "_id": 1 } },
+      { $project: { date: "$_id", totalAmount: 1, totalQuantity: 1, count: 1, _id: 0 } }
     ]);
 
     return purchaseTrend;
   } catch (error) {
+    console.error('Purchase trend error:', error);
     throw error;
   }
 };
 
-// Sales Trend API
 exports.getSalesTrend = async (days = 30, user, organizationId) => {
   try {
-    user.organizationId = organizationId;
-
+    const userIds = await getAccessibleUserIds(user.role, user.userid);
+    const salesFilter = buildFilter(organizationId, user.role, userIds, 'user');
+    
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
     startDate.setHours(0, 0, 0, 0);
 
-    let assignedUsers = [];
-    if (user.role === 'manager') {
-      const userDoc = await User.findById(user.userid);
-      assignedUsers = userDoc?.assignedUsers || [];
-    }
-    const salesPipelineMatch = getOrganizationPipeline(user, assignedUsers, 'user');
-
     const salesTrend = await SalesOrder.aggregate([
-      ...salesPipelineMatch,
-      {
-        $match: {
-          createdAt: { $gte: startDate }
-        }
+      { $match: { ...salesFilter, createdAt: { $gte: startDate } } },
+      { 
+        $group: { 
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } }, 
+          totalRevenue: { $sum: "$totalamount" }, 
+          totalOrders: { $sum: 1 } 
+        } 
       },
-      {
-        $group: {
-          _id: {
-            $dateToString: {
-              format: "%Y-%m-%d",
-              date: "$createdAt"
-            }
-          },
-          totalRevenue: { $sum: "$totalamount" },
-          totalOrders: { $sum: 1 }
-        }
-      },
-      { $sort: { "_id": 1 } }
+      { $sort: { "_id": 1 } },
+      { $project: { date: "$_id", totalRevenue: 1, totalOrders: 1, _id: 0 } }
     ]);
 
     return salesTrend;
   } catch (error) {
+    console.error('Sales trend error:', error);
     throw error;
   }
 };
